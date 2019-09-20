@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+if (php_sapi_name() !== 'cli') {
+    exit;
+}
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Minicli\App;
+
+$app = new App();
+
+$app->registerCommand('hello', function (array $argv) use ($app) {
+    $name = isset ($argv[2]) ? $argv[2] : "World";
+    $app->getPrinter()->display("Hello $name!!!");
+});
+
+$app->registerCommand('help', function (array $argv) use ($app) {
+    $app->getPrinter()->display("usage: minicli hello [ your-name ]");
+});
+
+$app->runCommand($argv);
