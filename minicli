@@ -11,10 +11,7 @@ use Minicli\App;
 
 $app = new App();
 
-$app->registerCommand('hello', function (array $argv) use ($app) {
-    $name = isset ($argv[2]) ? $argv[2] : "World";
-    $app->getPrinter()->display("Hello $name!!!");
-});
+$app->registerController('hello', new \App\Command\HelloController($app));
 
 $app->registerCommand('help', function (array $argv) use ($app) {
     $app->getPrinter()->display("usage: minicli hello [ your-name ]");
