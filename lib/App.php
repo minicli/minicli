@@ -37,23 +37,11 @@ class App
             $command_name = $argv[1];
         }
 
-        call_user_func($this->getCallable($command_name), $argv);
-    }
-
-    protected function getCallable($command_name)
-    {
-        $controller = $this->command_registry->getController($command_name);
-
-        if ($controller instanceof CommandController) {
-            return [ $controller, 'run' ];
-        }
-
-        $command = $this->command_registry->getCommand($command_name);
-        if ($command === null) {
+        try {
+            call_user_func($this->command_registry->getCallable($command_name), $argv);
+        } catch (\Exception $e) {
             $this->getPrinter()->display("ERROR: Command \"$command_name\" not found.");
             exit;
         }
-
-        return $command;
     }
 }
