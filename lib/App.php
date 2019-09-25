@@ -40,7 +40,7 @@ class App
         try {
             call_user_func($this->command_registry->getCallable($command_name), $argv);
         } catch (\Exception $e) {
-            $this->getPrinter()->display("ERROR: Command \"$command_name\" not found.");
+            $this->getPrinter()->display("ERROR: " . $e->getMessage());
             exit;
         }
     }
