@@ -8,13 +8,14 @@ if (php_sapi_name() !== 'cli') {
 require __DIR__ . '/vendor/autoload.php';
 
 use Minicli\App;
+use Minicli\CommandCall;
 
 $app = new App();
+$app->setSignature("minicli hello name [ user=name ]");
 
-$app->registerController('hello', new \App\Command\HelloController($app));
-
-$app->registerCommand('help', function (array $argv) use ($app) {
-    $app->getPrinter()->display("usage: minicli hello [ your-name ]");
+$app->registerCommand("help", function(CommandCall $call) use ($app) {
+    $app->printSignature();
+    print_r($call->params);
 });
 
 $app->runCommand($argv);

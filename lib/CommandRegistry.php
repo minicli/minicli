@@ -4,43 +4,110 @@ namespace Minicli;
 
 class CommandRegistry
 {
-    protected $registry = [];
+    /** @var string */
+    protected $commands_path;
 
-    protected $controllers = [];
+    /** @var array */
+    protected $namespaces = [];
 
-    public function registerController($command_name, CommandController $controller)
+    /** @var array */
+    protected $default_registry = [];
+
+    /**
+     * CommandRegistry constructor.
+     * @param string $commands_path
+     */
+    public function __construct($commands_path)
     {
-        $this->controllers = [ $command_name => $controller ];
+        $this->commands_path = $commands_path;
+        $this->autoloadNamespaces();
     }
 
+    /**
+     * @return void
+     */
+    public function autoloadNamespaces()
+    {
+        foreach (glob($this->getCommandsPath() . '/*', GLOB_ONLYDIR) as $namespace_path) {
+            $this->registerNamespace(basename($namespace_path));
+        }
+    }
+
+    /**
+     * @param string $command_namespace
+     * @return void
+     */
+    public function registerNamespace($command_namespace)
+    {
+        $namespace = new CommandNamespace($command_namespace);
+        $namespace->loadControllers($this->getCommandsPath());
+        $this->namespaces[strtolower($command_namespace)] = $namespace;
+    }
+
+    /**
+     * @param string $command
+     * @return CommandNamespace
+     */
+    public function getNamespace($command)
+    {
+        return isset($this->namespaces[$command]) ? $this->namespaces[$command] : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommandsPath()
+    {
+        return $this->commands_path;
+    }
+
+    /**
+     * Registers an anonymous function as single command.
+     * @param string $name
+     * @param callable $callable
+     */
     public function registerCommand($name, $callable)
     {
-        $this->registry[$name] = $callable;
+        $this->default_registry[$name] = $callable;
     }
 
-    public function getController($command)
-    {
-        return isset($this->controllers[$command]) ? $this->controllers[$command] : null;
-    }
-
+    /**
+     * @param string $command
+     * @return callable|null
+     */
     public function getCommand($command)
     {
-        return isset($this->registry[$command]) ? $this->registry[$command] : null;
+        return isset($this->default_registry[$command]) ? $this->default_registry[$command] : null;
     }
 
-    public function getCallable($command_name)
+    /**
+     * @param string $command
+     * @param string $subcommand
+     * @return CommandController | null
+     */
+    public function getCallableController($command, $subcommand = null)
     {
-        $controller = $this->getController($command_name);
+        $namespace = $this->getNamespace($command);
 
-        if ($controller instanceof CommandController) {
-            return [ $controller, 'run' ];
+        if ($namespace !== null) {
+            return $namespace->getController($subcommand);
         }
 
-        $command = $this->getCommand($command_name);
-        if ($command === null) {
-            throw new \Exception("Command \"$command_name\" not found.");
+        return null;
+    }
+
+    /**
+     * @param string $command
+     * @return callable|null
+     * @throws \Exception
+     */
+    public function getCallable($command)
+    {
+        $single_command = $this->getCommand($command);
+        if ($single_command === null) {
+            throw new \Exception(sprintf("Command \"%s\" not found.", $command));
         }
 
-        return $command;
+        return $single_command;
     }
 }
