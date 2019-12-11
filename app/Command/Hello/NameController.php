@@ -2,7 +2,7 @@
 
 namespace App\Command\Hello;
 
-use Minicli\CommandController;
+use Minicli\Command\CommandController;
 
 class NameController extends CommandController
 {

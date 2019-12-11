@@ -1,5 +1,5 @@
 <?php
-namespace Minicli;
+namespace Minicli\Command;
 
 class CommandNamespace
 {
@@ -65,10 +65,19 @@ class CommandNamespace
 
         $controller_class = str_replace('.php', '', $filename);
         $command_name = strtolower(str_replace('Controller', '', $controller_class));
-        $full_class_name = sprintf("App\\Command\\%s\\%s", $this->getName(), $controller_class);
+        $full_class_name = sprintf("%s\\%s", $this->getNamespace($controller_file), $controller_class);
 
         /** @var CommandController $controller */
         $controller = new $full_class_name();
         $this->controllers[$command_name] = $controller;
+    }
+
+    protected function getNamespace($filename) {
+        $lines = preg_grep('/^namespace /', file($filename));
+        $namespace_line = array_shift($lines);
+        $match = [];
+        preg_match('/^namespace (.*);$/', $namespace_line, $match);
+
+        return array_pop($match);
     }
 }

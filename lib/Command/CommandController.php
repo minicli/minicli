@@ -1,8 +1,12 @@
 <?php
 
-namespace Minicli;
+namespace Minicli\Command;
 
-abstract class CommandController
+use Minicli\App;
+use Minicli\ControllerInterface;
+use Minicli\Output\CliPrinter;
+
+abstract class CommandController implements ControllerInterface
 {
     /** @var  App */
     protected $app;

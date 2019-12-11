@@ -1,8 +1,10 @@
 <?php
 
-namespace Minicli;
+namespace Minicli\Output;
 
-class CliPrinter
+use Minicli\OutputInterface;
+
+class BasicPrinter implements OutputInterface
 {
     public function out($message)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Minicli;
+namespace Minicli\Command;
 
 
 class CommandCall
