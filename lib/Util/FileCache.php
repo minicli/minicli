@@ -1,6 +1,6 @@
 <?php
 
-namespace Dolphin\Core;
+namespace Minicli\Util;
 
 class FileCache
 {
