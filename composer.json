@@ -1,4 +1,9 @@
 {
+  "name": "erikaheidi/minicli",
+  "description": "Dependency-free CLI AppKit",
+  "license": "MIT",
+  "homepage": "https://github.com/erikaheidi/minicli",
+  "keywords": ["cli","command-line"],
   "autoload": {
     "psr-4": {
       "Minicli\\": "lib/",

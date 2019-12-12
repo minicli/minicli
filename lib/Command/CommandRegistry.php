@@ -2,7 +2,11 @@
 
 namespace Minicli\Command;
 
-class CommandRegistry
+use Minicli\App;
+use Minicli\Exception\CommandNotFoundException;
+use Minicli\ServiceInterface;
+
+class CommandRegistry implements ServiceInterface
 {
     /** @var string */
     protected $commands_path;
@@ -20,6 +24,10 @@ class CommandRegistry
     public function __construct($commands_path)
     {
         $this->commands_path = $commands_path;
+    }
+
+    public function load(App $app)
+    {
         $this->autoloadNamespaces();
     }
 
@@ -105,9 +113,37 @@ class CommandRegistry
     {
         $single_command = $this->getCommand($command);
         if ($single_command === null) {
-            throw new \Exception(sprintf("Command \"%s\" not found.", $command));
+            throw new CommandNotFoundException(sprintf("Command \"%s\" not found.", $command));
         }
 
         return $single_command;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCommandMap()
+    {
+        $map = [];
+
+        foreach ($this->default_registry as $command => $callback) {
+            $map[$command] = $callback;
+        }
+
+        /**
+         * @var  string $command
+         * @var  CommandNamespace $namespace
+         */
+        foreach ($this->namespaces as $command => $namespace) {
+            $controllers = $namespace->getControllers();
+            $subs = [];
+            foreach ($controllers as $subcommand => $controller) {
+                $subs[] = $subcommand;
+            }
+
+            $map[$command] = $subs;
+        }
+
+        return $map;
     }
 }

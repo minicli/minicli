@@ -4,33 +4,66 @@ namespace Minicli;
 
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
-use Minicli\Output\BasicPrinter;
 use Minicli\Output\CliPrinter;
 
 class App
 {
-    /** @var OutputInterface  */
-    protected $printer;
-
-    /** @var CommandRegistry  */
-    protected $command_registry;
-
     /** @var  string  */
     protected $app_signature;
 
-    public function __construct($app_path = null, OutputInterface $output = null)
+    /** @var  array */
+    protected $services = [];
+
+    /** @var array  */
+    protected $loaded_services = [];
+
+    public function __construct(array $config = null)
     {
-        if ($app_path === null) {
-            $app_path = __DIR__ . '/../app/Command';
+        $config = array_merge([
+            'app_path' => __DIR__ . '/../app/Command',
+            'theme'    => 'regular',
+        ], $config);
+
+        $this->setSignature('./minicli help');
+
+        $this->addService('config', new Config($config));
+        $this->addService('command_registry', new CommandRegistry($this->config->app_path));
+        $this->addService('printer', new CliPrinter());
+    }
+
+    /**
+     * Magic method implements lazy loading for services.
+     * @param string $name
+     * @return ServiceInterface|null
+     */
+    public function __get($name)
+    {
+        if (!array_key_exists($name, $this->services)) {
+            return null;
         }
 
-        if ($output === null) {
-            $this->printer = new BasicPrinter();
-        } else {
-            $this->printer = $output;
+        if (!array_key_exists($name, $this->loaded_services)) {
+            $this->loadService($name);
         }
 
-        $this->command_registry = new CommandRegistry($app_path);
+        return $this->services[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param ServiceInterface $service
+     */
+    public function addService($name, ServiceInterface $service)
+    {
+        $this->services[$name] = $service;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function loadService($name)
+    {
+        $this->loaded_services[$name] = $this->services[$name]->load($this);
     }
 
     /**

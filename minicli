@@ -8,18 +8,6 @@ if (php_sapi_name() !== 'cli') {
 require __DIR__ . '/vendor/autoload.php';
 
 use Minicli\App;
-use Minicli\Command\CommandCall;
-use Minicli\Output\CliTheme;
-use Minicli\Output\CliColors;
-use Minicli\Output\CliPrinter;
 
-$theme = new CliTheme(CliColors::palette('unicorn'));
-$app = new App(__DIR__ . '/app/Command', new CliPrinter($theme));
-$app->setSignature("minicli hello name [ user=name ]");
-
-$app->registerCommand("help", function(CommandCall $call) use ($app) {
-    $app->printSignature();
-    print_r($call->params);
-});
-
+$app = new App(['theme' => 'unicorn']);
 $app->runCommand($argv);
