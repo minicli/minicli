@@ -73,6 +73,15 @@ abstract class CommandController implements ControllerInterface
     }
 
     /**
+     * @param string $flag
+     * @return bool
+     */
+    protected function hasFlag($flag)
+    {
+        return $this->input->hasFlag($flag);
+    }
+
+    /**
      * @param $param
      * @return null
      */

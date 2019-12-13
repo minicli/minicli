@@ -52,6 +52,11 @@ class CommandCall
         return isset($this->params[$param]);
     }
 
+    public function hasFlag($flag)
+    {
+        return in_array($flag, $this->args);
+    }
+
     /**
      * @param string $param
      * @return string|null
