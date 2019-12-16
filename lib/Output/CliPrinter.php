@@ -19,7 +19,7 @@ class CliPrinter implements OutputInterface, ServiceInterface
 
     public function load(App $app)
     {
-        $theme = new CliTheme(CliColors::palette($app->config->palette));
+        $theme = new CliTheme(CliColors::palette($app->config->theme));
         $this->setTheme($theme);
     }
 

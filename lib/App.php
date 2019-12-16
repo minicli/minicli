@@ -87,7 +87,7 @@ class App
      */
     public function printSignature()
     {
-        $this->getPrinter()->display(sprintf("usage: %s", $this->getSignature()));
+        $this->getPrinter()->display($this->getSignature());
     }
     /**
      * @param string $app_signature
