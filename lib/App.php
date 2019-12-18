@@ -124,7 +124,7 @@ class App
             $controller->boot($this);
             $controller->run($input);
             $controller->teardown();
-            exit;
+            return;
         }
 
         $this->runSingle($input);
@@ -140,8 +140,7 @@ class App
             call_user_func($callable, $input);
         } catch (\Exception $e) {
             $this->getPrinter()->display("ERROR: " . $e->getMessage());
-            $this->printSignature();
-            exit;
+            return;
         }
     }
 
