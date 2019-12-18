@@ -1,7 +1,7 @@
 {
   "name": "minicli/minicli",
   "type": "library",
-  "description": "Dependency-free CLI AppKit",
+  "description": "Mini CLI-only Experimental PHP Framework",
   "license": "MIT",
   "homepage": "https://github.com/erikaheidi/minicli",
   "keywords": ["cli","command-line"],
@@ -9,5 +9,8 @@
     "psr-4": {
       "Minicli\\": "lib/"
     }
+  },
+  "require": {
+    "ext-readline": "*"
   }
 }
