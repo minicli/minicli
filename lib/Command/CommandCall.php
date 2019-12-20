@@ -14,8 +14,14 @@ class CommandCall
     /** @var array */
     public $args = [];
 
+    /** @var array  */
+    public $raw_args = [];
+
     /** @var array */
     public $params = [];
+
+    /** @var array  */
+    public $flags = [];
 
     /**
      * CommandCall constructor.
@@ -23,23 +29,31 @@ class CommandCall
      */
     public function __construct(array $argv)
     {
-        $this->args = $argv;
-        $this->command = isset($argv[1]) ? $argv[1] : null;
-        $this->subcommand = isset($argv[2]) ? $argv[2] : 'default';
+        $this->raw_args = $argv;
+        $this->parseCommand($argv);
 
-        $this->loadParams($argv);
+        $this->command = isset($this->args[1]) ? $this->args[1] : null;
+
+        $this->subcommand = isset($this->args[2]) ? $this->args[2] : 'default';
     }
 
-    /**
-     * @param array $args
-     */
-    protected function loadParams(array $args)
+    protected function parseCommand($argv)
     {
-        foreach ($args as $arg) {
+        foreach ($argv as $arg) {
+
             $pair = explode('=', $arg);
+
             if (count($pair) == 2) {
                 $this->params[$pair[0]] = $pair[1];
+                continue;
             }
+
+            if (substr($arg, 0, 2) == '--') {
+                $this->flags[] = $arg;
+                continue;
+            }
+
+            $this->args[] = $arg;
         }
     }
 
@@ -52,9 +66,13 @@ class CommandCall
         return isset($this->params[$param]);
     }
 
+    /**
+     * @param string $flag
+     * @return bool
+     */
     public function hasFlag($flag)
     {
-        return in_array($flag, $this->args);
+        return in_array($flag, $this->flags);
     }
 
     /**
@@ -65,4 +83,22 @@ class CommandCall
     {
         return $this->hasParam($param) ? $this->params[$param] : null;
     }
+
+    /**
+     * @return array
+     */
+    public function getRawArgs()
+    {
+        return $this->raw_args;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFlags()
+    {
+        return $this->flags;
+    }
+
+
 }
