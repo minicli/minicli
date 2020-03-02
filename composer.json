@@ -1,7 +1,7 @@
 {
   "name": "minicli/minicli",
   "type": "library",
-  "description": "Mini CLI-only Experimental PHP Framework",
+  "description": "Experimental micro CLI framework for PHP",
   "license": "MIT",
   "homepage": "https://github.com/erikaheidi/minicli",
   "keywords": ["cli","command-line"],
