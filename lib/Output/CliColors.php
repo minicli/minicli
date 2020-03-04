@@ -20,6 +20,12 @@ class CliColors
     static $BG_WHITE = '47';
     static $BG_MAGENTA = '45';
 
+    static $BOLD = '1';
+    static $DIM = '2';
+    static $ITALIC = '3';
+    static $UNDERLINE = '4';
+    static $INVERT = '7';
+
     static $THEME_REGULAR = 1;
     static $THEME_UNICORN = 2;
 
@@ -33,7 +39,12 @@ class CliColors
             'success'     => [ CliColors::$FG_GREEN ],
             'success_alt' => [ CliColors::$FG_WHITE, CliColors::$BG_GREEN ],
             'info'        => [ CliColors::$FG_CYAN],
-            'info_alt'    => [ CliColors::$FG_WHITE, CliColors::$BG_CYAN ]
+            'info_alt'    => [ CliColors::$FG_WHITE, CliColors::$BG_CYAN ],
+            'bold'        => [ CliColors::$BOLD ],
+            'dim'         => [ CliColors::$DIM ],
+            'italic'      => [ CliColors::$ITALIC ],
+            'underline'   => [ CliColors::$UNDERLINE ],
+            'invert'      => [ CliColors::$INVERT ]
         ];
 
         $themes['unicorn'] = [
@@ -44,7 +55,12 @@ class CliColors
             'success'     => [ CliColors::$FG_GREEN ],
             'success_alt' => [ CliColors::$FG_BLACK, CliColors::$BG_GREEN ],
             'info'        => [ CliColors::$FG_MAGENTA],
-            'info_alt'    => [ CliColors::$FG_WHITE, CliColors::$BG_MAGENTA ]
+            'info_alt'    => [ CliColors::$FG_WHITE, CliColors::$BG_MAGENTA ],
+            'bold'        => [ CliColors::$BOLD ],
+            'dim'         => [ CliColors::$DIM ],
+            'italic'      => [ CliColors::$ITALIC ],
+            'underline'   => [ CliColors::$UNDERLINE ],
+            'invert'      => [ CliColors::$INVERT ]
         ];
 
         return isset($themes[$name]) ? $themes[$name] : $themes['regular'];
