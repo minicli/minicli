@@ -14,6 +14,6 @@ class CliTheme
 
     public function __get($name)
     {
-        return $this->styles[$name] ? $this->styles[$name] : null;
+        return array_key_exists($name, $this->styles) ? $this->styles[$name] : null;
     }
 }
