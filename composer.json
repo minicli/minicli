@@ -3,11 +3,11 @@
   "type": "library",
   "description": "Experimental micro CLI framework for PHP",
   "license": "MIT",
-  "homepage": "https://github.com/erikaheidi/minicli",
+  "homepage": "https://github.com/minicli/minicli",
   "keywords": ["cli","command-line"],
   "autoload": {
     "psr-4": {
-      "Minicli\\": "lib/"
+      "Minicli\\": "src/"
     }
   },
   "require": {
