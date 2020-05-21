@@ -3,30 +3,30 @@
 namespace Minicli\Output;
 
 use Minicli\App;
+use Minicli\Config;
+use Minicli\Output\Theme\DefaultCliTheme;
 use Minicli\OutputInterface;
 use Minicli\ServiceInterface;
 
 class CliPrinter implements OutputInterface, ServiceInterface
 {
-    /** @var  CliTheme */
-    protected $theme;
+    /** @var  CliThemeInterface */
+    public $theme;
 
     public function __construct()
     {
-        $theme = new CliTheme(CliColors::palette('regular'));
-        $this->setTheme($theme);
+        $this->setTheme(new DefaultCliTheme());
     }
 
     public function load(App $app)
     {
-        $theme = new CliTheme(CliColors::palette($app->config->theme));
-        $this->setTheme($theme);
+        //
     }
 
     /**
-     * @param CliTheme $theme
+     * @param CliThemeInterface $theme
      */
-    public function setTheme(CliTheme $theme)
+    public function setTheme(CliThemeInterface $theme)
     {
         $this->theme = $theme;
     }

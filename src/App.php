@@ -66,13 +66,13 @@ class App
         $this->loaded_services[$name] = $this->services[$name]->load($this);
     }
 
-    /**
-     * @return OutputInterface
-     */
-    public function getPrinter()
-    {
-        return $this->printer;
-    }
+//    /**
+//     * @return ServiceInterface
+//     */
+//    public function getPrinter()
+//    {
+//        return $this->printer;
+//    }
 
     /**
      * @return string
@@ -87,7 +87,7 @@ class App
      */
     public function printSignature()
     {
-        $this->getPrinter()->display($this->getSignature());
+        $this->printer->display($this->getSignature());
     }
     /**
      * @param string $app_signature
