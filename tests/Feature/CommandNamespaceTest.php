@@ -19,7 +19,7 @@ it('asserts that controllers are loaded successfully', function() {
     $controllers = $namespace->loadControllers(getCommandsPath());
 
     assertIsArray($controllers);
-    assertCount(2, $controllers);
+    assertNotEmpty($controllers);
     assertContainsOnly(CommandController::class, $controllers);
 });
 

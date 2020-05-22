@@ -1,10 +1,9 @@
 <?php
 
-use Minicli\App;
 use Minicli\Command\CommandRegistry;
 use Minicli\Config;
-use Minicli\Output\CliPrinter;
-
+use Minicli\Output\OutputHandler;
+use Minicli\Output\Adapter\DefaultPrinterAdapter;
 
 it('asserts App is created', function () {
     $app = getBasicApp();
@@ -12,15 +11,18 @@ it('asserts App is created', function () {
     assertTrue($app instanceof \Minicli\App);
 });
 
-it('asserts App sets and gets signature', function () {
+it('asserts App sets, gets and prints signature', function () {
 
     $app = getBasicApp();
+    $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
 
     assertStringContainsString("minicli", $app->getSignature());
 
     $app->setSignature("Testing minicli");
     assertEquals("Testing minicli", $app->getSignature());
-});
+
+    $app->printSignature();
+})->expectOutputString("\nTesting minicli\n\n");
 
 it('asserts App has Config Service', function () {
 
@@ -46,7 +48,7 @@ it('asserts App has Printer service', function () {
 
     $printer = $app->printer;
 
-    assertTrue($printer instanceof CliPrinter);
+    assertTrue($printer instanceof OutputHandler);
 });
 
 it('asserts App returns null when a service is not found', function () {
@@ -58,15 +60,29 @@ it('asserts App returns null when a service is not found', function () {
     assertNull($service);
 });
 
-it('asserts App registers command', function () {
+it('asserts App registers and executes single command', function () {
 
     $app = getBasicApp();
 
-    $app->registerCommand('minicli-test', function() {
-        return "testing minicli";
+    $app->registerCommand('minicli-test', function() use ($app){
+        $app->getPrinter()->rawOutput("testing minicli");
     });
 
     $command = $app->command_registry->getCallable('minicli-test');
-
     assertIsCallable($command);
-});
+
+    $app->runCommand(['minicli', 'minicli-test']);
+})->expectOutputString("testing minicli");
+
+it('asserts App executes command from namespace', function () {
+    $app = getBasicApp();
+
+    $app->runCommand(['minicli', 'test']);
+})->expectOutputString("test default");
+
+it('asserts App prints signature when no command is specified', function () {
+    $app = getBasicApp();
+    $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
+
+    $app->runCommand(['minicli']);
+})->expectOutputString("\n./minicli help\n\n");

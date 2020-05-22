@@ -7,36 +7,23 @@ use Minicli\Command\CommandController;
 
 class HelpController extends CommandController
 {
-    /** @var  array */
-    protected $command_map = [];
 
-    public function boot(App $app)
-    {
-        parent::boot($app);
-        $this->command_map = $app->command_registry->getCommandMap();
-    }
-    
     public function handle()
     {
-        $this->getPrinter()->info('Available Commands');
+        $name = "default";
 
-        foreach ($this->command_map as $command => $sub) {
-
-            $this->getPrinter()->newline();
-            $this->getPrinter()->out($command, 'info_alt');
-
-            if (is_array($sub)) {
-                foreach ($sub as $subcommand) {
-                    if ($subcommand !== 'default') {
-                        $this->getPrinter()->newline();
-                        $this->getPrinter()->out(sprintf('%s%s','└──', $subcommand));
-                    }
-                }
-            }
-            $this->getPrinter()->newline();
+        //test for arguments
+        if ($this->hasParam('name')) {
+            $name = $this->getParam('name');
         }
 
-        $this->getPrinter()->newline();
-        $this->getPrinter()->newline();
+        //test for flags
+        $shout = false;
+
+        if ($this->hasFlag('--shout')) {
+            $shout = true;
+        }
+
+        $this->getPrinter()->rawOutput($shout ? strtoupper("Hello $name") : "Hello $name");
     }
 }

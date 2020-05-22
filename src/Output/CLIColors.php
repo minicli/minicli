@@ -2,7 +2,7 @@
 
 namespace Minicli\Output;
 
-class CliColors
+class CLIColors
 {
     static $FG_BLACK = '0;30';
     static $FG_WHITE = '1;37';

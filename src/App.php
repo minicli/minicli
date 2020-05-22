@@ -4,7 +4,8 @@ namespace Minicli;
 
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
-use Minicli\Output\CliPrinter;
+use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\OutputHandler;
 
 class App
 {
@@ -21,14 +22,16 @@ class App
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
-            'theme'    => 'regular',
         ], $config);
 
         $this->setSignature('./minicli help');
 
         $this->addService('config', new Config($config));
         $this->addService('command_registry', new CommandRegistry($this->config->app_path));
-        $this->addService('printer', new CliPrinter());
+
+        $output = new OutputHandler();
+        $output->registerFilter(new ColorOutputFilter());
+        $this->addService('printer', $output);
     }
 
     /**
@@ -66,13 +69,23 @@ class App
         $this->loaded_services[$name] = $this->services[$name]->load($this);
     }
 
-//    /**
-//     * @return ServiceInterface
-//     */
-//    public function getPrinter()
-//    {
-//        return $this->printer;
-//    }
+    /**
+     * Shortcut for accessing the Output Handler
+     * @return ServiceInterface
+     */
+    public function getPrinter(): ServiceInterface
+    {
+        return $this->printer;
+    }
+
+    /**
+     * Shortcut for setting the Output Handler
+     * @param OutputHandler $output_printer
+     */
+    public function setOutputHandler(OutputHandler $output_printer)
+    {
+        $this->services['printer'] = $output_printer;
+    }
 
     /**
      * @return string
@@ -87,7 +100,7 @@ class App
      */
     public function printSignature()
     {
-        $this->printer->display($this->getSignature());
+        $this->getPrinter()->display($this->getSignature());
     }
     /**
      * @param string $app_signature
@@ -115,7 +128,7 @@ class App
 
         if (count($input->args) < 2) {
             $this->printSignature();
-            exit;
+            return;
         }
 
         $controller = $this->command_registry->getCallableController($input->command, $input->subcommand);
