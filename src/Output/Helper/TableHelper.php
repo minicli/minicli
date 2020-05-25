@@ -119,14 +119,14 @@ class TableHelper
             $column_count = 0;
 
             foreach ($row_content as $cell) {
-                $column_sizes[$column_count] = $min_col_size;
+                $column_sizes[$column_count] = $column_sizes[$column_count] ?? $min_col_size;
                 if (strlen($cell) >= $column_sizes[$column_count]) {
                     $column_sizes[$column_count] = strlen($cell) + 2;
                 }
                 $column_count++;
             }
         }
-
+        
         return $column_sizes;
     }
 
