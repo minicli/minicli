@@ -40,3 +40,21 @@ it('asserts that TableHelper sets and outputs table rows', function() {
     assertStringContainsString('NAME', $table_content);
     assertStringContainsString('FIELD3', $table_content);
 });
+
+it('asserts that all fields respect column sizes', function() {
+    $table = [
+        ['ID', 'NAME', 'FIELD3'],
+        ['value11234123', 'value2234', 'value3as2341234123'],
+        ['value1', 'value2', 'value3']
+    ];
+
+
+    $table_helper = new TableHelper($table);
+    $table_content = $table_helper->getFormattedTable();
+
+    $rows = explode("\n", $table_content);
+    $size_at_first = strlen($rows[1]);
+    $size_at_last = strlen($rows[count($rows)-1]);
+
+    assertSame($size_at_first, $size_at_last);
+});
