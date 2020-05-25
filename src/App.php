@@ -4,6 +4,7 @@ namespace Minicli;
 
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\OutputHandler;
 
@@ -145,16 +146,18 @@ class App
 
     /**
      * @param CommandCall $input
+     * @throws CommandNotFoundException
+     * @return bool
      */
     protected function runSingle(CommandCall $input)
     {
-        try {
-            $callable = $this->command_registry->getCallable($input->command);
+        $callable = $this->command_registry->getCallable($input->command);
+        if (is_callable($callable)) {
             call_user_func($callable, $input);
-        } catch (\Exception $e) {
-            $this->getPrinter()->display("ERROR: " . $e->getMessage());
-            return;
+            return true;
         }
+
+        throw new CommandNotFoundException("The registered command is not a callable function.");
     }
 
 }

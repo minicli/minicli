@@ -4,6 +4,7 @@ use Minicli\Command\CommandRegistry;
 use Minicli\Config;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Exception\CommandNotFoundException;
 
 it('asserts App is created', function () {
     $app = getBasicApp();
@@ -22,7 +23,7 @@ it('asserts App sets, gets and prints signature', function () {
     assertEquals("Testing minicli", $app->getSignature());
 
     $app->printSignature();
-})->expectOutputString("\nTesting minicli\n\n");
+})->expectOutputString("\nTesting minicli\n");
 
 it('asserts App has Config Service', function () {
 
@@ -85,4 +86,13 @@ it('asserts App prints signature when no command is specified', function () {
     $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
 
     $app->runCommand(['minicli']);
-})->expectOutputString("\n./minicli help\n\n");
+})->expectOutputString("\n./minicli help\n");
+
+it('asserts App throws exception when single command is not found', function() {
+
+    $app = getBasicApp();
+    $app->registerCommand('minicli-test-error', "not a callable");
+
+    $app->runCommand(['minicli', 'minicli-test-error']);
+
+})->expectException(CommandNotFoundException::class);

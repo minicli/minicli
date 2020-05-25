@@ -11,8 +11,16 @@ class TableController extends CommandController
 
     public function handle()
     {
-        $this->getPrinter();
-
         $table = new TableHelper();
+
+        $table->addHeader(['ID', 'NAME', 'FIELD3']);
+
+        for($i = 1; $i <= 10; $i++) {
+            $table->addRow([
+                $i, 'test', rand(0,200)
+            ]);
+        }
+
+        return $table->getFormattedTable();
     }
 }

@@ -4,8 +4,9 @@ use Minicli\Output\CLITheme;
 use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\CLIColors;
 use Minicli\Output\OutputHandler;
-use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\Filter\ColorOutputFilter;
+
+/** Color Output Helpers */
 
 function getColorOutputHandler()
 {
@@ -45,6 +46,8 @@ function getThemedOutput($text)
     return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_MAGENTA, $text);
 }
 
+/** TESTS */
+
 it('asserts that OutputHandler outputs correct style', function () {
     $printer = getColorOutputHandler();
     $printer->out("testing minicli", "alt");
@@ -59,7 +62,7 @@ it('asserts that OutputHandler outputs newline', function () {
 it('asserts that OutputHandler displays content wrapped in newlines', function () {
     $printer = getColorOutputHandler();
     $printer->display("testing minicli");
-})->expectOutputString("\n" . getDefaultOutput("testing minicli") . "\n\n");
+})->expectOutputString("\n" . getDefaultOutput("testing minicli") . "\n");
 
 it('asserts that OutputHandler displays error with expected style', function() {
     $printer = getColorOutputHandler();
@@ -83,3 +86,14 @@ it('asserts that OutputHandler allows changing theme', function () {
 
     $printer->info("themed info minicli");
 })->expectOutputString("\n" . getThemedOutput("themed info minicli"). "\n");
+
+it('asserts that a custom CLITheme can be created', function () {
+    $printer = getColorOutputHandler();
+    $printer->clearFilters();
+
+    $my_custom_theme = new CLITheme();
+    $my_custom_theme->setStyle('default', [CLIColors::$FG_MAGENTA]);
+
+    $printer->registerFilter(new ColorOutputFilter($my_custom_theme));
+    $printer->display("custom theme");
+})->expectOutputString("\n" . getThemedOutput("custom theme"). "\n");

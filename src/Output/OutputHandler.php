@@ -4,6 +4,7 @@ namespace Minicli\Output;
 
 use Minicli\App;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Output\Helper\TableHelper;
 use Minicli\ServiceInterface;
 
 class OutputHandler implements ServiceInterface
@@ -23,120 +24,138 @@ class OutputHandler implements ServiceInterface
         $this->printer_adapter = $printer ?? new DefaultPrinterAdapter();
     }
 
-    public function registerFilter(OutputFilterInterface $filter)
+    /**
+     * @param OutputFilterInterface $filter
+     */
+    public function registerFilter(OutputFilterInterface $filter): void
     {
         $this->output_filters[] = $filter;
     }
 
-    public function clearFilters()
+    /**
+     * Removes all filters.
+     */
+    public function clearFilters(): void
     {
         $this->output_filters = [];
     }
 
+    /**
+     * @param App $app
+     * @return bool
+     */
     public function load(App $app)
     {
         return true;
     }
 
-    public function filterOutput($message, $style = null)
+    /**
+     * Pass content through current configured filter(s).
+     * @param string $content
+     * @param string $style
+     * @return string
+     */
+    public function filterOutput($content, $style = null): string
     {
         /** @var OutputFilterInterface $filter */
 
         foreach ($this->output_filters as $filter) {
-            $message = $filter->filter($message, $style);
+            $content = $filter->filter($content, $style);
         }
 
-        return $message;
+        return $content;
     }
 
-    public function out($message, $style = null)
+    /**
+     * Prints a content using configured filters
+     * @param string $content
+     * @param string $style
+     */
+    public function out($content, $style = null): void
     {
-        $this->printer_adapter->out($this->filterOutput($message, $style));
+        $this->printer_adapter->out($this->filterOutput($content, $style));
     }
 
+    /**
+     * Prints content without formatting or styling
+     * @param string $content
+     */
     public function rawOutput($content)
     {
         $this->printer_adapter->out($content);
     }
 
-    public function newline()
+    /**
+     * Prints a new line.
+     */
+    public function newline(): void
     {
         $this->rawOutput("\n");
     }
 
     /**
-     * @param string $message
+     * Displays content using the "default" style
+     * @param string $content
+     * @param bool $alt Whether or not to use the inverted style ("alt")
      * @return void
      */
-    public function display($message, $alt = false)
+    public function display($content, $alt = false): void
     {
         $this->newline();
-        $this->out($message, $alt ? "alt" : "default");
-        $this->newline();
+        $this->out($content, $alt ? "alt" : "default");
         $this->newline();
     }
 
     /**
-     * @param string $message
+     * Prints content using the "error" style
+     * @param string $content
+     * @param bool $alt Whether or not to use the inverted style ("error_alt")
      * @return void
      */
-    public function error($message, $alt = false)
+    public function error($content, $alt = false): void
     {
         $this->newline();
-        $this->out($message, $alt ? "error_alt" : "error");
+        $this->out($content, $alt ? "error_alt" : "error");
         $this->newline();
     }
 
     /**
-     * @param string $message
+     * Prints content using the "info" style
+     * @param string $content
+     * @param bool $alt Whether or not to use the inverted style ("info_alt")
      * @return void
      */
-    public function info($message, $alt = false)
+    public function info($content, $alt = false): void
     {
         $this->newline();
-        $this->out($message, $alt ? "info_alt" : "info");
+        $this->out($content, $alt ? "info_alt" : "info");
         $this->newline();
     }
 
     /**
-     * @param string $message
+     * Prints content using the "success" style
+     * @param string $content The string to print
+     * @param bool $alt Whether or not to use the inverted style ("success_alt")
      * @return void
      */
-    public function success($message, $alt = false)
+    public function success($content, $alt = false): void
     {
         $this->newline();
-        $this->out($message, $alt ? "success_alt" : "success");
+        $this->out($content, $alt ? "success_alt" : "success");
         $this->newline();
     }
 
     /**
-     * @param array $table
-     * @param int $min_col_size
-     * @param bool $with_header
+     * Shortcut method to print tables using the TableHelper
+     * @param array $table An array containing all table rows. Each row must be an array with the individual cells.
      */
-    public function printTable(array $table, $min_col_size = 10, $with_header = true, $spacing = true)
+    public function printTable(array $table): void
     {
-        $first = true;
-            $helper = new TableHelper();
+        $helper = new TableHelper($table);
 
-        if ($spacing) {
-            $this->newline();
-        }
-
-        foreach ($table as $index => $row) {
-
-            if ($first && $with_header) {
-                array_map(function ($item) {
-                    return strtoupper($item);
-                }, $row);
-            }
-
-            $this->out($helper->getRow($table, $index, $min_col_size));
-            $first = false;
-        }
-
-        if ($spacing) {
-            $this->newline();
-        }
+        $filter = (isset($this->output_filters[0]) && $this->output_filters instanceof OutputFilterInterface) ? $this->output_filters[0] : null;
+        $this->newline();
+        $this->rawOutput($helper->getFormattedTable($filter));
+        $this->newline();
     }
 }

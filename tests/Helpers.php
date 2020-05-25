@@ -3,6 +3,9 @@
 use Minicli\App;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\Output\OutputHandler;
+use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\CLIColors;
 
 function getCommandsPath()
 {

@@ -12,12 +12,17 @@ class ColorOutputFilter implements OutputFilterInterface
     /** @var CLITheme */
     protected $theme;
 
+    /**
+     * ColorOutputFilter constructor.
+     * @param CLITheme|null $theme If a theme is not set, the default CLITheme will be used.
+     */
     public function __construct(CLITheme $theme = null)
     {
         $this->theme = $theme ?? new CLITheme();
     }
 
     /**
+     * Gets the CLITheme
      * @return CLITheme
      */
     public function getTheme(): CLITheme
@@ -26,6 +31,7 @@ class ColorOutputFilter implements OutputFilterInterface
     }
 
     /**
+     * Sets the CLITheme
      * @param CLITheme $theme
      */
     public function setTheme(CLITheme $theme): void
@@ -34,9 +40,10 @@ class ColorOutputFilter implements OutputFilterInterface
     }
 
     /**
+     * Filters a string according to the specified style.
      * @param string $message
      * @param string $style
-     * @return string
+     * @return string the resulting string
      */
     public function filter($message, $style = null): string
     {
@@ -44,6 +51,7 @@ class ColorOutputFilter implements OutputFilterInterface
     }
 
     /**
+     * Formats a message with color codes based on a CLITheme
      * @param string $message
      * @param string $style
      * @return string
@@ -57,8 +65,6 @@ class ColorOutputFilter implements OutputFilterInterface
             $bg = ';' . $style_colors[1];
         }
 
-        $output = sprintf("\e[%s%sm%s\e[0m", $style_colors[0], $bg, $message);
-
-        return $output;
+        return sprintf("\e[%s%sm%s\e[0m", $style_colors[0], $bg, $message);
     }
 }

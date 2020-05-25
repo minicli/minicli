@@ -33,11 +33,6 @@ class CLITheme implements CLIThemeInterface
         ];
     }
 
-    public function setThemeStyles(array $styles)
-    {
-        $this->styles = $styles;
-    }
-
     public function setStyle($name, array $style)
     {
         $this->styles[$name] = $style;
