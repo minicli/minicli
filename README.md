@@ -98,7 +98,7 @@ You can now run the boostrapped application with:
 ./minicli help
 ```
 
-The [documentation](https://minicliphp.readthedocs.io/en/latest/) contains more detailed information about creating commands and working with output.
+The [documentation](https://docs.minicli.dev) contains more detailed information about creating commands and working with output.
 
 ## Building Minicli
 
