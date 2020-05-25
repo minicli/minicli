@@ -4,7 +4,7 @@ namespace Minicli\Command;
 
 use Minicli\App;
 use Minicli\ControllerInterface;
-use Minicli\Output\ColorOutputHandler;
+use Minicli\Output\OutputHandler;
 
 abstract class CommandController implements ControllerInterface
 {
@@ -99,7 +99,7 @@ abstract class CommandController implements ControllerInterface
     }
 
     /**
-     * @return ColorOutputHandler
+     * @return OutputHandler
      */
     protected function getPrinter()
     {

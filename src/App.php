@@ -72,9 +72,9 @@ class App
 
     /**
      * Shortcut for accessing the Output Handler
-     * @return ServiceInterface
+     * @return OutputHandler
      */
-    public function getPrinter(): ServiceInterface
+    public function getPrinter(): OutputHandler
     {
         return $this->printer;
     }
@@ -122,6 +122,7 @@ class App
 
     /**
      * @param array $argv
+     * @throws CommandNotFoundException
      */
     public function runCommand(array $argv = [])
     {
