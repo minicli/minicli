@@ -1,3 +1,5 @@
+[![Latest Stable Version](https://poser.pugx.org/minicli/minicli/v)](//packagist.org/packages/minicli/minicli) [![Total Downloads](https://poser.pugx.org/minicli/minicli/downloads)](//packagist.org/packages/minicli/minicli) [![License](https://poser.pugx.org/minicli/minicli/license)](//packagist.org/packages/minicli/minicli) [![Documentation Status](https://readthedocs.org/projects/minicliphp/badge/?version=latest)](https://docs.minicli.dev/en/latest/?badge=latest)
+
 # Minicli 2
 
 [Minicli](https://github.com/minicli/minicli) is an experimental dependency-free toolkit for building CLI-centric applications in PHP.
