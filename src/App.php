@@ -152,7 +152,13 @@ class App
      */
     protected function runSingle(CommandCall $input)
     {
-        $callable = $this->command_registry->getCallable($input->command);
+        try {
+            $callable = $this->command_registry->getCallable($input->command);
+        } catch (\Minicli\Exception\CommandNotFoundException $e){
+            $this->getPrinter()->error($e->getMessage());
+            return false;
+        }
+
         if (is_callable($callable)) {
             call_user_func($callable, $input);
             return true;
