@@ -19,7 +19,7 @@ class App
     /** @var array  */
     protected $loaded_services = [];
 
-    public function __construct(array $config = null)
+    public function __construct(array $config = [])
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
