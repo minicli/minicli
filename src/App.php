@@ -23,7 +23,7 @@ class App
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
-            'debug' => false,
+            'debug' => true,
         ], $config);
 
         $this->setSignature('./minicli help');
