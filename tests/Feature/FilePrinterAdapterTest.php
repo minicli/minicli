@@ -5,8 +5,10 @@ use Minicli\Output\OutputHandler;
 it('asserts that FilePrinterAdapter saves content to file', function() {
     $file_path = sys_get_temp_dir() . '/minicli-output-test.log';
 
-    //make sure an empty file is created
-    unlink($file_path);
+    //makes sure we get a new empty file
+    if (file_exists($file_path)) {
+    	@unlink($file_path);
+    }
 
     $fileprinter = new FilePrinterAdapter($file_path);
     $output = new OutputHandler($fileprinter);
