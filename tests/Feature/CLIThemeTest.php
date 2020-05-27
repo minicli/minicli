@@ -35,3 +35,13 @@ it('asserts that Unicorn CLI theme sets all default styles', function () {
     assertIsArray($theme->getStyle('success'));
     assertIsArray($theme->getStyle('success_alt'));
 });
+
+it('asserts that missing styles in Unicorn CLI theme are included from default theme', function () {
+    $theme = new UnicornTheme();
+
+    assertArrayHasKey('italic', $theme->styles);
+    assertArrayHasKey('bold', $theme->styles);
+    assertArrayHasKey('dim', $theme->styles);
+    assertArrayHasKey('underline', $theme->styles);
+    assertArrayHasKey('invert', $theme->styles);
+});
