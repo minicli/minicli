@@ -11,7 +11,7 @@ Minicli 2 has a lot of improved features, and about 98% test coverage with [Pest
 
 What does it mean to be dependency-free? It means that you can build a working CLI PHP application without dozens of nested user-land dependencies. The basic `minicli/minicli` package has only **testing** dependencies, and a couple system requirements:
 
-- PHP >= 7.2
+- PHP >= 7.3
 - `ext-readline` for obtaining user input
 
 It gives you a lot of room to choose your own dependencies.
