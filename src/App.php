@@ -24,6 +24,7 @@ class App
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
             'theme' => ''
+            'debug' => true,
         ], $config);
 
         $this->addService('config', new Config($config));
@@ -165,10 +166,24 @@ class App
      */
     protected function runSingle(CommandCall $input)
     {
-        $callable = $this->command_registry->getCallable($input->command);
+        try {
+            $callable = $this->command_registry->getCallable($input->command);
+        } catch(\Exception $e) {
+            if (!$this->config->debug) {
+                $this->getPrinter()->error($e->getMessage());
+                return false;
+            }
+            throw $e;
+        }
+
         if (is_callable($callable)) {
             call_user_func($callable, $input);
             return true;
+        }
+
+        if (!$this->config->debug) {
+            $this->getPrinter()->error("The registered command is not a callable function.");
+            return false;
         }
 
         throw new CommandNotFoundException("The registered command is not a callable function.");
