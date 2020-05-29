@@ -1,6 +1,27 @@
-[![Latest Stable Version](https://poser.pugx.org/minicli/minicli/v)](//packagist.org/packages/minicli/minicli) [![Total Downloads](https://poser.pugx.org/minicli/minicli/downloads)](//packagist.org/packages/minicli/minicli) [![License](https://poser.pugx.org/minicli/minicli/license)](//packagist.org/packages/minicli/minicli) [![Documentation Status](https://readthedocs.org/projects/minicliphp/badge/?version=latest)](https://docs.minicli.dev/en/latest/?badge=latest)
+<p align="center">
 
-# Minicli 2
+<img src="https://user-images.githubusercontent.com/18489496/83184863-60072200-a12a-11ea-934f-602c26b8b799.png" align="center" alt="logo" title="logo" width="160">
+
+
+</p>
+<p align="center">
+    <a href="//packagist.org/packages/minicli/minicli">
+        <img src="https://poser.pugx.org/minicli/minicli/v" alt="Latest Stable Version" title="Latest Stable Version">
+    </a>
+    <a href="//packagist.org/packages/minicli/minicli">
+        <img src="https://poser.pugx.org/minicli/minicli/downloads" alt="Total Downloads" title="Total Downloads">
+    </a>
+    <a href="//packagist.org/packages/minicli/minicli">
+        <img src="https://poser.pugx.org/minicli/minicli/license" alt="License" title="License">
+    </a>
+    <a href="https://docs.minicli.dev/en/latest/?badge=latest">
+        <img src="https://readthedocs.org/projects/minicliphp/badge/?version=latest" alt="Documentation Status" title="Documentation Status">
+    </a>
+    <h1 align="center">
+        Minicli 2
+    </h1>
+</p>
+<br>
 
 [Minicli](https://github.com/minicli/minicli) is an experimental dependency-free toolkit for building CLI-centric applications in PHP.
 Minicli was created as [an educational experiment](https://dev.to/erikaheidi/bootstrapping-a-cli-php-application-in-vanilla-php-4ee) and a way to go dependency-free when building simple command-line applications in PHP. It can be used for microservices, personal dev tools, bots and little fun things.
@@ -51,7 +72,7 @@ $app->registerCommand('mycommand', function(CommandCall $input) {
 });
 
 $app->runCommand($argv);
-``` 
+```
 
 Then, make it executable and run `minicli` with your command:
 
