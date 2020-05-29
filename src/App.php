@@ -23,7 +23,7 @@ class App
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
-            'theme' => ''
+            'theme' => '',
             'debug' => true,
         ], $config);
 
