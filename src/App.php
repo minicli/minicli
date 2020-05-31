@@ -5,7 +5,7 @@ namespace Minicli;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
-use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
 
 class App
@@ -23,17 +23,15 @@ class App
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
+            'theme' => '',
             'debug' => true,
         ], $config);
-
-        $this->setSignature('./minicli help');
 
         $this->addService('config', new Config($config));
         $this->addService('command_registry', new CommandRegistry($this->config->app_path));
 
-        $output = new OutputHandler();
-        $output->registerFilter(new ColorOutputFilter());
-        $this->addService('printer', $output);
+        $this->setSignature('./minicli help');
+        $this->setTheme($this->config->theme);
     }
 
     /**
@@ -110,6 +108,21 @@ class App
     public function setSignature($app_signature)
     {
         $this->app_signature = $app_signature;
+    }
+
+    /**
+     * Set the Output Handler based on the App's theme config setting.
+     * @param string $theme_config
+     */
+    public function setTheme(string $theme_config)
+    {
+        $output = new OutputHandler();
+
+        $output->registerFilter((new ThemeHelper($theme_config))
+                                ->getOutputFilter()
+                                );
+
+        $this->addService('printer', $output);
     }
 
     /**
