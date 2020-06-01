@@ -21,6 +21,16 @@ function getBasicApp()
     return new App($config);
 }
 
+function getProdApp()
+{
+    $config = [
+        'app_path' => getCommandsPath(),
+        'debug' => false
+    ];
+
+    return new App($config);
+}
+
 function getThemedApp()
 {
     $config = [

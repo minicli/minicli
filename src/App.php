@@ -19,6 +19,10 @@ class App
     /** @var array  */
     protected $loaded_services = [];
 
+    /**
+     * App constructor.
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $config = array_merge([
@@ -119,8 +123,8 @@ class App
         $output = new OutputHandler();
 
         $output->registerFilter((new ThemeHelper($theme_config))
-                                ->getOutputFilter()
-                                );
+            ->getOutputFilter()
+        );
 
         $this->addService('printer', $output);
     }

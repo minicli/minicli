@@ -1,6 +1,5 @@
 <?php
 
-
 use Minicli\Output\Filter\SimpleOutputFilter;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\CLIColors;

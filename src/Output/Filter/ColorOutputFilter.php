@@ -4,37 +4,38 @@
 namespace Minicli\Output\Filter;
 
 
-use Minicli\Output\CLITheme;
+use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\OutputFilterInterface;
+use Minicli\Output\Theme\DefaultTheme;
 
 class ColorOutputFilter implements OutputFilterInterface
 {
-    /** @var CLITheme */
+    /** @var CLIThemeInterface */
     protected $theme;
 
     /**
      * ColorOutputFilter constructor.
-     * @param CLITheme|null $theme If a theme is not set, the default CLITheme will be used.
+     * @param CLIThemeInterface|null $theme If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(CLITheme $theme = null)
+    public function __construct(CLIThemeInterface $theme = null)
     {
-        $this->theme = $theme ?? new CLITheme();
+        $this->theme = $theme ?? new DefaultTheme();
     }
 
     /**
      * Gets the CLITheme
-     * @return CLITheme
+     * @return CLIThemeInterface
      */
-    public function getTheme(): CLITheme
+    public function getTheme(): CLIThemeInterface
     {
         return $this->theme;
     }
 
     /**
      * Sets the CLITheme
-     * @param CLITheme $theme
+     * @param CLIThemeInterface $theme
      */
-    public function setTheme(CLITheme $theme): void
+    public function setTheme(CLIThemeInterface $theme): void
     {
         $this->theme = $theme;
     }
@@ -45,7 +46,7 @@ class ColorOutputFilter implements OutputFilterInterface
      * @param string $style
      * @return string the resulting string
      */
-    public function filter($message, $style = null): string
+    public function filter($message, $style = "default"): string
     {
         return $this->format($message, $style);
     }

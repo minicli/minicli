@@ -1,6 +1,6 @@
 <?php
 
-use Minicli\Output\CLITheme;
+use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\CLIColors;
 use Minicli\Output\OutputHandler;
@@ -91,7 +91,7 @@ it('asserts that a custom CLITheme can be created', function () {
     $printer = getColorOutputHandler();
     $printer->clearFilters();
 
-    $my_custom_theme = new CLITheme();
+    $my_custom_theme = new DefaultTheme();
     $my_custom_theme->setStyle('default', [CLIColors::$FG_MAGENTA]);
 
     $printer->registerFilter(new ColorOutputFilter($my_custom_theme));
