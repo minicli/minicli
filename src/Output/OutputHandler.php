@@ -71,7 +71,7 @@ class OutputHandler implements ServiceInterface
      * @param string $content
      * @param string $style
      */
-    public function out($content, $style = null): void
+    public function out($content, $style = "default"): void
     {
         $this->printer_adapter->out($this->filterOutput($content, $style));
     }

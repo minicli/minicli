@@ -87,7 +87,7 @@ it('asserts that OutputHandler allows changing theme', function () {
     $printer->info("themed info minicli");
 })->expectOutputString("\n" . getThemedOutput("themed info minicli"). "\n");
 
-it('asserts that a custom CLITheme can be created', function () {
+it('asserts that its possible to overwrite default styles', function () {
     $printer = getColorOutputHandler();
     $printer->clearFilters();
 
@@ -97,3 +97,19 @@ it('asserts that a custom CLITheme can be created', function () {
     $printer->registerFilter(new ColorOutputFilter($my_custom_theme));
     $printer->display("custom theme");
 })->expectOutputString("\n" . getThemedOutput("custom theme"). "\n");
+
+it('asserts that custom styles can be used with the out method', function () {
+    $printer = getColorOutputHandler();
+    $printer->clearFilters();
+
+    $my_custom_theme = new DefaultTheme();
+    $my_custom_theme->setStyle('custom', [CLIColors::$FG_MAGENTA]);
+
+    $printer->registerFilter(new ColorOutputFilter($my_custom_theme));
+    $printer->out("custom theme", 'custom');
+})->expectOutputString(getThemedOutput("custom theme"));
+
+it('asserts that out method sets style to default when style is not passed', function () {
+    $printer = getColorOutputHandler();
+    $printer->out("testing minicli");
+})->expectOutputString(getDefaultOutput("testing minicli"));
