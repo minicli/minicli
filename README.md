@@ -1,9 +1,7 @@
 <p align="center">
-
-<img src="https://user-images.githubusercontent.com/18489496/83184863-60072200-a12a-11ea-934f-602c26b8b799.png" align="center" alt="logo" title="logo" width="160">
-
-
+<img src="https://minicli.dev/images/minicli_logo_term_pink.png" align="center" alt="logo" title="Minicli logo" alt="Minicli Logo" width="160">
 </p>
+
 <p align="center">
     <a href="//packagist.org/packages/minicli/minicli">
         <img src="https://poser.pugx.org/minicli/minicli/v" alt="Latest Stable Version" title="Latest Stable Version">
@@ -82,7 +80,7 @@ chmod +x minicli
 ./minicli mycommand
 ```
 
-### Structured App
+### Structured App (Recommended)
 
 For a more structured application using Controllers and Services, it's best to use [Command Namespaces](https://minicliphp.readthedocs.io/en/latest/#using-command-controllers).
 Our [application template repository](https://github.com/minicli/application) is a great starting point / template to set up Minicli that way.
@@ -156,21 +154,19 @@ The above setting would use the following example theme:
 
 namespace App\Theme;
 
-use Minicli\Output\CLITheme;
+use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\CLIColors;
 
-class BlueTheme extends CLITheme
+class BlueTheme extends DefaultTheme
 {
-    public function getDefaultColors()
+    public function getThemeColors(): array
     {
-        $styles = [
+        return [
             'default'     => [ CLIColors::$FG_BLUE ],
             'alt'         => [ CLIColors::$FG_BLACK, CLIColors::$BG_BLUE ],
             'info'        => [ CLIColors::$FG_WHITE],
             'info_alt'    => [ CLIColors::$FG_WHITE, CLIColors::$BG_BLUE ]
         ];
-
-        return array_merge(parent::getDefaultColors(), $styles); // Any styles not defined here, will use the default styles.
     }
 }
 ```
