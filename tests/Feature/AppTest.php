@@ -89,10 +89,33 @@ it('asserts App prints signature when no command is specified', function () {
 })->expectOutputString("\n./minicli help\n");
 
 it('asserts App throws exception when single command is not found', function() {
+    $app = getBasicApp();
 
+    $app->runCommand(['minicli', 'minicli-test-error']);
+
+})->expectException(CommandNotFoundException::class);
+
+it('asserts App throws exception when command is not callable', function() {
     $app = getBasicApp();
     $app->registerCommand('minicli-test-error', "not a callable");
 
     $app->runCommand(['minicli', 'minicli-test-error']);
 
 })->expectException(CommandNotFoundException::class);
+
+$app = new \Minicli\App();
+$error_not_found = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
+$error_not_callable = $app->getPrinter()->filterOutput("The registered command is not a callable function.", 'error');
+
+it('asserts App shows error when debug is set to false and command is not found', function() {
+    $app = getProdApp();
+
+    $app->runCommand(['minicli', 'inexistent-command']);
+})->expectOutputString("\n" . $error_not_found . "\n");
+
+it('asserts App shows error when debug is set to false and command is not callable', function() {
+    $app = getProdApp();
+    $app->registerCommand('minicli-test-error', "not a callable");
+
+    $app->runCommand(['minicli', 'minicli-test-error']);
+})->expectOutputString("\n" . $error_not_callable . "\n");
