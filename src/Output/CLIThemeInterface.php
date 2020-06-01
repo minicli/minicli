@@ -10,5 +10,5 @@ interface CLIThemeInterface
      * @param string $name The name of the style
      * @return array An array containing FG color and optionally BG color
      */
-    public function getStyle($name);
+    public function getStyle(string $name);
 }
