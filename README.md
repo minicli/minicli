@@ -173,6 +173,25 @@ class BlueTheme extends DefaultTheme
 
 User-defined themes only need to define styles which will override those in the default theme.
 
+## Contributing
+
+Contributions are very welcome! You can contribute with code, documentation, filing issues... Please refer to our [contributing doc](CONTRIBUTING.md) for more information on the contribution process and what we expect from you.
+
+### Running the Test Suite
+
+Minicli uses [Pest PHP](https://pestphp.com) as testing framework. Once you have all dependencies installed via `composer install`, you can run the test suite with:
+
+```bash
+./vendor/bin/pest
+```
+
+To obtain the code coverage report, you'll need to have `xdebug` installed. Then, you can run:
+
+```bash
+./vendor/bin/pest --coverage
+```
+
+And this will give you detailed information about code coverage.
 
 ## Building Minicli
 
