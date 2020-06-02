@@ -21,10 +21,13 @@
 </p>
 <br>
 
-[Minicli](https://github.com/minicli/minicli) is an experimental dependency-free toolkit for building CLI-centric applications in PHP.
-Minicli was created as [an educational experiment](https://dev.to/erikaheidi/bootstrapping-a-cli-php-application-in-vanilla-php-4ee) and a way to go dependency-free when building simple command-line applications in PHP. It can be used for microservices, personal dev tools, bots and little fun things.
+[Minicli](https://docs.minicli.dev) is a minimalist, dependency-free framework for building CLI-centric PHP applications. It provides a structured way to organize your commands, as well as various helpers to facilitate working with command arguments, obtaining input from users, and printing colored output.
 
-Minicli 2 has a lot of improved features, and about 98% test coverage with [Pest PHP](https://pestphp.com/).
+Quick links:
+
+- [Documentation](https://docs.minicli.dev)
+- [Demos](https://github.com/minicli/demos)
+- [Contributing](CONTRIBUTING.md)
 
 ## Dependency-free: What Does it Mean
 
@@ -37,7 +40,7 @@ It gives you a lot of room to choose your own dependencies.
 
 ## Getting Started
 
-There are two ways to get started. If you want the **bare minimum**:
+There are two ways to get started. If you want the bare minimum, what we'll call "Minimalist App", you can create a single PHP script with your whole application. If you want a more structured application, with commands and subcommands, then you should use Command Namespaces to organize your commands into Controllers.
 
 ### Minimalist App
 
