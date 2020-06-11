@@ -2,7 +2,6 @@
 
 namespace Minicli\Command;
 
-
 class CommandCall
 {
     /** @var string  */
@@ -40,7 +39,6 @@ class CommandCall
     protected function parseCommand($argv)
     {
         foreach ($argv as $arg) {
-
             $pair = explode('=', $arg);
 
             if (count($pair) == 2) {
@@ -99,6 +97,4 @@ class CommandCall
     {
         return $this->flags;
     }
-
-
 }

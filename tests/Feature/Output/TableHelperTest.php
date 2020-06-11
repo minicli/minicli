@@ -2,8 +2,7 @@
 use Minicli\Output\Helper\TableHelper;
 use Minicli\Output\Filter\ColorOutputFilter;
 
-it('asserts that TableHelper creates table from constructor', function() {
-
+it('asserts that TableHelper creates table from constructor', function () {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
         ['value1', 'value2', 'value3']
@@ -20,16 +19,16 @@ it('asserts that TableHelper creates table from constructor', function() {
     assertStringContainsString('value3', $table_content);
 });
 
-it('asserts that TableHelper sets and outputs table rows', function() {
+it('asserts that TableHelper sets and outputs table rows', function () {
     $table = new TableHelper();
 
     $table->addHeader(
         ['ID', 'NAME', 'FIELD3']
     );
 
-    for($i = 1; $i <= 10; $i++) {
+    for ($i = 1; $i <= 10; $i++) {
         $table->addRow([
-            $i, 'test', rand(0,200)
+            $i, 'test', rand(0, 200)
         ]);
     }
 
@@ -41,7 +40,7 @@ it('asserts that TableHelper sets and outputs table rows', function() {
     assertStringContainsString('FIELD3', $table_content);
 });
 
-it('asserts that all fields respect column sizes', function() {
+it('asserts that all fields respect column sizes', function () {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
         ['value11234123', 'value2234', 'value3as2341234123'],

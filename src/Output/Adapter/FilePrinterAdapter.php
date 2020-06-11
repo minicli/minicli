@@ -3,7 +3,6 @@
 
 namespace Minicli\Output\Adapter;
 
-
 use Minicli\Output\PrinterAdapterInterface;
 
 class FilePrinterAdapter implements PrinterAdapterInterface
@@ -28,12 +27,10 @@ class FilePrinterAdapter implements PrinterAdapterInterface
      */
     public function out($message, $style = null)
     {
-
         $fp = fopen($this->output_file, "a+");
         fwrite($fp, $message);
         fclose($fp);
 
         return $message;
     }
-
 }

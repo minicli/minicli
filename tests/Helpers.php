@@ -53,7 +53,7 @@ function getRegistry()
     ];
 
     $app = new App($config);
-    $app->registerCommand("minicli-test", function() {
+    $app->registerCommand("minicli-test", function () {
         return true;
     });
 

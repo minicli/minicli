@@ -5,8 +5,6 @@ use Minicli\Command\CommandRegistry;
 use Minicli\Command\CommandNamespace;
 use Minicli\Exception\CommandNotFoundException;
 
-
-
 it('asserts Registry autoloads command namespaces', function () {
     $registry = getRegistry();
     $namespace = $registry->getNamespace("test");
@@ -36,7 +34,7 @@ it('asserts Registry returns correct controller from namespace when a subcommand
     assertTrue($controller instanceof \Assets\Command\Test\HelpController);
 });
 
-it('asserts Registry returns null when a namespace controller is not found', function (){
+it('asserts Registry returns null when a namespace controller is not found', function () {
     $registry = getRegistry();
     $controller = $registry->getCallableController("dasdsad");
 
@@ -53,7 +51,6 @@ it('asserts Registry returns correct callable', function () {
 it('asserts Registry throws CommandNotFoundException when a command is not found', function () {
     $registry = getRegistry();
     $callable = $registry->getCallable("dasdakjsdasd");
-
 })->throws(CommandNotFoundException::class);
 
 it('assets Registry returns full command list', function () {

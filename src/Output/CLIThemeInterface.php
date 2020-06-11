@@ -2,7 +2,6 @@
 
 namespace Minicli\Output;
 
-
 interface CLIThemeInterface
 {
     /**
