@@ -26,7 +26,8 @@ Contributing requires you to create a pull request. Here's what we expect from y
 
 - Preferrably, discuss the changes beforehand by creating an issue. We don't want you to spend your time on something that might eventually not get accepted. It's better if we can talk about it before you dedicate your time.
 - Be nice. We expect you to adhere to our [code of conduct](CODE_OF_CONDUCT.md) at all times, whether if you're filing an issue, contributing code, or commenting on existing issues and pull requests.
-- Provide enough information on the Pull Request's body - explain **why** and **how**. 
+- Provide enough information on the Pull Request's body - explain **why** and **how**.
+- Code standards: we follow [PSR-12](https://www.php-fig.org/psr/psr-12/).
 - Make sure tests are passing. 
 
 Here's what you can expect from us:
