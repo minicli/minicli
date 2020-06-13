@@ -6,14 +6,14 @@ use Minicli\Output\CLIColors;
 use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\Filter\TimestampOutputFilter;
 
-it('asserts that SimpleOutputFilter returns unstyled content', function() {
-   $simple = new SimpleOutputFilter();
+it('asserts that SimpleOutputFilter returns unstyled content', function () {
+    $simple = new SimpleOutputFilter();
 
-   $text = "My content";
-   assertEquals($text, $simple->filter($text));
+    $text = "My content";
+    assertEquals($text, $simple->filter($text));
 });
 
-it('asserts that ColorOutputFilter returns styled content with default theme', function() {
+it('asserts that ColorOutputFilter returns styled content with default theme', function () {
     $color = new ColorOutputFilter();
 
     $text = "My content";
@@ -23,7 +23,7 @@ it('asserts that ColorOutputFilter returns styled content with default theme', f
     assertEquals($expected, $styled);
 });
 
-it('asserts that ColorOutputFilter sets theme correctly and formats with style', function() {
+it('asserts that ColorOutputFilter sets theme correctly and formats with style', function () {
     $color = new ColorOutputFilter();
     $color->setTheme(new UnicornTheme());
 
@@ -36,7 +36,7 @@ it('asserts that ColorOutputFilter sets theme correctly and formats with style',
     assertEquals($expected, $styled);
 });
 
-it('asserts that TimestampOutputFilter adds timestamp to messages', function() {
+it('asserts that TimestampOutputFilter adds timestamp to messages', function () {
     $time = new TimestampOutputFilter();
 
     $message = "test timestamp";

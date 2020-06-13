@@ -51,7 +51,6 @@ function getThemedOutput($text)
 it('asserts that OutputHandler outputs correct style', function () {
     $printer = getColorOutputHandler();
     $printer->out("testing minicli", "alt");
-
 })->expectOutputString(getAltOutput("testing minicli"));
 
 it('asserts that OutputHandler outputs newline', function () {
@@ -64,17 +63,17 @@ it('asserts that OutputHandler displays content wrapped in newlines', function (
     $printer->display("testing minicli");
 })->expectOutputString("\n" . getDefaultOutput("testing minicli") . "\n");
 
-it('asserts that OutputHandler displays error with expected style', function() {
+it('asserts that OutputHandler displays error with expected style', function () {
     $printer = getColorOutputHandler();
     $printer->error("error minicli");
 })->expectOutputString("\n" . getErrorOutput("error minicli") . "\n");
 
-it('asserts that OutputHandler displays info with expected style', function() {
+it('asserts that OutputHandler displays info with expected style', function () {
     $printer = getColorOutputHandler();
     $printer->info("info minicli");
 })->expectOutputString("\n" . getInfoOutput("info minicli") . "\n");
 
-it('asserts that OutputHandler displays success with expected style', function() {
+it('asserts that OutputHandler displays success with expected style', function () {
     $printer = getColorOutputHandler();
     $printer->success("success minicli");
 })->expectOutputString("\n" . getSuccessOutput("success minicli") . "\n");

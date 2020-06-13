@@ -2,7 +2,6 @@
 
 namespace Minicli\Output\Theme;
 
-
 use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
 

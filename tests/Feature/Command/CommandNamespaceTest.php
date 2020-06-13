@@ -14,7 +14,7 @@ it('asserts that a name is set as expected', function () {
     assertEquals("Test", $namespace->getName());
 });
 
-it('asserts that controllers are loaded successfully', function() {
+it('asserts that controllers are loaded successfully', function () {
     $namespace = getCommandNamespace();
     $controllers = $namespace->loadControllers(getCommandsPath());
 

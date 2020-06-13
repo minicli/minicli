@@ -25,7 +25,7 @@ class ThemeHelper
      */
     public function getOutputFilter()
     {
-        if (class_exists($this->theme)){
+        if (class_exists($this->theme)) {
             return new ColorOutputFilter(new $this->theme());
         }
 
@@ -36,8 +36,8 @@ class ThemeHelper
      * Parses the theme config setting and returns a namespaced class name.
      * @return string
      */
-    protected function parseThemeSetting($theme_config) {
-
+    protected function parseThemeSetting($theme_config)
+    {
         if (!$theme_config) {
             return '';
         }
@@ -48,5 +48,4 @@ class ThemeHelper
 
         return $theme_config . 'Theme'; // User-defined theme.
     }
-
 }

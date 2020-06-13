@@ -122,7 +122,8 @@ class App
     {
         $output = new OutputHandler();
 
-        $output->registerFilter((new ThemeHelper($theme_config))
+        $output->registerFilter(
+            (new ThemeHelper($theme_config))
             ->getOutputFilter()
         );
 
@@ -172,7 +173,7 @@ class App
     {
         try {
             $callable = $this->command_registry->getCallable($input->command);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             if (!$this->config->debug) {
                 $this->getPrinter()->error($e->getMessage());
                 return false;
@@ -192,5 +193,4 @@ class App
 
         throw new CommandNotFoundException("The registered command is not a callable function.");
     }
-
 }

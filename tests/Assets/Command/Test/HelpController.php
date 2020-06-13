@@ -7,7 +7,6 @@ use Minicli\Command\CommandController;
 
 class HelpController extends CommandController
 {
-
     public function handle()
     {
         $name = "default";

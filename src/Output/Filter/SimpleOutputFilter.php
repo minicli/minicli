@@ -3,7 +3,6 @@
 
 namespace Minicli\Output\Filter;
 
-
 use Minicli\Output\OutputFilterInterface;
 
 class SimpleOutputFilter implements OutputFilterInterface

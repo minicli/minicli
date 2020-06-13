@@ -3,7 +3,6 @@
 
 namespace Assets\Theme;
 
-
 use Minicli\Output\CLIColors;
 use Minicli\Output\Theme\DefaultTheme;
 

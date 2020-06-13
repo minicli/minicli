@@ -3,7 +3,6 @@
 
 namespace Minicli\Output\Filter;
 
-
 use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\OutputFilterInterface;
 use Minicli\Output\Theme\DefaultTheme;

@@ -3,7 +3,6 @@
 
 namespace Minicli\Output\Filter;
 
-
 use Minicli\Output\OutputFilterInterface;
 
 class TimestampOutputFilter implements OutputFilterInterface
@@ -17,6 +16,6 @@ class TimestampOutputFilter implements OutputFilterInterface
     public function filter($message, $style = null)
     {
         $datetime = new \DateTime();
-        return $datetime->format('[Y-m-d H:i:S]' ) . $message;
+        return $datetime->format('[Y-m-d H:i:S]') . $message;
     }
 }

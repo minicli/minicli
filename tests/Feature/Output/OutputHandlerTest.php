@@ -11,13 +11,11 @@ function getSimpleOutputHandler()
 it('asserts that OutputHandler outputs expected text', function () {
     $printer = getSimpleOutputHandler();
     $printer->out("testing minicli");
-
 })->expectOutputString("testing minicli");
 
 it('asserts that OutputHandler outputs raw content', function () {
     $printer = getSimpleOutputHandler();
     $printer->rawOutput("testing minicli");
-
 })->expectOutputString("testing minicli");
 
 it('asserts that OutputHandler outputs newline', function () {
@@ -30,22 +28,22 @@ it('asserts that OutputHandler displays content wrapped in newlines', function (
     $printer->display("testing minicli");
 })->expectOutputString("\ntesting minicli\n");
 
-it('asserts that OutputHandler displays error', function() {
+it('asserts that OutputHandler displays error', function () {
     $printer = getSimpleOutputHandler();
     $printer->error("error minicli");
 })->expectOutputString("\nerror minicli\n");
 
-it('asserts that OutputHandler displays info', function() {
+it('asserts that OutputHandler displays info', function () {
     $printer = getSimpleOutputHandler();
     $printer->info("info minicli");
 })->expectOutputString("\ninfo minicli\n");
 
-it('asserts that OutputHandler displays success', function() {
+it('asserts that OutputHandler displays success', function () {
     $printer = getSimpleOutputHandler();
     $printer->success("success minicli");
 })->expectOutputString("\nsuccess minicli\n");
 
-it('asserts that OutputHandler prints table', function() {
+it('asserts that OutputHandler prints table', function () {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
         ['value1', 'value2', 'value3']

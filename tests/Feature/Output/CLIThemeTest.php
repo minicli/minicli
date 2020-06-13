@@ -5,16 +5,16 @@ use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\CLIColors;
 
 it('asserts that Default CLI theme sets all default styles', function () {
-   $theme = new DefaultTheme();
+    $theme = new DefaultTheme();
 
-   assertIsArray($theme->getStyle('default'));
-   assertIsArray($theme->getStyle('alt'));
-   assertIsArray($theme->getStyle('info'));
-   assertIsArray($theme->getStyle('info_alt'));
-   assertIsArray($theme->getStyle('error'));
-   assertIsArray($theme->getStyle('error_alt'));
-   assertIsArray($theme->getStyle('success'));
-   assertIsArray($theme->getStyle('success_alt'));
+    assertIsArray($theme->getStyle('default'));
+    assertIsArray($theme->getStyle('alt'));
+    assertIsArray($theme->getStyle('info'));
+    assertIsArray($theme->getStyle('info_alt'));
+    assertIsArray($theme->getStyle('error'));
+    assertIsArray($theme->getStyle('error_alt'));
+    assertIsArray($theme->getStyle('success'));
+    assertIsArray($theme->getStyle('success_alt'));
 });
 
 it('asserts that default theme returns expected colors for default text', function () {

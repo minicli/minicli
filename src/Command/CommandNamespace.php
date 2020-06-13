@@ -72,7 +72,8 @@ class CommandNamespace
         $this->controllers[$command_name] = $controller;
     }
 
-    protected function getNamespace($filename) {
+    protected function getNamespace($filename)
+    {
         $lines = preg_grep('/^namespace /', file($filename));
         $namespace_line = array_shift($lines);
         $match = [];
