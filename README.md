@@ -51,7 +51,7 @@ If you just want to set up a few simple commands to run through `minicli`, all y
 3. Create a `minicli` script with the following content:
 
 ```php
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 if (php_sapi_name() !== 'cli') {
