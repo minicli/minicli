@@ -4,6 +4,7 @@ namespace Minicli;
 
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\Command\ParsedCommand;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
@@ -162,6 +163,34 @@ class App
         }
 
         $this->runSingle($input);
+    }
+
+    /**
+     * @param array $argv
+     * @return ParsedCommand|null
+     * @throws CommandNotFoundException
+     */
+    public function parseCommand(array $argv = []): ?ParsedCommand
+    {
+        $input = new CommandCall($argv);
+
+        if (count($input->args) < 2) {
+            $this->printSignature();
+            return null;
+        }
+
+        $controller = $this->command_registry->getCallableController($input->command, $input->subcommand);
+        return new ParsedCommand(
+            $input,
+            $this->command_registry->getCallable($input->command),
+            $controller
+        );
+
+        return new ParsedCommand(
+            $input,
+            $this->command_registry->getCallable($input->command),
+            null
+        );
     }
 
     /**

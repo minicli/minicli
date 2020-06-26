@@ -85,6 +85,14 @@ class CommandCall
     /**
      * @return array
      */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @return array
+     */
     public function getRawArgs()
     {
         return $this->raw_args;

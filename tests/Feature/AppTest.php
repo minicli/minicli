@@ -111,3 +111,21 @@ it('asserts App shows error when debug is set to false and command is not callab
 
     $app->runCommand(['minicli', 'minicli-test-error']);
 })->expectOutputString("\n" . $error_not_callable . "\n");
+
+
+it('returns parsed command correctly', function () {
+    $app = getBasicApp();
+
+    $was_called = false;
+
+    $closure = function () use (&$was_called) {
+        $was_called = true;
+    };
+
+    $app->registerCommand('parse', $closure);
+
+    $parsedCommand = $app->parseCommand(['minicli', 'parse']);
+    call_user_func($parsedCommand->getCallable());
+
+    assertTrue($was_called);
+});
