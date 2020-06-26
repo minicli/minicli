@@ -185,12 +185,6 @@ class App
             $this->command_registry->getCallable($input->command),
             $controller
         );
-
-        return new ParsedCommand(
-            $input,
-            $this->command_registry->getCallable($input->command),
-            null
-        );
     }
 
     /**
