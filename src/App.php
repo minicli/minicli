@@ -4,9 +4,11 @@ namespace Minicli;
 
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\Command\ParsedCommand;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use Minicli\Invoker;
 
 class App
 {
@@ -162,6 +164,33 @@ class App
         }
 
         $this->runSingle($input);
+    }
+
+
+    /**
+     * @param array $argv
+     * @param \Minicli\Invoker $invoker
+     * @return mixed
+     * @throws CommandNotFoundException
+     */
+    public function dispatchCommand(array $argv, Invoker $invoker)// : mixed
+    {
+        $input = new CommandCall($argv);
+
+        if (count($input->args) < 2) {
+            $this->printSignature();
+            return null;
+        }
+
+        $controller = $this->command_registry->getCallableController($input->command, $input->subcommand);
+
+        $parsedCommand = new ParsedCommand(
+            $input,
+            $this->command_registry->getCallable($input->command),
+            $controller
+        );
+
+        return $invoker->invokeParsedCommand($parsedCommand);
     }
 
     /**

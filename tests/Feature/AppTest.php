@@ -1,7 +1,9 @@
 <?php
 
 use Minicli\Command\CommandRegistry;
+use Minicli\Command\ParsedCommand;
 use Minicli\Config;
+use Minicli\Invoker;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Exception\CommandNotFoundException;
@@ -111,3 +113,38 @@ it('asserts App shows error when debug is set to false and command is not callab
 
     $app->runCommand(['minicli', 'minicli-test-error']);
 })->expectOutputString("\n" . $error_not_callable . "\n");
+
+
+
+it('invoking works', function () {
+    $app = getBasicApp();
+
+    $was_called = false;
+    $expectedResult = "This is the result";
+
+    $closure = function () use (&$was_called) {
+        $was_called = true;
+    };
+
+    $app->registerCommand('invoke', $closure);
+
+    $invoker = new class ($expectedResult) implements Invoker {
+        public function __construct($result_string)
+        {
+            $this->result_string = $result_string;
+        }
+
+        public function invokeParsedCommand(ParsedCommand $parsedCommand)
+        {
+            call_user_func($parsedCommand->getCallable());
+            return $this->result_string;
+        }
+    };
+
+    $actualResult = $app->dispatchCommand(
+        ['minicli', 'invoke'],
+        $invoker
+    );
+
+    assertSame($expectedResult, $actualResult);
+});
