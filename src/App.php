@@ -23,7 +23,7 @@ class App
      * App constructor.
      * @param array $config
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], string $signature = './minicli help')
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
@@ -34,7 +34,7 @@ class App
         $this->addService('config', new Config($config));
         $this->addService('command_registry', new CommandRegistry($this->config->app_path));
 
-        $this->setSignature('./minicli help');
+        $this->setSignature($signature);
         $this->setTheme($this->config->theme);
     }
 
