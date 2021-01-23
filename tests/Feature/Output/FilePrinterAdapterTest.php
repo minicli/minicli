@@ -1,4 +1,5 @@
 <?php
+
 use Minicli\Output\Adapter\FilePrinterAdapter;
 use Minicli\Output\OutputHandler;
 

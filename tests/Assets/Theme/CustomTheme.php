@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Assets\Theme;
 
 use Minicli\Output\CLIColors;

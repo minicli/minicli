@@ -1,6 +1,6 @@
 <?php
+
 use Minicli\Output\Helper\TableHelper;
-use Minicli\Output\Filter\ColorOutputFilter;
 
 it('asserts that TableHelper creates table from constructor', function () {
     $table = [

@@ -1,7 +1,5 @@
 <?php
 
-use Minicli\App;
-use Minicli\Command\CommandRegistry;
 use Minicli\Command\CommandNamespace;
 use Minicli\Exception\CommandNotFoundException;
 
