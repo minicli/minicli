@@ -75,7 +75,7 @@ class CommandNamespace
     protected function getNamespace($filename)
     {
         $lines = preg_grep('/^namespace /', file($filename));
-        $namespace_line = array_shift($lines);
+        $namespace_line = trim(array_shift($lines));
         $match = [];
         preg_match('/^namespace (.*);$/', $namespace_line, $match);
 
