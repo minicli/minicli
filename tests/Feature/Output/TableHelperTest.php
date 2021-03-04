@@ -1,6 +1,6 @@
 <?php
+
 use Minicli\Output\Helper\TableHelper;
-use Minicli\Output\Filter\ColorOutputFilter;
 
 it('asserts that TableHelper creates table from constructor', function () {
     $table = [
@@ -11,12 +11,12 @@ it('asserts that TableHelper creates table from constructor', function () {
 
     $table_helper = new TableHelper($table);
 
-    assertEquals(2, $table_helper->totalRows());
+    $this->assertEquals(2, $table_helper->totalRows());
     $table_content = $table_helper->getFormattedTable();
 
-    assertStringContainsString('value1', $table_content);
-    assertStringContainsString('value2', $table_content);
-    assertStringContainsString('value3', $table_content);
+    $this->assertStringContainsString('value1', $table_content);
+    $this->assertStringContainsString('value2', $table_content);
+    $this->assertStringContainsString('value3', $table_content);
 });
 
 it('asserts that TableHelper sets and outputs table rows', function () {
@@ -32,12 +32,12 @@ it('asserts that TableHelper sets and outputs table rows', function () {
         ]);
     }
 
-    assertEquals(11, $table->totalRows());
+    $this->assertEquals(11, $table->totalRows());
     $table_content = $table->getFormattedTable();
 
-    assertStringContainsString('ID', $table_content);
-    assertStringContainsString('NAME', $table_content);
-    assertStringContainsString('FIELD3', $table_content);
+    $this->assertStringContainsString('ID', $table_content);
+    $this->assertStringContainsString('NAME', $table_content);
+    $this->assertStringContainsString('FIELD3', $table_content);
 });
 
 it('asserts that all fields respect column sizes', function () {
@@ -55,5 +55,5 @@ it('asserts that all fields respect column sizes', function () {
     $size_at_first = strlen($rows[1]);
     $size_at_last = strlen($rows[count($rows)-1]);
 
-    assertSame($size_at_first, $size_at_last);
+    $this->assertSame($size_at_first, $size_at_last);
 });

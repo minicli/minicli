@@ -9,17 +9,17 @@ use Minicli\Exception\CommandNotFoundException;
 it('asserts App is created', function () {
     $app = getBasicApp();
 
-    assertTrue($app instanceof \Minicli\App);
+    $this->assertTrue($app instanceof \Minicli\App);
 });
 
 it('asserts App sets, gets and prints signature', function () {
     $app = getBasicApp();
     $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
 
-    assertStringContainsString("minicli", $app->getSignature());
+    $this->assertStringContainsString("minicli", $app->getSignature());
 
     $app->setSignature("Testing minicli");
-    assertEquals("Testing minicli", $app->getSignature());
+    $this->assertEquals("Testing minicli", $app->getSignature());
 
     $app->printSignature();
 })->expectOutputString("\nTesting minicli\n");
@@ -29,7 +29,7 @@ it('asserts App has Config Service', function () {
 
     $config = $app->config;
 
-    assertTrue($config instanceof Config);
+    $this->assertTrue($config instanceof Config);
 });
 
 it('asserts App has CommandRegistry Service', function () {
@@ -37,7 +37,7 @@ it('asserts App has CommandRegistry Service', function () {
 
     $registry = $app->command_registry;
 
-    assertTrue($registry instanceof CommandRegistry);
+    $this->assertTrue($registry instanceof CommandRegistry);
 });
 
 it('asserts App has Printer service', function () {
@@ -45,7 +45,7 @@ it('asserts App has Printer service', function () {
 
     $printer = $app->printer;
 
-    assertTrue($printer instanceof OutputHandler);
+    $this->assertTrue($printer instanceof OutputHandler);
 });
 
 it('asserts App returns null when a service is not found', function () {
@@ -53,7 +53,7 @@ it('asserts App returns null when a service is not found', function () {
 
     $service = $app->inexistent_service;
 
-    assertNull($service);
+    $this->assertNull($service);
 });
 
 it('asserts App registers and executes single command', function () {
@@ -64,7 +64,7 @@ it('asserts App registers and executes single command', function () {
     });
 
     $command = $app->command_registry->getCallable('minicli-test');
-    assertIsCallable($command);
+    $this->assertIsCallable($command);
 
     $app->runCommand(['minicli', 'minicli-test']);
 })->expectOutputString("testing minicli");

@@ -2,7 +2,6 @@
 
 namespace Assets\Command\Test;
 
-use Minicli\App;
 use Minicli\Command\CommandController;
 
 class ParamsController extends CommandController
