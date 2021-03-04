@@ -11,21 +11,21 @@ function getCommandNamespace()
 it('asserts that a name is set as expected', function () {
     $namespace = getCommandNamespace();
 
-    assertEquals("Test", $namespace->getName());
+    $this->assertEquals("Test", $namespace->getName());
 });
 
 it('asserts that controllers are loaded successfully', function () {
     $namespace = getCommandNamespace();
     $controllers = $namespace->loadControllers(getCommandsPath());
 
-    assertIsArray($controllers);
-    assertNotEmpty($controllers);
-    assertContainsOnly(CommandController::class, $controllers);
+    $this->assertIsArray($controllers);
+    $this->assertNotEmpty($controllers);
+    $this->assertContainsOnly(CommandController::class, $controllers);
 });
 
 it('asserts that no controllers are returned if the namespace is empty', function () {
     $namespace = new CommandNamespace("Empty");
     $controllers = $namespace->loadControllers(getCommandsPath());
 
-    assertCount(0, $controllers);
+    $this->assertCount(0, $controllers);
 });
