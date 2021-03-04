@@ -10,7 +10,7 @@ it('asserts that SimpleOutputFilter returns unstyled content', function () {
     $simple = new SimpleOutputFilter();
 
     $text = "My content";
-    assertEquals($text, $simple->filter($text));
+    $this->assertEquals($text, $simple->filter($text));
 });
 
 it('asserts that ColorOutputFilter returns styled content with default theme', function () {
@@ -20,20 +20,20 @@ it('asserts that ColorOutputFilter returns styled content with default theme', f
     $styled = $color->filter($text);
 
     $expected =  sprintf("\e[%sm%s\e[0m", CLIColors::$FG_WHITE, $text);
-    assertEquals($expected, $styled);
+    $this->assertEquals($expected, $styled);
 });
 
 it('asserts that ColorOutputFilter sets theme correctly and formats with style', function () {
     $color = new ColorOutputFilter();
     $color->setTheme(new UnicornTheme());
 
-    assertInstanceOf(UnicornTheme::class, $color->getTheme());
+    $this->assertInstanceOf(UnicornTheme::class, $color->getTheme());
 
     $text = "My content";
     $styled = $color->filter($text, 'info');
 
     $expected =  sprintf("\e[%sm%s\e[0m", CLIColors::$FG_MAGENTA, $text);
-    assertEquals($expected, $styled);
+    $this->assertEquals($expected, $styled);
 });
 
 it('asserts that TimestampOutputFilter adds timestamp to messages', function () {
@@ -42,6 +42,6 @@ it('asserts that TimestampOutputFilter adds timestamp to messages', function () 
     $message = "test timestamp";
     $today = (new DateTime())->format('Y-m-d');
 
-    assertStringContainsString($today, $time->filter($message));
-    assertStringContainsString($message, $time->filter($message));
+    $this->assertStringContainsString($today, $time->filter($message));
+    $this->assertStringContainsString($message, $time->filter($message));
 });

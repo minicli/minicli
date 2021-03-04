@@ -8,8 +8,8 @@ it('asserts that config sets properties from constructor', function () {
         "param2" => "value2"
     ]);
 
-    assertTrue($config->has('param1'));
-    assertTrue($config->has('param2'));
+    $this->assertTrue($config->has('param1'));
+    $this->assertTrue($config->has('param2'));
 });
 
 
@@ -21,5 +21,5 @@ it('asserts that config sets and gets properties', function () {
 
     $config->param3 = "value3";
 
-    assertEquals("value3", $config->param3);
+    $this->assertEquals("value3", $config->param3);
 });
