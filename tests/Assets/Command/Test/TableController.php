@@ -2,7 +2,6 @@
 
 namespace Assets\Command\Test;
 
-use Minicli\App;
 use Minicli\Command\CommandController;
 use Minicli\Output\Helper\TableHelper;
 
