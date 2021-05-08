@@ -17,6 +17,12 @@ it('asserts flags are correctly set', function () {
     $this->assertContains("--flag", $call->getFlags());
 });
 
+it('asserts flags can be obtained without "--"', function () {
+    $call = new CommandCall(["minicli", "help", "test", "--flag"]);
+
+    $this->assertTrue($call->hasFlag('flag'));
+});
+
 it('asserts params are correctly set', function () {
     $call = new CommandCall(["minicli", "help", "test", "name=test"]);
 

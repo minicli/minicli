@@ -2,6 +2,8 @@
 
 namespace Minicli\Command;
 
+use Assets\Command\Test\ParamsController;
+
 class CommandCall
 {
     /** @var string  */
@@ -70,7 +72,11 @@ class CommandCall
      */
     public function hasFlag($flag)
     {
-        return in_array($flag, $this->flags);
+        if (in_array($flag, $this->flags)) {
+            return true;
+        }
+
+        return in_array('--' . $flag, $this->flags);
     }
 
     /**
