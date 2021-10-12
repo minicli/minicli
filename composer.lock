@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c78cb543c38e436a66b527dcd9dd95cc",
+    "content-hash": "1b045b45b931f67ddef49b251fa68b44",
     "packages": [],
     "packages-dev": [
         {
@@ -1054,6 +1054,7 @@
                     "type": "patreon"
                 }
             ],
+            "abandoned": "pestphp/pest",
             "time": "2021-01-03T15:51:41+00:00"
         },
         {
@@ -1126,6 +1127,7 @@
                     "type": "patreon"
                 }
             ],
+            "abandoned": "pestphp/pest",
             "time": "2021-01-03T16:02:34+00:00"
         },
         {
@@ -1201,6 +1203,7 @@
                     "type": "patreon"
                 }
             ],
+            "abandoned": "pestphp/pest",
             "time": "2021-01-03T15:47:48+00:00"
         },
         {
@@ -4678,9 +4681,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.3",
-        "ext-readline": "*"
+        "php": ">=7.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
