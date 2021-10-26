@@ -11,6 +11,7 @@ class CLIColors
     public static $FG_BLUE = '1;34';
     public static $FG_CYAN = '0;36';
     public static $FG_MAGENTA = '0;35';
+    public static $FG_YELLOW = '0;33';
 
     public static $BG_BLACK = '40';
     public static $BG_RED = '41';
@@ -19,6 +20,7 @@ class CLIColors
     public static $BG_CYAN = '46';
     public static $BG_WHITE = '47';
     public static $BG_MAGENTA = '45';
+    public static $BG_YELLOW = '43';
 
     public static $BOLD = '1';
     public static $DIM = '2';
