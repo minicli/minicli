@@ -1,0 +1,14 @@
+name: Update CONTRIBUTORS file
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: minicli/action-contributors@v1
+        name: 'Update a projects CONTRIBUTORS file'
+        env:
+          CONTRIB_REPOSITORY: 'minicli/minicli'
+          CONTRIB_OUTPUT_FILE: 'CONTRIBUTORS.md'
