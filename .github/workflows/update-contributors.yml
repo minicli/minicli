@@ -1,13 +1,13 @@
 name: Update CONTRIBUTORS file
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 0 * *"
   workflow_dispatch:
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: minicli/action-contributors@v1
+      - uses: minicli/action-contributors@v1.
         name: 'Update a projects CONTRIBUTORS file'
       - name: Update resources
         uses: test-room-7/action-update-file@v1
