@@ -54,7 +54,7 @@ it('asserts Registry throws CommandNotFoundException when a command is not found
 it('assets Registry returns full command list', function () {
     $registry = getRegistry();
 
-    $command_list = $registry->getCommandMap();
-    $this->assertCount(2, $command_list);
-    $this->assertCount(4, $command_list['test']);
+    $commandList = $registry->getCommandMap();
+    $this->assertCount(2, $commandList);
+    $this->assertCount(4, $commandList['test']);
 });

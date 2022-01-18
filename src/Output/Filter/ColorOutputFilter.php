@@ -58,13 +58,13 @@ class ColorOutputFilter implements OutputFilterInterface
      */
     public function format($message, $style = "default"): string
     {
-        $style_colors = $this->theme->getStyle($style);
+        $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if (isset($style_colors[1])) {
-            $bg = ';' . $style_colors[1];
+        if (isset($styleColors[1])) {
+            $bg = ';' . $styleColors[1];
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $style_colors[0], $bg, $message);
+        return sprintf("\e[%s%sm%s\e[0m", $styleColors[0], $bg, $message);
     }
 }

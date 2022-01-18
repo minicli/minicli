@@ -11,11 +11,11 @@ class ThemeHelper
 
     /**
      * ThemeHelper constructor. Takes in the App theme config value.
-     * @param string $theme_config
+     * @param string $themeConfig
      */
-    public function __construct(string $theme_config = '')
+    public function __construct(string $themeConfig = '')
     {
-        $this->theme = $this->parseThemeSetting($theme_config);
+        $this->theme = $this->parseThemeSetting($themeConfig);
         return $this;
     }
 
@@ -36,16 +36,16 @@ class ThemeHelper
      * Parses the theme config setting and returns a namespaced class name.
      * @return string
      */
-    protected function parseThemeSetting($theme_config)
+    protected function parseThemeSetting($themeConfig)
     {
-        if (!$theme_config) {
+        if (!$themeConfig) {
             return '';
         }
 
-        if ($theme_config[0] == '\\') {
-            return '\Minicli\Output\Theme' . $theme_config . 'Theme';  // Built-in theme.
+        if ($themeConfig[0] == '\\') {
+            return '\Minicli\Output\Theme' . $themeConfig . 'Theme';  // Built-in theme.
         }
 
-        return $theme_config . 'Theme'; // User-defined theme.
+        return $themeConfig . 'Theme'; // User-defined theme.
     }
 }

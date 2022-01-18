@@ -11,13 +11,13 @@ use Minicli\Output\OutputHandler;
 class App
 {
     /** @var  string  */
-    protected $app_signature;
+    protected $appSignature;
 
     /** @var  array */
     protected $services = [];
 
     /** @var array  */
-    protected $loaded_services = [];
+    protected $loadedServices = [];
 
     /**
      * App constructor.
@@ -32,7 +32,7 @@ class App
         ], $config);
 
         $this->addService('config', new Config($config));
-        $this->addService('command_registry', new CommandRegistry($this->config->app_path));
+        $this->addService('commandRegistry', new CommandRegistry($this->config->app_path));
 
         $this->setSignature($signature);
         $this->setTheme($this->config->theme);
@@ -49,7 +49,7 @@ class App
             return null;
         }
 
-        if (!array_key_exists($name, $this->loaded_services)) {
+        if (!array_key_exists($name, $this->loadedServices)) {
             $this->loadService($name);
         }
 
@@ -70,7 +70,7 @@ class App
      */
     public function loadService($name)
     {
-        $this->loaded_services[$name] = $this->services[$name]->load($this);
+        $this->loadedServices[$name] = $this->services[$name]->load($this);
     }
 
     /**
@@ -96,7 +96,7 @@ class App
      */
     public function getSignature()
     {
-        return $this->app_signature;
+        return $this->appSignature;
     }
 
     /**
@@ -107,23 +107,23 @@ class App
         $this->getPrinter()->display($this->getSignature());
     }
     /**
-     * @param string $app_signature
+     * @param string $appSignature
      */
-    public function setSignature($app_signature)
+    public function setSignature($appSignature)
     {
-        $this->app_signature = $app_signature;
+        $this->appSignature = $appSignature;
     }
 
     /**
      * Set the Output Handler based on the App's theme config setting.
-     * @param string $theme_config
+     * @param string $loadedServices
      */
-    public function setTheme(string $theme_config)
+    public function setTheme(string $loadedServices)
     {
         $output = new OutputHandler();
 
         $output->registerFilter(
-            (new ThemeHelper($theme_config))
+            (new ThemeHelper($loadedServices))
             ->getOutputFilter()
         );
 
@@ -136,7 +136,7 @@ class App
      */
     public function registerCommand($name, $callable)
     {
-        $this->command_registry->registerCommand($name, $callable);
+        $this->commandRegistry->registerCommand($name, $callable);
     }
 
     /**
@@ -152,7 +152,7 @@ class App
             return;
         }
 
-        $controller = $this->command_registry->getCallableController($input->command, $input->subcommand);
+        $controller = $this->commandRegistry->getCallableController($input->command, $input->subcommand);
 
         if ($controller instanceof ControllerInterface) {
             $controller->boot($this);
@@ -172,7 +172,7 @@ class App
     protected function runSingle(CommandCall $input)
     {
         try {
-            $callable = $this->command_registry->getCallable($input->command);
+            $callable = $this->commandRegistry->getCallable($input->command);
         } catch (\Exception $e) {
             if (!$this->config->debug) {
                 $this->getPrinter()->error($e->getMessage());

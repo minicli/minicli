@@ -9,21 +9,21 @@ use Minicli\ServiceInterface;
 class CommandRegistry implements ServiceInterface
 {
     /** @var string */
-    protected $commands_path;
+    protected $commandsPath;
 
     /** @var array */
     protected $namespaces = [];
 
     /** @var array */
-    protected $default_registry = [];
+    protected $defaultRegistry = [];
 
     /**
      * CommandRegistry constructor.
-     * @param string $commands_path
+     * @param string $commandsPath
      */
-    public function __construct($commands_path)
+    public function __construct($commandsPath)
     {
-        $this->commands_path = $commands_path;
+        $this->commandsPath = $commandsPath;
     }
 
     public function load(App $app)
@@ -36,20 +36,20 @@ class CommandRegistry implements ServiceInterface
      */
     public function autoloadNamespaces()
     {
-        foreach (glob($this->getCommandsPath() . '/*', GLOB_ONLYDIR) as $namespace_path) {
-            $this->registerNamespace(basename($namespace_path));
+        foreach (glob($this->getCommandsPath() . '/*', GLOB_ONLYDIR) as $namespacePath) {
+            $this->registerNamespace(basename($namespacePath));
         }
     }
 
     /**
-     * @param string $command_namespace
+     * @param string $commandNamespace
      * @return void
      */
-    public function registerNamespace($command_namespace)
+    public function registerNamespace($commandNamespace)
     {
-        $namespace = new CommandNamespace($command_namespace);
+        $namespace = new CommandNamespace($commandNamespace);
         $namespace->loadControllers($this->getCommandsPath());
-        $this->namespaces[strtolower($command_namespace)] = $namespace;
+        $this->namespaces[strtolower($commandNamespace)] = $namespace;
     }
 
     /**
@@ -66,7 +66,7 @@ class CommandRegistry implements ServiceInterface
      */
     public function getCommandsPath()
     {
-        return $this->commands_path;
+        return $this->commandsPath;
     }
 
     /**
@@ -76,7 +76,7 @@ class CommandRegistry implements ServiceInterface
      */
     public function registerCommand($name, $callable)
     {
-        $this->default_registry[$name] = $callable;
+        $this->defaultRegistry[$name] = $callable;
     }
 
     /**
@@ -85,7 +85,7 @@ class CommandRegistry implements ServiceInterface
      */
     public function getCommand($command)
     {
-        return isset($this->default_registry[$command]) ? $this->default_registry[$command] : null;
+        return isset($this->defaultRegistry[$command]) ? $this->defaultRegistry[$command] : null;
     }
 
     /**
@@ -126,7 +126,7 @@ class CommandRegistry implements ServiceInterface
     {
         $map = [];
 
-        foreach ($this->default_registry as $command => $callback) {
+        foreach ($this->defaultRegistry as $command => $callback) {
             $map[$command] = $callback;
         }
 

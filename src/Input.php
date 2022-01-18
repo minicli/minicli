@@ -7,7 +7,7 @@ use RuntimeException;
 class Input
 {
     /** @var array  */
-    protected $input_history = [];
+    protected $inputHistory = [];
 
     /** @var string */
     protected $prompt;
@@ -28,7 +28,7 @@ class Input
     {
         $this->checkReadlineExtension();
         $input = readline($this->getPrompt());
-        $this->input_history[] = $input;
+        $this->inputHistory[] = $input;
 
         return $input;
     }
@@ -38,7 +38,7 @@ class Input
      */
     public function getInputHistory()
     {
-        return $this->input_history;
+        return $this->inputHistory;
     }
 
     /**

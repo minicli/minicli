@@ -11,8 +11,8 @@ it('asserts that FilePrinterAdapter saves content to file', function () {
         @unlink($file_path);
     }
 
-    $fileprinter = new FilePrinterAdapter($file_path);
-    $output = new OutputHandler($fileprinter);
+    $filePrinter = new FilePrinterAdapter($file_path);
+    $output = new OutputHandler($filePrinter);
 
     $output->rawOutput("writing output to file");
 
@@ -23,8 +23,8 @@ it('asserts that FilePrinterAdapter saves content to file', function () {
 it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided', function () {
     $file_path = '/root/cant_write_here';
 
-    $fileprinter = new FilePrinterAdapter($file_path);
-    $output = new OutputHandler($fileprinter);
+    $filePrinter = new FilePrinterAdapter($file_path);
+    $output = new OutputHandler($filePrinter);
 
     $output->rawOutput("writing output to file");
 })->expectException(ErrorException::class);

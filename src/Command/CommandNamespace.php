@@ -30,10 +30,10 @@ class CommandNamespace
      * Load namespace controllers
      * @return array
      */
-    public function loadControllers($commands_path)
+    public function loadControllers($commandsPath)
     {
-        foreach (glob($commands_path . '/' . $this->getName() . '/*Controller.php') as $controller_file) {
-            $this->loadCommandMap($controller_file);
+        foreach (glob($commandsPath . '/' . $this->getName() . '/*Controller.php') as $controllerFile) {
+            $this->loadCommandMap($controllerFile);
         }
 
         return $this->getControllers();
@@ -48,36 +48,36 @@ class CommandNamespace
     }
 
     /**
-     * @param $command_name
+     * @param $commandName
      * @return CommandController
      */
-    public function getController($command_name)
+    public function getController($commandName)
     {
-        return isset($this->controllers[$command_name]) ? $this->controllers[$command_name] : null;
+        return isset($this->controllers[$commandName]) ? $this->controllers[$commandName] : null;
     }
 
     /**
-     * @param string $controller_file
+     * @param string $controllerFile
      */
-    protected function loadCommandMap($controller_file)
+    protected function loadCommandMap($controllerFile)
     {
-        $filename = basename($controller_file);
+        $filename = basename($controllerFile);
 
-        $controller_class = str_replace('.php', '', $filename);
-        $command_name = strtolower(str_replace('Controller', '', $controller_class));
-        $full_class_name = sprintf("%s\\%s", $this->getNamespace($controller_file), $controller_class);
+        $controllerClass = str_replace('.php', '', $filename);
+        $commandName = strtolower(str_replace('Controller', '', $controllerClass));
+        $full_class_name = sprintf("%s\\%s", $this->getNamespace($controllerFile), $controllerClass);
 
         /** @var CommandController $controller */
         $controller = new $full_class_name();
-        $this->controllers[$command_name] = $controller;
+        $this->controllers[$commandName] = $controller;
     }
 
     protected function getNamespace($filename)
     {
         $lines = preg_grep('/^namespace /', file($filename));
-        $namespace_line = trim(array_shift($lines));
+        $namespaceLine = trim(array_shift($lines));
         $match = [];
-        preg_match('/^namespace (.*);$/', $namespace_line, $match);
+        preg_match('/^namespace (.*);$/', $namespaceLine, $match);
 
         return array_pop($match);
     }

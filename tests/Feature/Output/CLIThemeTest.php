@@ -19,9 +19,9 @@ it('asserts that Default CLI theme sets all default styles', function () {
 });
 
 it('asserts that default theme returns expected colors for default text', function () {
-    $theme_default = new DefaultTheme();
+    $themeDefault = new DefaultTheme();
 
-    $this->assertContains(CLIColors::$FG_WHITE, $theme_default->getStyle('default'));
+    $this->assertContains(CLIColors::$FG_WHITE, $themeDefault->getStyle('default'));
 });
 
 it('asserts that Unicorn CLI theme sets all default styles', function () {

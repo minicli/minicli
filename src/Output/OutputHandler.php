@@ -10,10 +10,10 @@ use Minicli\ServiceInterface;
 class OutputHandler implements ServiceInterface
 {
     /** @var PrinterAdapterInterface */
-    protected $printer_adapter;
+    protected $printerAdapter;
 
     /** @var array */
-    protected $output_filters = [];
+    protected $outputFilters = [];
 
     /**
      * OutputHandler constructor.
@@ -21,7 +21,7 @@ class OutputHandler implements ServiceInterface
      */
     public function __construct(PrinterAdapterInterface $printer = null)
     {
-        $this->printer_adapter = $printer ?? new DefaultPrinterAdapter();
+        $this->printerAdapter = $printer ?? new DefaultPrinterAdapter();
     }
 
     /**
@@ -29,7 +29,7 @@ class OutputHandler implements ServiceInterface
      */
     public function registerFilter(OutputFilterInterface $filter): void
     {
-        $this->output_filters[] = $filter;
+        $this->outputFilters[] = $filter;
     }
 
     /**
@@ -37,7 +37,7 @@ class OutputHandler implements ServiceInterface
      */
     public function clearFilters(): void
     {
-        $this->output_filters = [];
+        $this->outputFilters = [];
     }
 
     /**
@@ -59,7 +59,7 @@ class OutputHandler implements ServiceInterface
     {
         /** @var OutputFilterInterface $filter */
 
-        foreach ($this->output_filters as $filter) {
+        foreach ($this->outputFilters as $filter) {
             $content = $filter->filter($content, $style);
         }
 
@@ -73,7 +73,7 @@ class OutputHandler implements ServiceInterface
      */
     public function out($content, $style = "default"): void
     {
-        $this->printer_adapter->out($this->filterOutput($content, $style));
+        $this->printerAdapter->out($this->filterOutput($content, $style));
     }
 
     /**
@@ -82,7 +82,7 @@ class OutputHandler implements ServiceInterface
      */
     public function rawOutput($content)
     {
-        $this->printer_adapter->out($content);
+        $this->printerAdapter->out($content);
     }
 
     /**
@@ -153,7 +153,7 @@ class OutputHandler implements ServiceInterface
     {
         $helper = new TableHelper($table);
 
-        $filter = (isset($this->output_filters[0]) && $this->output_filters[0] instanceof OutputFilterInterface) ? $this->output_filters[0] : null;
+        $filter = (isset($this->outputFilters[0]) && $this->outputFilters[0] instanceof OutputFilterInterface) ? $this->outputFilters[0] : null;
         $this->newline();
         $this->rawOutput($helper->getFormattedTable($filter));
         $this->newline();

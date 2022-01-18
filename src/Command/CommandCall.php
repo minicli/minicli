@@ -2,8 +2,6 @@
 
 namespace Minicli\Command;
 
-use Assets\Command\Test\ParamsController;
-
 class CommandCall
 {
     /** @var string  */
@@ -16,7 +14,7 @@ class CommandCall
     public $args = [];
 
     /** @var array  */
-    public $raw_args = [];
+    public $rawArgs = [];
 
     /** @var array */
     public $params = [];
@@ -30,7 +28,7 @@ class CommandCall
      */
     public function __construct(array $argv)
     {
-        $this->raw_args = $argv;
+        $this->rawArgs = $argv;
         $this->parseCommand($argv);
 
         $this->command = isset($this->args[1]) ? $this->args[1] : null;
@@ -93,7 +91,7 @@ class CommandCall
      */
     public function getRawArgs()
     {
-        return $this->raw_args;
+        return $this->rawArgs;
     }
 
     /**
