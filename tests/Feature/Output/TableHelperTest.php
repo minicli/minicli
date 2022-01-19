@@ -28,7 +28,9 @@ it('asserts that TableHelper sets and outputs table rows', function () {
 
     for ($i = 1; $i <= 10; $i++) {
         $table->addRow([
-            $i, 'test', rand(0, 200)
+           (string) $i,
+           'test',
+           (string) rand(0, 200)
         ]);
     }
 

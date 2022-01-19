@@ -91,9 +91,7 @@ it('asserts App throws exception when single command is not found', function () 
 it('asserts App throws exception when command is not callable', function () {
     $app = getBasicApp();
     $app->registerCommand('minicli-test-error', "not a callable");
-
-    $app->runCommand(['minicli', 'minicli-test-error']);
-})->expectException(CommandNotFoundException::class);
+})->expectException(\TypeError::class);
 
 $app = new \Minicli\App();
 $errorNotFound = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');

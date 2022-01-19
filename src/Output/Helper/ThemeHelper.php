@@ -1,16 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Helper;
 
 use Minicli\Output\Filter\ColorOutputFilter;
 
 class ThemeHelper
 {
-    /** @var array */
-    protected $theme = '';
+    /**
+     * theme
+     *
+     * @var string
+     */
+    protected string $theme = '';
 
     /**
-     * ThemeHelper constructor. Takes in the App theme config value.
+     * ThemeHelper constructor. Takes in the App theme config value
+     *
      * @param string $themeConfig
      */
     public function __construct(string $themeConfig = '')
@@ -20,10 +27,11 @@ class ThemeHelper
     }
 
     /**
-     * Initialize and return an OutputFilter based on our theme class.
+     * Initialize and return an OutputFilter based on our theme class
+     *
      * @return ColorOutPutFilter
      */
-    public function getOutputFilter()
+    public function getOutputFilter(): ColorOutPutFilter
     {
         if (class_exists($this->theme)) {
             return new ColorOutputFilter(new $this->theme());
@@ -34,9 +42,11 @@ class ThemeHelper
 
     /**
      * Parses the theme config setting and returns a namespaced class name.
+     *
+     * @param string $themeConfig
      * @return string
      */
-    protected function parseThemeSetting($themeConfig)
+    protected function parseThemeSetting(string $themeConfig): string
     {
         if (!$themeConfig) {
             return '';

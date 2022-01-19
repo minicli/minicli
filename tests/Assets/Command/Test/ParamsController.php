@@ -6,7 +6,7 @@ use Minicli\Command\CommandController;
 
 class ParamsController extends CommandController
 {
-    public function handle()
+    public function handle(): void
     {
         $print = count($this->getArgs());
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli;
 
 use Minicli\Command\CommandCall;
@@ -10,17 +12,30 @@ use Minicli\Output\OutputHandler;
 
 class App
 {
-    /** @var  string  */
-    protected $appSignature;
-
-    /** @var  array */
-    protected $services = [];
-
-    /** @var array  */
-    protected $loadedServices = [];
+    /**
+     * app signature
+     *
+     * @var string
+     */
+    protected string $appSignature;
 
     /**
-     * App constructor.
+     * app services
+     *
+     * @var array
+     */
+    protected array $services = [];
+
+    /**
+     * app loaded services
+     *
+     * @var array
+     */
+    protected array $loadedServices = [];
+
+    /**
+     * App constructor
+     *
      * @param array $config
      */
     public function __construct(array $config = [], string $signature = './minicli help')
@@ -39,11 +54,12 @@ class App
     }
 
     /**
-     * Magic method implements lazy loading for services.
+     * Magic method implements lazy loading for services
+     *
      * @param string $name
      * @return ServiceInterface|null
      */
-    public function __get($name)
+    public function __get(string $name): ?ServiceInterface
     {
         if (!array_key_exists($name, $this->services)) {
             return null;
@@ -57,24 +73,31 @@ class App
     }
 
     /**
+     * add app service
+     *
      * @param string $name
      * @param ServiceInterface $service
+     * @return void
      */
-    public function addService($name, ServiceInterface $service)
+    public function addService(string $name, ServiceInterface $service): void
     {
         $this->services[$name] = $service;
     }
 
     /**
+     * load app service
+     *
      * @param string $name
+     * @return void
      */
-    public function loadService($name)
+    public function loadService(string $name): void
     {
         $this->loadedServices[$name] = $this->services[$name]->load($this);
     }
 
     /**
      * Shortcut for accessing the Output Handler
+     *
      * @return OutputHandler
      */
     public function getPrinter(): OutputHandler
@@ -84,41 +107,53 @@ class App
 
     /**
      * Shortcut for setting the Output Handler
+     *
      * @param OutputHandler $output_printer
+     * @return void
      */
-    public function setOutputHandler(OutputHandler $output_printer)
+    public function setOutputHandler(OutputHandler $output_printer): void
     {
         $this->services['printer'] = $output_printer;
     }
 
     /**
+     * get app signature
+     *
      * @return string
      */
-    public function getSignature()
+    public function getSignature(): string
     {
         return $this->appSignature;
     }
 
     /**
+     * print signature
+     *
      * @return void
      */
-    public function printSignature()
+    public function printSignature(): void
     {
         $this->getPrinter()->display($this->getSignature());
     }
+
     /**
+     * set signature
+     *
      * @param string $appSignature
+     * @return void
      */
-    public function setSignature($appSignature)
+    public function setSignature(string $appSignature): void
     {
         $this->appSignature = $appSignature;
     }
 
     /**
-     * Set the Output Handler based on the App's theme config setting.
+     * Set the Output Handler based on the App's theme config setting
+     *
      * @param string $loadedServices
+     * @return void
      */
-    public function setTheme(string $loadedServices)
+    public function setTheme(string $loadedServices): void
     {
         $output = new OutputHandler();
 
@@ -131,19 +166,26 @@ class App
     }
 
     /**
+     * register app command
+     *
      * @param string $name
      * @param callable $callable
+     * @return void
      */
-    public function registerCommand($name, $callable)
+    public function registerCommand(string $name, callable $callable): void
     {
         $this->commandRegistry->registerCommand($name, $callable);
     }
 
     /**
+     * run command
+     *
      * @param array $argv
+     * @return void
+     *
      * @throws CommandNotFoundException
      */
-    public function runCommand(array $argv = [])
+    public function runCommand(array $argv = []): void
     {
         $input = new CommandCall($argv);
 
@@ -165,11 +207,14 @@ class App
     }
 
     /**
+     * run single
+     *
      * @param CommandCall $input
      * @throws CommandNotFoundException
+     *
      * @return bool
      */
-    protected function runSingle(CommandCall $input)
+    protected function runSingle(CommandCall $input): bool
     {
         try {
             $callable = $this->commandRegistry->getCallable($input->command);

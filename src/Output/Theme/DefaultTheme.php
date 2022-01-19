@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
@@ -7,8 +9,12 @@ use Minicli\Output\CLIThemeInterface;
 
 class DefaultTheme implements CLIThemeInterface
 {
-    /** @var array $styles  */
-    public $styles = [];
+    /**
+     * styles
+     *
+     * @var array
+     */
+    public array $styles = [];
 
     /**
      * DefaultTheme constructor.
@@ -24,6 +30,7 @@ class DefaultTheme implements CLIThemeInterface
 
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
+     *
      * @param string $style_name
      * @return array An array containing FG color and optionally BG color
      */
@@ -34,6 +41,7 @@ class DefaultTheme implements CLIThemeInterface
 
     /**
      * Sets a style
+     *
      * @param string $name
      * @param array $style
      */
@@ -43,7 +51,9 @@ class DefaultTheme implements CLIThemeInterface
     }
 
     /**
-     * Returns the default style colors
+     * get default style colors
+     *
+     * @return array
      */
     public function getDefaultColors(): array
     {
@@ -65,7 +75,8 @@ class DefaultTheme implements CLIThemeInterface
     }
 
     /**
-     * This method should be implemented by children themes to overwrite and set custom styles/colors.
+     * This method should be implemented by children themes to overwrite and set custom styles/colors
+     *
      * @return array
      */
     public function getThemeColors(): array
