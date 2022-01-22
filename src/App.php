@@ -108,12 +108,12 @@ class App
     /**
      * Shortcut for setting the Output Handler
      *
-     * @param OutputHandler $output_printer
+     * @param OutputHandler $outputPrinter
      * @return void
      */
-    public function setOutputHandler(OutputHandler $output_printer): void
+    public function setOutputHandler(OutputHandler $outputPrinter): void
     {
-        $this->services['printer'] = $output_printer;
+        $this->services['printer'] = $outputPrinter;
     }
 
     /**
