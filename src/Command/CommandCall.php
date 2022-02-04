@@ -13,11 +13,11 @@ class CommandCall
      */
     public ?string $command;
 
-     /**
-     * sub command
-     *
-     * @param string $subcommand
-     */
+    /**
+    * sub command
+    *
+    * @param string $subcommand
+    */
     public string $subcommand;
 
     /**
@@ -27,11 +27,11 @@ class CommandCall
      */
     public array $args = [];
 
-     /**
-     * raw arguments
-     *
-     * @param array $rawArgs
-     */
+    /**
+    * raw arguments
+    *
+    * @param array $rawArgs
+    */
     public array $rawArgs = [];
 
     /**

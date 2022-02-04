@@ -24,13 +24,13 @@ class FilePrinterAdapter implements PrinterAdapterInterface
         $this->outputFile = $outputFile;
     }
 
-   /**
-    * writes output to file
-    *
-    * @param string $message
-    * @param string|null $style
-    * @return string
-    */
+    /**
+     * writes output to file
+     *
+     * @param string $message
+     * @param string|null $style
+     * @return string
+     */
     public function out(string $message, ?string $style = null): string
     {
         $fp = fopen($this->outputFile, "a+");

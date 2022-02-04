@@ -128,7 +128,7 @@ class CommandRegistry implements ServiceInterface
      * @param string $subcommand
      * @return CommandController|null
      */
-    public function getCallableController(string $command,string $subcommand = "default"): ?CommandController
+    public function getCallableController(string $command, string $subcommand = "default"): ?CommandController
     {
         $namespace = $this->getNamespace($command);
 
