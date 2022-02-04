@@ -95,17 +95,9 @@ it('asserts App throws exception when command is not callable', function () {
 
 $app = new \Minicli\App();
 $errorNotFound = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
-$errorNotCallable = $app->getPrinter()->filterOutput("The registered command is not a callable function.", 'error');
 
 it('asserts App shows error when debug is set to false and command is not found', function () {
     $app = getProdApp();
 
     $app->runCommand(['minicli', 'inexistent-command']);
 })->expectOutputString("\n" . $errorNotFound . "\n");
-
-it('asserts App shows error when debug is set to false and command is not callable', function () {
-    $app = getProdApp();
-    $app->registerCommand('minicli-test-error', "not a callable");
-
-    $app->runCommand(['minicli', 'minicli-test-error']);
-})->expectOutputString("\n" . $errorNotCallable . "\n");
