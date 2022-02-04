@@ -14,12 +14,16 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=7.3"
+    "php": ">=8"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
     "pestphp/pest": "^1.0",
-    "friendsofphp/php-cs-fixer": "^2.16"
+    "friendsofphp/php-cs-fixer": "^3.5"
+  },
+  "scripts": {
+    "test" : ["pest"],
+    "csfix": ["php-cs-fixer fix"]
   },
   "suggest": {
     "ext-readline": "For obtaining user input"
