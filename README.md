@@ -16,7 +16,7 @@
         <img src="https://readthedocs.org/projects/minicliphp/badge/?version=latest" alt="Documentation Status" title="Documentation Status">
     </a>
     <h1 align="center">
-        Minicli 2
+        Minicli 3
     </h1>
 </p>
 <br>
@@ -28,6 +28,7 @@ Quick links:
 - [Documentation](https://docs.minicli.dev)
 - [Demos](https://github.com/minicli/demos)
 - [Contributing](CONTRIBUTING.md)
+- [Contributors](CONTRIBUTORS.md)
 
 ## Dependency-free: What Does it Mean
 
@@ -207,7 +208,3 @@ The following tutorials on [dev.to](https://dev.to/erikaheidi) compose a series 
  - Part 4: [Introducing minicli: a microframework for CLI-centric PHP applications](https://dev.to/erikaheidi/introducing-minicli-a-microframework-for-cli-centric-php-applications-44ik)
 
 _Note: Minicli has evolved a lot since that series was initially written, but that was the base for what Minicli is today._
-
-## Created with Minicli
-
-- [Dolphin](https://github.com/do-community/dolphin) - a CLI tool for managing DigitalOcean servers with Ansible.
