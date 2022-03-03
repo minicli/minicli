@@ -5,10 +5,12 @@ $finder = PhpCsFixer\Finder::create()
     ->name('*.php')
 ;
 
-return PhpCsFixer\Config::create()
-    ->setRules([
-        '@PSR1' => true,
-        '@PSR2' => true,
+
+$config = new PhpCsFixer\Config();
+return $config->setRules([
+        '@PSR12' => true,
+        'strict_param' => true,
+        'array_syntax' => ['syntax' => 'short'],
         'full_opening_tag' => true,
         'no_closing_tag' => true,
     ])
