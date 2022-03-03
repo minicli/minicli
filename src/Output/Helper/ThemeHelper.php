@@ -1,29 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Helper;
 
 use Minicli\Output\Filter\ColorOutputFilter;
 
 class ThemeHelper
 {
-    /** @var array */
-    protected $theme = '';
+    /**
+     * theme
+     *
+     * @var string
+     */
+    protected string $theme = '';
 
     /**
-     * ThemeHelper constructor. Takes in the App theme config value.
-     * @param string $theme_config
+     * ThemeHelper constructor. Takes in the App theme config value
+     *
+     * @param string $themeConfig
      */
-    public function __construct(string $theme_config = '')
+    public function __construct(string $themeConfig = '')
     {
-        $this->theme = $this->parseThemeSetting($theme_config);
+        $this->theme = $this->parseThemeSetting($themeConfig);
         return $this;
     }
 
     /**
-     * Initialize and return an OutputFilter based on our theme class.
+     * Initialize and return an OutputFilter based on our theme class
+     *
      * @return ColorOutPutFilter
      */
-    public function getOutputFilter()
+    public function getOutputFilter(): ColorOutPutFilter
     {
         if (class_exists($this->theme)) {
             return new ColorOutputFilter(new $this->theme());
@@ -34,18 +42,20 @@ class ThemeHelper
 
     /**
      * Parses the theme config setting and returns a namespaced class name.
+     *
+     * @param string $themeConfig
      * @return string
      */
-    protected function parseThemeSetting($theme_config)
+    protected function parseThemeSetting(string $themeConfig): string
     {
-        if (!$theme_config) {
+        if (!$themeConfig) {
             return '';
         }
 
-        if ($theme_config[0] == '\\') {
-            return '\Minicli\Output\Theme' . $theme_config . 'Theme';  // Built-in theme.
+        if ($themeConfig[0] == '\\') {
+            return '\Minicli\Output\Theme' . $themeConfig . 'Theme';  // Built-in theme.
         }
 
-        return $theme_config . 'Theme'; // User-defined theme.
+        return $themeConfig . 'Theme'; // User-defined theme.
     }
 }

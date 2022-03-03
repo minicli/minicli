@@ -1,83 +1,109 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Minicli\Command;
 
 class CommandNamespace
 {
-    /** @var  string */
-    protected $name;
-
-    /** @var array  */
-    protected $controllers = [];
-
     /**
-     * CommandNamespace constructor.
+     * name
+     *
      * @param string $name
      */
-    public function __construct($name)
+    protected string $name;
+
+    /**
+     * controllers
+     *
+     * @param array $controllers
+     */
+    protected array $controllers = [];
+
+    /**
+     * CommandNamespace constructor
+     *
+     * @param string $name
+     */
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
     /**
-     * @return mixed
+     * get name
+     *
+     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Load namespace controllers
+     *
      * @return array
      */
-    public function loadControllers($commands_path)
+    public function loadControllers(string $commandsPath): array
     {
-        foreach (glob($commands_path . '/' . $this->getName() . '/*Controller.php') as $controller_file) {
-            $this->loadCommandMap($controller_file);
+        foreach (glob($commandsPath . '/' . $this->getName() . '/*Controller.php') as $controllerFile) {
+            $this->loadCommandMap($controllerFile);
         }
 
         return $this->getControllers();
     }
 
     /**
+     * get controllers
+     *
      * @return array
      */
-    public function getControllers()
+    public function getControllers(): array
     {
         return $this->controllers;
     }
 
     /**
-     * @param $command_name
-     * @return CommandController
+     * @param string $commandName
+     *
+     * @return CommandController|null
      */
-    public function getController($command_name)
+    public function getController(string $commandName): ?CommandController
     {
-        return isset($this->controllers[$command_name]) ? $this->controllers[$command_name] : null;
+        return isset($this->controllers[$commandName]) ? $this->controllers[$commandName] : null;
     }
 
     /**
-     * @param string $controller_file
+     * load command map
+     *
+     * @param string $controllerFile
+     * @return void
      */
-    protected function loadCommandMap($controller_file)
+    protected function loadCommandMap(string $controllerFile): void
     {
-        $filename = basename($controller_file);
+        $filename = basename($controllerFile);
 
-        $controller_class = str_replace('.php', '', $filename);
-        $command_name = strtolower(str_replace('Controller', '', $controller_class));
-        $full_class_name = sprintf("%s\\%s", $this->getNamespace($controller_file), $controller_class);
+        $controllerClass = str_replace('.php', '', $filename);
+        $commandName = strtolower(str_replace('Controller', '', $controllerClass));
+        $fullClassName = sprintf("%s\\%s", $this->getNamespace($controllerFile), $controllerClass);
 
-        /** @var CommandController $controller */
-        $controller = new $full_class_name();
-        $this->controllers[$command_name] = $controller;
+        $controller = new $fullClassName();
+        $this->controllers[$commandName] = $controller;
     }
 
-    protected function getNamespace($filename)
+    /**
+     * get namespace
+     *
+     * @param string $filename
+     * @return string
+     */
+    protected function getNamespace(string $filename): string
     {
         $lines = preg_grep('/^namespace /', file($filename));
-        $namespace_line = trim(array_shift($lines));
+        $namespaceLine = trim(array_shift($lines));
         $match = [];
-        preg_match('/^namespace (.*);$/', $namespace_line, $match);
+        preg_match('/^namespace (.*);$/', $namespaceLine, $match);
 
         return array_pop($match);
     }

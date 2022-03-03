@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Minicli\Output\Helper;
 
@@ -8,20 +9,33 @@ use Minicli\Output\OutputFilterInterface;
 
 class TableHelper
 {
-    /** @var array */
-    protected $table_rows;
-
-    /** @var array */
-    protected $styled_rows;
-
-    /** @var string */
-    protected $formatted_table;
+    /**
+     * table rows
+     *
+     * @var array
+     */
+    protected array $tableRows;
 
     /**
-     * TableHelper constructor. Optionally sets the table rows with an array containing all rows.
+     * style rows
+     *
+     * @var array
+     */
+    protected array $styledRows;
+
+    /**
+     * formatted table
+     *
+     * @var string
+     */
+    protected string $formattedTable = '';
+
+    /**
+     * TableHelper constructor. Optionally sets the table rows with an array containing all rows
+     *
      * @param array|null $table
      */
-    public function __construct(array $table = null)
+    public function __construct(?array $table = null)
     {
         if (is_array($table)) {
             $this->setTable($table);
@@ -30,17 +44,20 @@ class TableHelper
 
     /**
      * Returns the total number of rows in the table
+     *
      * @return int
      */
-    public function totalRows() : int
+    public function totalRows(): int
     {
-        return count($this->table_rows);
+        return count($this->tableRows);
     }
 
     /**
      * Adds a table header
+     *
      * @param array $header
      * @param string $style
+     * @return void
      */
     public function addHeader(array $header, $style = 'alt'): void
     {
@@ -49,7 +66,9 @@ class TableHelper
 
     /**
      * Sets the table rows at once
+     *
      * @param array $full_table An array containing each table row. Rows must be arrays containing the individual cell contents.
+     * @return void
      */
     public function setTable(array $full_table): void
     {
@@ -68,96 +87,103 @@ class TableHelper
 
     /**
      * Adds a table row
+     *
      * @param array $row
      * @param string $style
+     * @return void
      */
-    public function addRow(array $row, $style = 'default'): void
+    public function addRow(array $row, string $style = 'default'): void
     {
         $this->insertTableRow($row, $style);
     }
 
     /**
      * Returns the formatted table for printing
+     *
      * @param OutputFilterInterface $filter In case no filter is provided, a SimpleOutputFilter is used by default.
      * @return string
      */
-    public function getFormattedTable(OutputFilterInterface $filter = null)
+    public function getFormattedTable(OutputFilterInterface $filter = null): string
     {
         $filter = $filter ?? new SimpleOutputFilter();
 
-        foreach ($this->styled_rows as $index => $item) {
+        foreach ($this->styledRows as $index => $item) {
             $style = $item['style'];
             $row = $this->getRowAsString($item['row']);
 
-            $this->formatted_table .= "\n" . $filter->filter($row, $style);
+            $this->formattedTable .= "\n" . $filter->filter($row, $style);
         }
 
-        return $this->formatted_table;
+        return $this->formattedTable;
     }
 
     /**
      * Inserts a new row in the table and sets the style for that row
+     *
      * @param array $row
      * @param string $style
+     * @return void
      */
-    protected function insertTableRow(array $row, $style = 'default')
+    protected function insertTableRow(array $row, string $style = 'default'): void
     {
-        $this->table_rows[] = $row;
-        $this->styled_rows[] = [ 'row' => $row, 'style' => $style ];
+        $this->tableRows[] = $row;
+        $this->styledRows[] = [ 'row' => $row, 'style' => $style ];
     }
 
     /**
      * Calculates ideal column sizes for the current table rows
-     * @param int $min_col_size
+     *
+     * @param int $minColSize
      * @return array
      */
-    protected function calculateColumnSizes($min_col_size = 5): array
+    protected function calculateColumnSizes(int $minColSize = 5): array
     {
-        $column_sizes = [];
+        $columnSizes = [];
 
-        foreach ($this->table_rows as $row_number => $row_content) {
-            $column_count = 0;
+        foreach ($this->tableRows as $rowNumber => $rowContent) {
+            $columnCount = 0;
 
-            foreach ($row_content as $cell) {
-                $column_sizes[$column_count] = $column_sizes[$column_count] ?? $min_col_size;
-                if (strlen($cell) >= $column_sizes[$column_count]) {
-                    $column_sizes[$column_count] = strlen($cell) + 2;
+            foreach ($rowContent as $cell) {
+                $columnSizes[$columnCount] = $columnSizes[$columnCount] ?? $minColSize;
+                if (strlen($cell) >= $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = strlen($cell) + 2;
                 }
-                $column_count++;
+                $columnCount++;
             }
         }
-        
-        return $column_sizes;
+
+        return $columnSizes;
     }
 
     /**
      * Transforms a row into a formatted string, with adequate column sizing
+     *
      * @param array $row
-     * @param int $col_size
+     * @param int $colSize
      * @return string
      */
-    protected function getRowAsString(array $row, $col_size = 5): string
+    protected function getRowAsString(array $row, int $colSize = 5): string
     {
         //first, determine the size of each column
-        $column_sizes = $this->calculateColumnSizes();
+        $columnSizes  = $this->calculateColumnSizes();
+        $formattedRow = "";
 
-        $formatted_row = "";
-
-        foreach ($row as $column => $table_cell) {
-            $formatted_row .= $this->getPaddedString($table_cell, $column_sizes[$column]);
+        foreach ($row as $column => $tableCell) {
+            $formattedRow .= $this->getPaddedString($tableCell, $columnSizes[$column]);
         }
 
-        return $formatted_row;
+        return $formattedRow;
     }
 
     /**
      * Pads a string as table cell
-     * @param string $table_cell
-     * @param int $col_size
+     *
+     * @param string $tableCell
+     * @param int $colSize
      * @return string
      */
-    protected function getPaddedString($table_cell, $col_size = 5): string
+    protected function getPaddedString(string $tableCell, int $colSize = 5): string
     {
-        return str_pad($table_cell, $col_size);
+        return str_pad($tableCell, $colSize);
     }
 }

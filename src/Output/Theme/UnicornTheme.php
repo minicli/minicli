@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
 
 class UnicornTheme extends DefaultTheme
 {
+    /**
+     * get theme colors
+     *
+     * @return array
+     */
     public function getThemeColors(): array
     {
         return [

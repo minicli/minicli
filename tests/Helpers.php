@@ -55,7 +55,7 @@ function getRegistry()
     });
 
     /** @var CommandRegistry $registry */
-    $registry = $app->command_registry;
+    $registry = $app->commandRegistry;
 
     return $registry;
 }

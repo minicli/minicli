@@ -9,14 +9,14 @@ it('asserts that TableHelper creates table from constructor', function () {
     ];
 
 
-    $table_helper = new TableHelper($table);
+    $tableHelper = new TableHelper($table);
 
-    $this->assertEquals(2, $table_helper->totalRows());
-    $table_content = $table_helper->getFormattedTable();
+    $this->assertEquals(2, $tableHelper->totalRows());
+    $tableContent = $tableHelper->getFormattedTable();
 
-    $this->assertStringContainsString('value1', $table_content);
-    $this->assertStringContainsString('value2', $table_content);
-    $this->assertStringContainsString('value3', $table_content);
+    $this->assertStringContainsString('value1', $tableContent);
+    $this->assertStringContainsString('value2', $tableContent);
+    $this->assertStringContainsString('value3', $tableContent);
 });
 
 it('asserts that TableHelper sets and outputs table rows', function () {
@@ -28,16 +28,18 @@ it('asserts that TableHelper sets and outputs table rows', function () {
 
     for ($i = 1; $i <= 10; $i++) {
         $table->addRow([
-            $i, 'test', rand(0, 200)
+           (string) $i,
+           'test',
+           (string) rand(0, 200)
         ]);
     }
 
     $this->assertEquals(11, $table->totalRows());
-    $table_content = $table->getFormattedTable();
+    $tableContent = $table->getFormattedTable();
 
-    $this->assertStringContainsString('ID', $table_content);
-    $this->assertStringContainsString('NAME', $table_content);
-    $this->assertStringContainsString('FIELD3', $table_content);
+    $this->assertStringContainsString('ID', $tableContent);
+    $this->assertStringContainsString('NAME', $tableContent);
+    $this->assertStringContainsString('FIELD3', $tableContent);
 });
 
 it('asserts that all fields respect column sizes', function () {
@@ -48,12 +50,12 @@ it('asserts that all fields respect column sizes', function () {
     ];
 
 
-    $table_helper = new TableHelper($table);
-    $table_content = $table_helper->getFormattedTable();
+    $tableHelper = new TableHelper($table);
+    $tableContent = $tableHelper->getFormattedTable();
 
-    $rows = explode("\n", $table_content);
-    $size_at_first = strlen($rows[1]);
-    $size_at_last = strlen($rows[count($rows)-1]);
+    $rows = explode("\n", $tableContent);
+    $sizeAtFirst = strlen($rows[1]);
+    $sizeAtLast = strlen($rows[count($rows)-1]);
 
-    $this->assertSame($size_at_first, $size_at_last);
+    $this->assertSame($sizeAtFirst, $sizeAtLast);
 });

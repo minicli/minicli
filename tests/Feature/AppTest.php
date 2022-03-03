@@ -35,7 +35,7 @@ it('asserts App has Config Service', function () {
 it('asserts App has CommandRegistry Service', function () {
     $app = getBasicApp();
 
-    $registry = $app->command_registry;
+    $registry = $app->commandRegistry;
 
     $this->assertTrue($registry instanceof CommandRegistry);
 });
@@ -63,7 +63,7 @@ it('asserts App registers and executes single command', function () {
         $app->getPrinter()->rawOutput("testing minicli");
     });
 
-    $command = $app->command_registry->getCallable('minicli-test');
+    $command = $app->commandRegistry->getCallable('minicli-test');
     $this->assertIsCallable($command);
 
     $app->runCommand(['minicli', 'minicli-test']);
@@ -91,23 +91,13 @@ it('asserts App throws exception when single command is not found', function () 
 it('asserts App throws exception when command is not callable', function () {
     $app = getBasicApp();
     $app->registerCommand('minicli-test-error', "not a callable");
-
-    $app->runCommand(['minicli', 'minicli-test-error']);
-})->expectException(CommandNotFoundException::class);
+})->expectException(\TypeError::class);
 
 $app = new \Minicli\App();
-$error_not_found = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
-$error_not_callable = $app->getPrinter()->filterOutput("The registered command is not a callable function.", 'error');
+$errorNotFound = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
 
 it('asserts App shows error when debug is set to false and command is not found', function () {
     $app = getProdApp();
 
     $app->runCommand(['minicli', 'inexistent-command']);
-})->expectOutputString("\n" . $error_not_found . "\n");
-
-it('asserts App shows error when debug is set to false and command is not callable', function () {
-    $app = getProdApp();
-    $app->registerCommand('minicli-test-error', "not a callable");
-
-    $app->runCommand(['minicli', 'minicli-test-error']);
-})->expectOutputString("\n" . $error_not_callable . "\n");
+})->expectOutputString("\n" . $errorNotFound . "\n");

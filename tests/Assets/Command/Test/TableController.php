@@ -7,7 +7,7 @@ use Minicli\Output\Helper\TableHelper;
 
 class TableController extends CommandController
 {
-    public function handle()
+    public function handle(): void
     {
         $table = new TableHelper();
 
@@ -19,6 +19,6 @@ class TableController extends CommandController
             ]);
         }
 
-        return $table->getFormattedTable();
+        $table->getFormattedTable();
     }
 }

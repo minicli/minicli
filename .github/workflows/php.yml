@@ -21,7 +21,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run test suite
-      run: ./vendor/bin/pest
+      run: composer test
 
     - name: Run php-cs-fixer
-      run: ./vendor/bin/php-cs-fixer fix
+      run: composer csfix

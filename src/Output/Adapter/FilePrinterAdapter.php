@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Minicli\Output\Adapter;
 
@@ -7,27 +8,32 @@ use Minicli\Output\PrinterAdapterInterface;
 
 class FilePrinterAdapter implements PrinterAdapterInterface
 {
-    /** @var string */
-    protected $output_file;
+    /**
+     * output file
+     *
+     * @var string
+     */
+    protected string $outputFile;
 
     /**
-     * FilePrinterAdapter constructor.
-     * @param $output_file
+     * setup file printer adapter
+     * @param string $outputFile
      */
-    public function __construct($output_file)
+    public function __construct(string $outputFile)
     {
-        $this->output_file = $output_file;
+        $this->outputFile = $outputFile;
     }
 
     /**
-     * Writes output to file.
+     * writes output to file
+     *
      * @param string $message
-     * @param null $style
-     * @return bool
+     * @param string|null $style
+     * @return string
      */
-    public function out($message, $style = null)
+    public function out(string $message, ?string $style = null): string
     {
-        $fp = fopen($this->output_file, "a+");
+        $fp = fopen($this->outputFile, "a+");
         fwrite($fp, $message);
         fclose($fp);
 
