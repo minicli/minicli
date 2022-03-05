@@ -19,7 +19,8 @@
   "require-dev": {
     "phpunit/phpunit": "^9.0",
     "pestphp/pest": "^1.0",
-    "friendsofphp/php-cs-fixer": "^3.5"
+    "friendsofphp/php-cs-fixer": "^3.5",
+    "larapack/dd": "^1.1"
   },
   "scripts": {
     "test" : ["pest"],
@@ -27,5 +28,10 @@
   },
   "suggest": {
     "ext-readline": "For obtaining user input"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }

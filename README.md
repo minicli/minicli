@@ -70,7 +70,7 @@ $app->setSignature('./minicli mycommand');
 $app->registerCommand('mycommand', function(CommandCall $input) {
     echo "My Command!";
 
-    var_dump($input);
+    dd($input); // Debug
 });
 
 $app->runCommand($argv);
