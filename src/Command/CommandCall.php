@@ -59,9 +59,9 @@ class CommandCall
 
         $this->parseCommand($argv);
 
-        $this->command = isset($this->args[1]) ? $this->args[1] : null;
+        $this->command = $this->args[1] ?? null;
 
-        $this->subcommand = isset($this->args[2]) ? $this->args[2] : 'default';
+        $this->subcommand = $this->args[2] ?? 'default';
     }
 
     /**
