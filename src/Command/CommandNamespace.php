@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli\Command;
 
+use Minicli\ControllerInterface;
+
 class CommandNamespace
 {
     /**
@@ -67,11 +69,11 @@ class CommandNamespace
     /**
      * @param string $commandName
      *
-     * @return CommandController|null
+     * @return ControllerInterface|null
      */
-    public function getController(string $commandName): ?CommandController
+    public function getController(string $commandName): ?ControllerInterface
     {
-        return isset($this->controllers[$commandName]) ? $this->controllers[$commandName] : null;
+        return $this->controllers[$commandName] ?? null;
     }
 
     /**

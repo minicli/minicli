@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Command;
 
+use JetBrains\PhpStorm\Pure;
 use Minicli\App;
 use Minicli\ControllerInterface;
 use Minicli\Output\OutputHandler;
@@ -44,8 +45,7 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * run command
-     *
-     * @param App $app
+     * @param CommandCall $input
      * @return void
      */
     public function run(CommandCall $input): void
@@ -111,7 +111,7 @@ abstract class CommandController implements ControllerInterface
      * @param string $param
      * @return string|null
      */
-    protected function getParam($param): ?string
+    protected function getParam(string $param): ?string
     {
         return $this->input->getParam($param);
     }

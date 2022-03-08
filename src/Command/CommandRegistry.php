@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Command;
 
 use Minicli\App;
+use Minicli\ControllerInterface;
 use Minicli\ServiceInterface;
 use Minicli\Exception\CommandNotFoundException;
 
@@ -81,11 +82,11 @@ class CommandRegistry implements ServiceInterface
      * get namespace
      *
      * @param string $command
-     * @return CommandNamespace
+     * @return ?CommandNamespace
      */
     public function getNamespace(string $command): ?CommandNamespace
     {
-        return isset($this->namespaces[$command]) ? $this->namespaces[$command] : null;
+        return $this->namespaces[$command] ?? null;
     }
 
     /**
@@ -118,7 +119,7 @@ class CommandRegistry implements ServiceInterface
      */
     public function getCommand(string $command): ?callable
     {
-        return isset($this->defaultRegistry[$command]) ? $this->defaultRegistry[$command] : null;
+        return $this->defaultRegistry[$command] ?? null;
     }
 
     /**
@@ -126,9 +127,9 @@ class CommandRegistry implements ServiceInterface
      *
      * @param string $command
      * @param string $subcommand
-     * @return CommandController|null
+     * @return ControllerInterface|null
      */
-    public function getCallableController(string $command, string $subcommand = "default"): ?CommandController
+    public function getCallableController(string $command, string $subcommand = "default"): ?ControllerInterface
     {
         $namespace = $this->getNamespace($command);
 
@@ -145,7 +146,7 @@ class CommandRegistry implements ServiceInterface
      * @param string $command
      * @return callable|null
      *
-     * @throws \CommandNotFoundException
+     * @throws CommandNotFoundException
      */
     public function getCallable(string $command): ?callable
     {
