@@ -59,3 +59,20 @@ function getRegistry()
 
     return $registry;
 }
+
+function getRegistryWithMultiplePaths()
+{
+    $config = [
+        'app_path' => [
+            getCommandsPath(),
+            __DIR__ . '/Assets/VendorCommand'
+        ]
+    ];
+
+    $app = new App($config);
+
+    /** @var CommandRegistry $registry */
+    $registry = $app->commandRegistry;
+
+    return $registry;
+}
