@@ -14,9 +14,9 @@ class CommandRegistry implements ServiceInterface
     /**
      * commands path
      *
-     * @param string $commandsPath
+     * @param array $commandsPath
      */
-    protected string $commandsPath;
+    protected array $commandsPath;
 
     /**
      * namespaces
@@ -35,9 +35,9 @@ class CommandRegistry implements ServiceInterface
     /**
      * CommandRegistry constructor
      *
-     * @param string $commandsPath
+     * @param array $commandsPath
      */
-    public function __construct(string $commandsPath)
+    public function __construct(array $commandsPath)
     {
         $this->commandsPath = $commandsPath;
     }
@@ -50,18 +50,21 @@ class CommandRegistry implements ServiceInterface
      */
     public function load(App $app): void
     {
-        $this->autoloadNamespaces();
+        foreach ($this->getCommandsPath() as $commandSource) {
+            $this->autoloadNamespaces($commandSource);
+        }
     }
 
     /**
      * autoload namespaces
      *
+     * @param string $commandSource
      * @return void
      */
-    public function autoloadNamespaces(): void
+    public function autoloadNamespaces(string $commandSource): void
     {
-        foreach (glob($this->getCommandsPath() . '/*', GLOB_ONLYDIR) as $namespacePath) {
-            $this->registerNamespace(basename($namespacePath));
+        foreach (glob($commandSource . '/*', GLOB_ONLYDIR) as $namespacePath) {
+            $this->registerNamespace(basename($namespacePath), $commandSource);
         }
     }
 
@@ -69,12 +72,13 @@ class CommandRegistry implements ServiceInterface
      * register namespace
      *
      * @param string $commandNamespace
+     * @param string $commandSource
      * @return void
      */
-    public function registerNamespace(string $commandNamespace): void
+    public function registerNamespace(string $commandNamespace, string $commandSource): void
     {
         $namespace = new CommandNamespace($commandNamespace);
-        $namespace->loadControllers($this->getCommandsPath());
+        $namespace->loadControllers($commandSource);
         $this->namespaces[strtolower($commandNamespace)] = $namespace;
     }
 
@@ -92,9 +96,9 @@ class CommandRegistry implements ServiceInterface
     /**
      * get commands path
      *
-     * @return string
+     * @return array
      */
-    public function getCommandsPath(): string
+    public function getCommandsPath(): array
     {
         return $this->commandsPath;
     }

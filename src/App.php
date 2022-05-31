@@ -47,7 +47,11 @@ class App
         ], $config);
 
         $this->addService('config', new Config($config));
-        $this->addService('commandRegistry', new CommandRegistry($this->config->app_path));
+        $commandsPath = $this->config->app_path;
+        if (!is_array($commandsPath)) {
+            $commandsPath = [ $commandsPath ];
+        }
+        $this->addService('commandRegistry', new CommandRegistry($commandsPath));
 
         $this->setSignature($signature);
         $this->setTheme($this->config->theme);
