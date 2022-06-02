@@ -37,6 +37,7 @@ class App
      * App constructor
      *
      * @param array $config
+     * @param string $signature
      */
     public function __construct(array $config = [], string $signature = './minicli help')
     {
@@ -51,10 +52,32 @@ class App
         if (!is_array($commandsPath)) {
             $commandsPath = [ $commandsPath ];
         }
-        $this->addService('commandRegistry', new CommandRegistry($commandsPath));
+
+        $commandSources = [];
+        foreach ($commandsPath as $path) {
+            if (str_starts_with($path, '@')) {
+                $path = str_replace('@', $this->getAppRoot() . '/vendor/', $path) . '/Command';
+            }
+            $commandSources[] = $path;
+        }
+        $this->addService('commandRegistry', new CommandRegistry($commandSources));
 
         $this->setSignature($signature);
         $this->setTheme($this->config->theme);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppRoot(): string
+    {
+        $root_app = dirname(__DIR__);
+
+        if (!is_file($root_app . '/vendor/autoload.php')) {
+            $root_app = dirname(__DIR__, 4);
+        }
+
+        return $root_app;
     }
 
     /**
