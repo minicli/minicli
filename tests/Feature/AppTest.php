@@ -40,6 +40,19 @@ it('asserts App has CommandRegistry Service', function () {
     $this->assertTrue($registry instanceof CommandRegistry);
 });
 
+it('asserts App parses command path with @vendor tag', function () {
+    $app = new \Minicli\App([
+        'app_path' => '@namespace/command'
+    ]);
+
+    $registry = $app->commandRegistry;
+    $paths = $registry->getCommandsPath();
+    $this->assertIsArray($paths);
+    $this->assertCount(1, $paths);
+    var_dump($paths);
+    $this->assertStringEndsWith("namespace/command/Command", $paths[0]);
+});
+
 it('asserts App has Printer service', function () {
     $app = getBasicApp();
 
