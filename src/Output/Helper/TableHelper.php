@@ -100,14 +100,14 @@ class TableHelper
     /**
      * Returns the formatted table for printing
      *
-     * @param OutputFilterInterface $filter In case no filter is provided, a SimpleOutputFilter is used by default.
+     * @param OutputFilterInterface|null $filter In case no filter is provided, a SimpleOutputFilter is used by default.
      * @return string
      */
     public function getFormattedTable(OutputFilterInterface $filter = null): string
     {
         $filter = $filter ?? new SimpleOutputFilter();
 
-        foreach ($this->styledRows as $index => $item) {
+        foreach ($this->styledRows as $item) {
             $style = $item['style'];
             $row = $this->getRowAsString($item['row']);
 
@@ -140,7 +140,7 @@ class TableHelper
     {
         $columnSizes = [];
 
-        foreach ($this->tableRows as $rowNumber => $rowContent) {
+        foreach ($this->tableRows as $rowContent) {
             $columnCount = 0;
 
             foreach ($rowContent as $cell) {
@@ -159,10 +159,9 @@ class TableHelper
      * Transforms a row into a formatted string, with adequate column sizing
      *
      * @param array $row
-     * @param int $colSize
      * @return string
      */
-    protected function getRowAsString(array $row, int $colSize = 5): string
+    protected function getRowAsString(array $row): string
     {
         //first, determine the size of each column
         $columnSizes  = $this->calculateColumnSizes();
