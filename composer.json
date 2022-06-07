@@ -7,7 +7,11 @@
   "keywords": ["cli","command-line"],
   "autoload": {
     "psr-4": {
-      "Minicli\\": "src/",
+      "Minicli\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "Assets\\": "tests/Assets"
     }
   },
