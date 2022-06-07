@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Minicli;
 
-use RuntimeException;
-
 class Input
 {
     /**
@@ -29,7 +27,6 @@ class Input
      */
     public function __construct($prompt = 'minicli$> ')
     {
-        $this->checkReadlineExtension();
         $this->setPrompt($prompt);
     }
 
@@ -40,7 +37,6 @@ class Input
      */
     public function read(): string
     {
-        $this->checkReadlineExtension();
         $input = readline($this->getPrompt());
         $this->inputHistory[] = $input;
 
@@ -76,20 +72,5 @@ class Input
     public function setPrompt(string $prompt): void
     {
         $this->prompt = $prompt;
-    }
-
-    /**
-     * check read line extension
-     *
-     * @return void
-     * @throws RuntimeException
-     */
-    private function checkReadlineExtension(): void
-    {
-        if (extension_loaded('readline')) {
-            return;
-        }
-
-        throw new RuntimeException('Extension readline is required.');
     }
 }
