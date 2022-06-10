@@ -29,5 +29,10 @@
   "scripts": {
     "test" : ["pest"],
     "csfix": ["php-cs-fixer fix"]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }
