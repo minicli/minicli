@@ -27,5 +27,10 @@
   },
   "suggest": {
     "ext-readline": "For obtaining user input"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }
