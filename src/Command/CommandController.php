@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Minicli\Command;
 
-use JetBrains\PhpStorm\Pure;
 use Minicli\App;
 use Minicli\ControllerInterface;
 use Minicli\Output\OutputHandler;
