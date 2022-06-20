@@ -140,11 +140,7 @@ class CommandRegistry implements ServiceInterface
     {
         $namespace = $this->getNamespace($command);
 
-        if ($namespace !== null) {
-            return $namespace->getController($subcommand);
-        }
-
-        return null;
+        return $namespace?->getController($subcommand);
     }
 
     /**

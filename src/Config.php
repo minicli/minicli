@@ -31,7 +31,7 @@ class Config implements ServiceInterface
      */
     public function __get(string $name): mixed
     {
-        return isset($this->config[$name]) ? $this->config[$name] : null;
+        return $this->config[$name] ?? null;
     }
 
     /**

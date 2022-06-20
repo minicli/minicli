@@ -80,7 +80,7 @@ class CommandCall
                 continue;
             }
 
-            if (substr($arg, 0, 2) == '--') {
+            if (str_starts_with($arg, '--')) {
                 $this->flags[] = $arg;
                 continue;
             }

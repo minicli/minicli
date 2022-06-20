@@ -31,12 +31,12 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
      *
-     * @param string $style_name
+     * @param string $name
      * @return array An array containing FG color and optionally BG color
      */
-    public function getStyle(string $style_name): array
+    public function getStyle(string $name): array
     {
-        return $this->styles[$style_name] ?? $this->styles['default'];
+        return $this->styles[$name] ?? $this->styles['default'];
     }
 
     /**

@@ -45,6 +45,7 @@ class CommandNamespace
     /**
      * Load namespace controllers
      *
+     * @param string $commandsPath
      * @return array
      */
     public function loadControllers(string $commandsPath): array
