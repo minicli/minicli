@@ -10,6 +10,11 @@ use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
 
+/**
+ * @property Config $config
+ * @property OutputHandler $printer
+ * @property CommandRegistry $command_registry
+ */
 class App
 {
     /**
