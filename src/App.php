@@ -13,7 +13,7 @@ use Minicli\Output\OutputHandler;
 /**
  * @property Config $config
  * @property OutputHandler $printer
- * @property CommandRegistry $command_registry
+ * @property CommandRegistry $commandRegistry
  */
 class App
 {
