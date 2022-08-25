@@ -29,3 +29,10 @@ it('asserts params are correctly set', function () {
     $this->assertTrue($call->hasParam('name'));
     $this->assertEquals('test', $call->getParam('name'));
 });
+
+it('asserts params are correctly set if value contains "="', function () {
+    $call = new CommandCall(["minicli", "help", "test", "name=first=john&last=doe"]);
+
+    $this->assertTrue($call->hasParam('name'));
+    $this->assertEquals('first=john&last=doe', $call->getParam('name'));
+});
