@@ -1,0 +1,38 @@
+{
+  "name": "minicli/minicli",
+  "type": "library",
+  "description": "Experimental micro CLI framework for PHP",
+  "license": "MIT",
+  "homepage": "https://github.com/minicli/minicli",
+  "keywords": ["cli","command-line"],
+  "autoload": {
+    "psr-4": {
+      "Minicli\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Assets\\": "tests/Assets"
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=8",
+    "ext-readline": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0",
+    "pestphp/pest": "^1.0",
+    "friendsofphp/php-cs-fixer": "^3.5"
+  },
+  "scripts": {
+    "test" : ["pest"],
+    "csfix": ["php-cs-fixer fix"]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
