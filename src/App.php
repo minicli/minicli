@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli;
 
+use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
@@ -84,9 +85,9 @@ class App
      * Magic method implements lazy loading for services
      *
      * @param string $name
-     * @return ServiceInterface|null
+     * @return mixed
      */
-    public function __get(string $name): ?ServiceInterface
+    public function __get(string $name): mixed
     {
         if (!array_key_exists($name, $this->services)) {
             return null;
@@ -106,7 +107,7 @@ class App
      * @param ServiceInterface $service
      * @return void
      */
-    public function addService(string $name, ServiceInterface $service): void
+    public function addService(string $name, ServiceInterface|Closure $service): void
     {
         $this->services[$name] = $service;
     }
@@ -119,7 +120,15 @@ class App
      */
     public function loadService(string $name): void
     {
-        $this->loadedServices[$name] = $this->services[$name]->load($this);
+        $service = $this->services[$name];
+
+        if ($service instanceof Closure) {
+            $this->services[$name] = $service($this);
+            $this->loadedServices[$name] = true;
+            return;
+        }
+
+        $this->loadedServices[$name] = $service->load($this);
     }
 
     /**
