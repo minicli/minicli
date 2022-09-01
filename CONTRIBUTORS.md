@@ -14,4 +14,5 @@ Shout out to our top contributors!
 - [mrpc](https://github.com/mrpc)
 - [peter279k](https://github.com/peter279k)
 - [theoboldalex](https://github.com/theoboldalex)
+- [thinkverse](https://github.com/thinkverse)
 - [zaghadon](https://github.com/zaghadon)
