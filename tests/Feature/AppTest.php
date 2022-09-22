@@ -69,6 +69,24 @@ it('asserts App returns null when a service is not found', function () {
     $this->assertNull($service);
 });
 
+it ('asserts App can handle a closure as a service', function () {
+    $app = getBasicApp();
+    $app->addService('closure', function () {
+        return 'closure';
+    });
+
+    $this->assertEquals('closure', $app->closure);
+});
+
+it('asserts Closure service gets passed the App instance', function () {
+    $app = getBasicApp();
+    $app->addService('closure', function ($app) {
+        return $app;
+    });
+
+    $this->assertEquals($app, $app->closure);
+});
+
 it('asserts App registers and executes single command', function () {
     $app = getBasicApp();
 
