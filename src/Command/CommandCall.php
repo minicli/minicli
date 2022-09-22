@@ -73,10 +73,10 @@ class CommandCall
     protected function parseCommand(array $argv): void
     {
         foreach ($argv as $arg) {
-            $pair = explode('=', $arg);
+            $parts = explode('=', $arg);
 
-            if (count($pair) == 2) {
-                $this->params[$pair[0]] = $pair[1];
+            if (count($parts) >= 2) {
+                $this->params[$parts[0]] = join('=', array_slice($parts, 1));
                 continue;
             }
 
