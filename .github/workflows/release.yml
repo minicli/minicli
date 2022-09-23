@@ -23,5 +23,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - uses: anchore/sbom-action@v0
+      - name: Install Composer dependencies
+        run: composer instal --prefer-dist --no-progress
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
