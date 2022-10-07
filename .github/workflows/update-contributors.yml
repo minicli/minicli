@@ -7,7 +7,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: minicli/action-contributors@v3.1
+      - uses: minicli/action-contributors@v3.3
         name: 'Update a projects CONTRIBUTORS file'
       - name: Update resources
         uses: test-room-7/action-update-file@v1
