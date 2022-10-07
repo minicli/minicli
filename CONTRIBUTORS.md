@@ -1,5 +1,4 @@
-# Contributors
-
+# Top Contributors: minicli/minicli
 Shout out to our top contributors!
 
 - [erikaheidi](https://github.com/erikaheidi)
@@ -18,3 +17,6 @@ Shout out to our top contributors!
 - [theoboldalex](https://github.com/theoboldalex)
 - [thinkverse](https://github.com/thinkverse)
 - [zaghadon](https://github.com/zaghadon)
+
+
+_Last updated: Fri, 07 Oct 22 17:25:28 +0000_
