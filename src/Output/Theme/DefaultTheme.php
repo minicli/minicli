@@ -4,6 +4,7 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
+use Minicli\Output\Filter\ColorOutputFilter;
 
 class DefaultTheme implements CLIThemeInterface
 {
@@ -40,6 +41,14 @@ class DefaultTheme implements CLIThemeInterface
     public function setStyle(string $name, array $style): void
     {
         $this->styles[$name] = $style;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOutputFilter()
+    {
+        return new ColorOutputFilter($this);
     }
 
     /**

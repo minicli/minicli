@@ -21,12 +21,12 @@ class ThemeHelper
 
     /**
      * Initialize and return an OutputFilter based on our theme class.
-     * @return ColorOutPutFilter
+     * @return OutputFilterInterface
      */
     public function getOutputFilter()
     {
         if (class_exists($this->theme)) {
-            return new ColorOutputFilter(new $this->theme());
+            return (new $this->theme())->getOutputFilter();
         }
 
         return new ColorOutputFilter();
