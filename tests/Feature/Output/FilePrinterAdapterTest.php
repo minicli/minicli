@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Output\Adapter\FilePrinterAdapter;
 use Minicli\Output\OutputHandler;
 
@@ -11,12 +13,10 @@ it('asserts that FilePrinterAdapter saves content to file', function () {
         @unlink($file_path);
     }
 
-    $filePrinter = new FilePrinterAdapter($file_path);
-    $output = new OutputHandler($filePrinter);
+    (new OutputHandler(new FilePrinterAdapter($file_path)))
+        ->rawOutput('writing output to file');
 
-    $output->rawOutput("writing output to file");
-
-    $this->assertEquals(file_get_contents($file_path), "writing output to file");
+    $this->assertEquals(file_get_contents($file_path), 'writing output to file');
 });
 
 it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided', function () {
