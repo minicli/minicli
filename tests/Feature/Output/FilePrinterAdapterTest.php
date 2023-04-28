@@ -27,4 +27,4 @@ it('asserts that FilePrinterAdapter throws exception when a non-writable file is
     $output = new OutputHandler($filePrinter);
 
     $output->rawOutput("writing output to file");
-})->expectException(ErrorException::class);
+})->expectException(TypeError::class);
