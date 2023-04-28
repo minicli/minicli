@@ -9,19 +9,12 @@ use Minicli\Output\PrinterAdapterInterface;
 class FilePrinterAdapter implements PrinterAdapterInterface
 {
     /**
-     * output file
-     *
-     * @var string
-     */
-    protected string $outputFile;
-
-    /**
      * setup file printer adapter
      * @param string $outputFile
      */
-    public function __construct(string $outputFile)
-    {
-        $this->outputFile = $outputFile;
+    public function __construct(
+        protected string $outputFile,
+    ) {
     }
 
     /**
