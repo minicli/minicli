@@ -7,21 +7,11 @@ namespace Minicli;
 class Config implements ServiceInterface
 {
     /**
-     * config array
-     *
-     * @var array
-     */
-    protected array $config;
-
-    /**
-     * Config constructor
-     *
      * @param array $config
      */
-    public function __construct(array $config = [])
-    {
-        $this->config = $config;
-    }
+    public function __construct(
+        protected array $config = [],
+    ) {}
 
     /**
      * get config

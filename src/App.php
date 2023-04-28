@@ -10,6 +10,7 @@ use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use Throwable;
 
 /**
  * @property Config $config
@@ -109,7 +110,7 @@ class App
      * add app service
      *
      * @param string $name
-     * @param ServiceInterface $service
+     * @param ServiceInterface|Closure $service
      * @return void
      */
     public function addService(string $name, ServiceInterface|Closure $service): void
@@ -251,20 +252,20 @@ class App
      * run single
      *
      * @param CommandCall $input
-     * @throws CommandNotFoundException
-     *
      * @return bool
+     * @throws CommandNotFoundException|Throwable
+     *
      */
     protected function runSingle(CommandCall $input): bool
     {
         try {
             $callable = $this->commandRegistry->getCallable($input->command);
-        } catch (\Exception $e) {
-            if (!$this->config->debug) {
-                $this->getPrinter()->error($e->getMessage());
+        } catch (Throwable $exception) {
+            if (! $this->config->debug) {
+                $this->getPrinter()->error($exception->getMessage());
                 return false;
             }
-            throw $e;
+            throw $exception;
         }
 
         if (is_callable($callable)) {
