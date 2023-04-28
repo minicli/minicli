@@ -53,7 +53,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * get default style colors
      *
-     * @return array
+     * @return array<string,array>
      */
     public function getDefaultColors(): array
     {
