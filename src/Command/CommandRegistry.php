@@ -12,34 +12,15 @@ use Minicli\Exception\CommandNotFoundException;
 class CommandRegistry implements ServiceInterface
 {
     /**
-     * commands path
-     *
      * @param array $commandsPath
-     */
-    protected array $commandsPath;
-
-    /**
-     * namespaces
-     *
      * @param array $namespaces
-     */
-    protected array $namespaces = [];
-
-    /**
-     * default registry
-     *
      * @param array $defaultRegistry
      */
-    protected array $defaultRegistry = [];
-
-    /**
-     * CommandRegistry constructor
-     *
-     * @param array $commandsPath
-     */
-    public function __construct(array $commandsPath)
-    {
-        $this->commandsPath = $commandsPath;
+    public function __construct(
+        protected array $commandsPath,
+        protected array $namespaces = [],
+        protected array $defaultRegistry = [],
+    ) {
     }
 
     /**

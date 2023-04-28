@@ -9,27 +9,13 @@ use Minicli\ControllerInterface;
 class CommandNamespace
 {
     /**
-     * name
-     *
      * @param string $name
-     */
-    protected string $name;
-
-    /**
-     * controllers
-     *
      * @param array $controllers
      */
-    protected array $controllers = [];
-
-    /**
-     * CommandNamespace constructor
-     *
-     * @param string $name
-     */
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        protected string $name,
+        protected array $controllers = []
+    ) {
     }
 
     /**
