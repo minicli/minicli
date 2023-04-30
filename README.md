@@ -34,7 +34,7 @@ Quick links:
 
 What does it mean to be dependency-free? It means that you can build a working CLI PHP application without dozens of nested user-land dependencies. The basic `minicli/minicli` package has only **testing** dependencies, and a single system requirement:
 
-- PHP >= 8
+- PHP >= 8.1
 
 > Note: If you want to obtain user input, then the [`readline`](https://www.php.net/manual/en/function.readline.php) PHP extension is required as well.
 
