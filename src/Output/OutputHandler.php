@@ -12,27 +12,13 @@ use Minicli\ServiceInterface;
 class OutputHandler implements ServiceInterface
 {
     /**
-     * printer adapter
-     *
-     * @var PrinterAdapterInterface
+     * @param PrinterAdapterInterface $printerAdapter
+     * @param array $outputFilters
      */
-    protected PrinterAdapterInterface $printerAdapter;
-
-    /**
-     * output filters
-     *
-     * @var array
-     */
-    protected array $outputFilters = [];
-
-    /**
-     * OutputHandler constructor
-     *
-     * @param PrinterAdapterInterface|null $printer
-     */
-    public function __construct(?PrinterAdapterInterface $printer = null)
-    {
-        $this->printerAdapter = $printer ?? new DefaultPrinterAdapter();
+    public function __construct(
+        protected PrinterAdapterInterface $printerAdapter = new DefaultPrinterAdapter(),
+        protected array $outputFilters = [],
+    ) {
     }
 
     /**
@@ -115,59 +101,65 @@ class OutputHandler implements ServiceInterface
     }
 
     /**
+     * Print the output with a newline either side.
+     *
+     * @param string $content
+     * @param string $style
+     * @return void
+     */
+    public function breathe(string $content, string $style): void
+    {
+        $this->newline();
+        $this->out($content, $style);
+        $this->newline();
+    }
+
+    /**
      * Displays content using the "default" style
      *
      * @param string $content
-     * @param bool $alt Whether or not to use the inverted style ("alt")
+     * @param bool $alt  Use the inverted style ("alt")
      * @return void
      */
     public function display(string $content, bool $alt = false): void
     {
-        $this->newline();
-        $this->out($content, $alt ? "alt" : "default");
-        $this->newline();
+        $this->breathe($content, $alt ? 'alt' : 'default');
     }
 
     /**
      * Prints content using the "error" style
      *
      * @param string $content
-     * @param bool $alt Whether or not to use the inverted style ("error_alt")
+     * @param bool $alt Use the inverted style ("error_alt")
      * @return void
      */
     public function error(string $content, bool $alt = false): void
     {
-        $this->newline();
-        $this->out($content, $alt ? "error_alt" : "error");
-        $this->newline();
+        $this->breathe($content, $alt ? 'error_alt' : 'error');
     }
 
     /**
      * Prints content using the "info" style
      *
      * @param string $content
-     * @param bool $alt Whether or not to use the inverted style ("info_alt")
+     * @param bool $alt Use the inverted style ("info_alt")
      * @return void
      */
     public function info(string $content, bool $alt = false): void
     {
-        $this->newline();
-        $this->out($content, $alt ? "info_alt" : "info");
-        $this->newline();
+        $this->breathe($content, $alt ? 'info_alt' : 'info');
     }
 
     /**
      * Prints content using the "success" style
      *
      * @param string $content The string to print
-     * @param bool $alt Whether or not to use the inverted style ("success_alt")
+     * @param bool $alt Use the inverted style ("success_alt")
      * @return void
      */
     public function success(string $content, bool $alt = false): void
     {
-        $this->newline();
-        $this->out($content, $alt ? "success_alt" : "success");
-        $this->newline();
+        $this->breathe($content, $alt ? 'success_alt' : 'success');
     }
 
     /**

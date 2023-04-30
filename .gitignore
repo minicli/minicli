@@ -5,3 +5,4 @@ vendor/
 .composer
 docker-compose.yml
 Dockerfile
+.php-cs-fixer.cache
