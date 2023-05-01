@@ -52,3 +52,12 @@ it('asserts that OutputHandler prints table', function () {
     $printer = getSimpleOutputHandler();
     $printer->printTable($table);
 })->expectOutputRegex('/(\s*ID\s*)/');
+
+it('asserts a question can be asked', function () {
+    $printer = Mockery::mock(OutputHandler::class);
+    $printer->shouldReceive('ask');
+
+    expect(
+        $printer->ask('Test'),
+    )->toBeString();
+});

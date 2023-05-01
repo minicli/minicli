@@ -23,7 +23,8 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.5",
-    "pestphp/pest": "^2.5"
+    "pestphp/pest": "^2.5",
+    "mockery/mockery": "^1.5"
   },
   "scripts": {
     "test" : ["pest"],
