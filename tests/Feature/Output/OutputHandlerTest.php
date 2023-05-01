@@ -53,7 +53,7 @@ it('asserts that OutputHandler prints table', function () {
     $printer->printTable($table);
 })->expectOutputRegex('/(\s*ID\s*)/');
 
-it('asserts a question can be asked', function () {
+it('asserts a question can be asked', function (): void {
     $printer = Mockery::mock(OutputHandler::class);
     $printer->shouldReceive('ask');
 
@@ -61,3 +61,12 @@ it('asserts a question can be asked', function () {
         $printer->ask('Test'),
     )->toBeString();
 });
+
+it('throws an exception if asking a question and display method does not exist', function (): void {
+    $printer = getSimpleOutputHandler();
+
+    $printer->ask(
+        content: 'test',
+        method: 'awesome',
+    );
+})->throws(InvalidArgumentException::class);
