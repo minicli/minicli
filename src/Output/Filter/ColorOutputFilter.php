@@ -65,6 +65,10 @@ class ColorOutputFilter implements OutputFilterInterface
             $bg = ';' . $style_colors[1];
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $style_colors[0], $bg, $message);
+        $fg = $style_colors[0] ?? null;
+        
+        return $fg ?
+            sprintf("\e[%s%sm%s\e[0m", $fg, $bg, $message) :
+            $message;
     }
 }
