@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Minicli\Output;
 
+use InvalidArgumentException;
 use Minicli\App;
+use Minicli\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\Helper\TableHelper;
 use Minicli\ServiceInterface;
@@ -175,5 +177,27 @@ class OutputHandler implements ServiceInterface
         $this->newline();
         $this->rawOutput($helper->getFormattedTable($filter));
         $this->newline();
+    }
+
+    /**
+     * Ask the users input
+     *
+     * @param string $content
+     * @param bool $alt
+     * @return string
+     */
+    public function ask(string $content, string $method = 'display'): string
+    {
+        if (! method_exists($this, $method)) {
+            throw new InvalidArgumentException(
+                message: "No output for [$method]",
+            );
+        }
+
+        $this->{$method}(
+            $content,
+        );
+
+        return (new Input())->read();
     }
 }
