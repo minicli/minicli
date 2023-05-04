@@ -29,21 +29,21 @@ class App
     /**
      * app services
      *
-     * @var array
+     * @var array<string, ServiceInterface|Closure>
      */
     protected array $services = [];
 
     /**
      * app loaded services
      *
-     * @var array
+     * @var array<string, ServiceInterface|Closure|bool>
      */
     protected array $loadedServices = [];
 
     /**
      * App constructor
      *
-     * @param array $config
+     * @param array<string, mixed> $config
      * @param string $signature
      */
     public function __construct(array $config = [], string $signature = './minicli help')
@@ -134,7 +134,8 @@ class App
             return;
         }
 
-        $this->loadedServices[$name] = $service->load($this);
+        $service->load($this);
+        $this->loadedServices[$name] = true;
     }
 
     /**
@@ -222,10 +223,10 @@ class App
     /**
      * run command
      *
-     * @param array $argv
+     * @param array<int,string> $argv
      * @return void
      *
-     * @throws CommandNotFoundException
+     * @throws CommandNotFoundException|Throwable
      */
     public function runCommand(array $argv = []): void
     {

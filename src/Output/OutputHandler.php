@@ -183,7 +183,7 @@ class OutputHandler implements ServiceInterface
      * Ask the users input
      *
      * @param string $content
-     * @param bool $alt
+     * @param string $method
      * @return string
      */
     public function ask(string $content, string $method = 'display'): string
