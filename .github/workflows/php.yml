@@ -25,3 +25,6 @@ jobs:
 
     - name: Run php-cs-fixer
       run: composer csfix
+
+    - name: Run PHPStan
+      run: composer analyse
