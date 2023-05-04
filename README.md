@@ -128,9 +128,11 @@ The [documentation](https://docs.minicli.dev) contains more detailed information
 
 ## Color Themes
 
-Minicli supports the use of color themes to change the style of command line output. There is currently 1 built-in theme other than the default theme:
+Minicli supports the use of color themes to change the style of command line output. There is currently 3 built-in themes other than the default theme:
 
-- Unicorn
+- **[Unicorn](https://docs.minicli.dev/en/latest/output/using-themes/#unicorn)**: a more colorful theme.
+- **[Dalton](https://docs.minicli.dev/en/latest/output/using-themes/#dalton)**: a color-blind friendly theme.
+- **[Dracula](https://docs.minicli.dev/en/latest/output/using-themes/#dracula)**: a popular dark theme.
 
 To set the theme, pass in a configuration array with a `theme` value when initializing App in the script. Built-in themes need a leading `\` character:
 
