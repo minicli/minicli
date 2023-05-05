@@ -23,7 +23,6 @@ class ThemeHelper
     public function __construct(string $themeConfig = '')
     {
         $this->theme = $this->parseThemeSetting($themeConfig);
-        return $this;
     }
 
     /**
