@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli;
 
-use RuntimeException;
-
 class Input
 {
-
     /**
      * @param string $prompt
      * @param array $inputHistory
@@ -16,7 +13,8 @@ class Input
     public function __construct(
         protected string $prompt = 'minicli$> ',
         protected array $inputHistory = [],
-    ) {}
+    ) {
+    }
 
     /**
      * read input
@@ -27,15 +25,9 @@ class Input
     {
         $input = readline($this->getPrompt());
 
-        if (! $input) {
-            throw new RuntimeException(
-                message: 'Failed to retrieve user input.',
-            );
-        }
-
         $this->inputHistory[] = $input;
 
-        return $input;
+        return (string) $input;
     }
 
     /**

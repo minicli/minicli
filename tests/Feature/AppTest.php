@@ -69,7 +69,7 @@ it('asserts App returns null when a service is not found', function () {
     $this->assertNull($service);
 });
 
-it ('asserts App can handle a closure as a service', function () {
+it('asserts App can handle a closure as a service', function () {
     $app = getBasicApp();
     $app->addService('closure', function () {
         return 'closure';

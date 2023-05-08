@@ -8,7 +8,6 @@ use Minicli\App;
 use Minicli\ControllerInterface;
 use Minicli\ServiceInterface;
 use Minicli\Exception\CommandNotFoundException;
-use RuntimeException;
 
 class CommandRegistry implements ServiceInterface
 {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Minicli\Output\Adapter;
 
 use Minicli\Output\PrinterAdapterInterface;
-use RuntimeException;
 
 class FilePrinterAdapter implements PrinterAdapterInterface
 {
