@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Command;
 
 use Minicli\ControllerInterface;
+use RuntimeException;
 
 class CommandNamespace
 {
@@ -36,7 +37,12 @@ class CommandNamespace
      */
     public function loadControllers(string $commandsPath): array
     {
-        foreach (glob($commandsPath . '/' . $this->getName() . '/*Controller.php') as $controllerFile) {
+        $controllers = (array) glob($commandsPath . '/' . $this->getName() . '/*Controller.php');
+
+        /**
+         * @var string $controllerFile
+         */
+        foreach ($controllers as $controllerFile) {
             $this->loadCommandMap($controllerFile);
         }
 
@@ -89,11 +95,12 @@ class CommandNamespace
      */
     protected function getNamespace(string $filename): string
     {
-        $lines = preg_grep('/^namespace /', file($filename));
+        $file = (array) file($filename);
+        $lines = (array) preg_grep('/^namespace /', $file);
         $namespaceLine = trim(array_shift($lines));
         $match = [];
         preg_match('/^namespace (.*);$/', $namespaceLine, $match);
 
-        return array_pop($match);
+        return (string) array_pop($match);
     }
 }

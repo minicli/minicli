@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli;
 
+use RuntimeException;
+
 class Input
 {
 
@@ -24,6 +26,13 @@ class Input
     public function read(): string
     {
         $input = readline($this->getPrompt());
+
+        if (! $input) {
+            throw new RuntimeException(
+                message: 'Failed to retrieve user input.',
+            );
+        }
+
         $this->inputHistory[] = $input;
 
         return $input;
