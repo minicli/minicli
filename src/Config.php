@@ -14,11 +14,12 @@ use AllowDynamicProperties;
 class Config implements ServiceInterface
 {
     /**
-     * @param array $config
+     * @param array<string, mixed> $config
      */
     public function __construct(
         protected array $config = [],
-    ) {}
+    ) {
+    }
 
     /**
      * get config

@@ -10,7 +10,7 @@ class CommandNamespace
 {
     /**
      * @param string $name
-     * @param array $controllers
+     * @param array<string, ControllerInterface> $controllers
      */
     public function __construct(
         protected string $name,
@@ -32,7 +32,7 @@ class CommandNamespace
      * Load namespace controllers
      *
      * @param string $commandsPath
-     * @return array
+     * @return array<string, ControllerInterface>
      */
     public function loadControllers(string $commandsPath): array
     {
@@ -46,7 +46,7 @@ class CommandNamespace
     /**
      * get controllers
      *
-     * @return array
+     * @return array<string, ControllerInterface>
      */
     public function getControllers(): array
     {

@@ -12,14 +12,14 @@ class TableHelper
     /**
      * table rows
      *
-     * @var array
+     * @var array<int, array<string>>
      */
     protected array $tableRows;
 
     /**
      * style rows
      *
-     * @var array
+     * @var array<int, array<string, string|array<string>>>
      */
     protected array $styledRows;
 
@@ -33,7 +33,7 @@ class TableHelper
     /**
      * TableHelper constructor. Optionally sets the table rows with an array containing all rows
      *
-     * @param array|null $table
+     * @param array<int, array<string>>|null $table
      */
     public function __construct(?array $table = null)
     {
@@ -55,7 +55,7 @@ class TableHelper
     /**
      * Adds a table header
      *
-     * @param array $header
+     * @param array<int, string> $header
      * @param string $style
      * @return void
      */
@@ -67,7 +67,7 @@ class TableHelper
     /**
      * Sets the table rows at once
      *
-     * @param array $full_table An array containing each table row. Rows must be arrays containing the individual cell contents.
+     * @param array<int, array<string>> $full_table An array containing each table row. Rows must be arrays containing the individual cell contents.
      * @return void
      */
     public function setTable(array $full_table): void
@@ -88,7 +88,7 @@ class TableHelper
     /**
      * Adds a table row
      *
-     * @param array $row
+     * @param array<int, string> $row
      * @param string $style
      * @return void
      */
@@ -120,7 +120,7 @@ class TableHelper
     /**
      * Inserts a new row in the table and sets the style for that row
      *
-     * @param array $row
+     * @param array<int, string> $row
      * @param string $style
      * @return void
      */
@@ -134,7 +134,7 @@ class TableHelper
      * Calculates ideal column sizes for the current table rows
      *
      * @param int $minColSize
-     * @return array
+     * @return array<int, int>
      */
     protected function calculateColumnSizes(int $minColSize = 5): array
     {
@@ -158,7 +158,7 @@ class TableHelper
     /**
      * Transforms a row into a formatted string, with adequate column sizing
      *
-     * @param array $row
+     * @param array<int, string> $row
      * @return string
      */
     protected function getRowAsString(array $row): string

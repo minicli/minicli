@@ -15,7 +15,7 @@ class OutputHandler implements ServiceInterface
 {
     /**
      * @param PrinterAdapterInterface $printerAdapter
-     * @param array $outputFilters
+     * @param array<int, OutputFilterInterface> $outputFilters
      */
     public function __construct(
         protected PrinterAdapterInterface $printerAdapter = new DefaultPrinterAdapter(),
@@ -167,7 +167,7 @@ class OutputHandler implements ServiceInterface
     /**
      * Shortcut method to print tables using the TableHelper
      *
-     * @param array $table An array containing all table rows. Each row must be an array with the individual cells.
+     * @param array<int, array<string>> $table An array containing all table rows. Each row must be an array with the individual cells.
      */
     public function printTable(array $table): void
     {

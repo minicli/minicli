@@ -12,7 +12,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * styles
      *
-     * @var array
+     * @var array<string, array<int, string>>
      */
     public array $styles = [];
 
@@ -32,7 +32,7 @@ class DefaultTheme implements CLIThemeInterface
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
      *
      * @param string $name
-     * @return array An array containing FG color and optionally BG color
+     * @return array<int, string> An array containing FG color and optionally BG color
      */
     public function getStyle(string $name): array
     {
@@ -43,7 +43,7 @@ class DefaultTheme implements CLIThemeInterface
      * Sets a style
      *
      * @param string $name
-     * @param array $style
+     * @param array<int, string> $style
      */
     public function setStyle(string $name, array $style): void
     {
@@ -53,7 +53,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * get default style colors
      *
-     * @return array<string,array>
+     * @return array<string, array<int, string>>
      */
     public function getDefaultColors(): array
     {
@@ -77,7 +77,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * This method should be implemented by children themes to overwrite and set custom styles/colors
      *
-     * @return array
+     * @return array<string, array<int, string>>
      */
     public function getThemeColors(): array
     {
