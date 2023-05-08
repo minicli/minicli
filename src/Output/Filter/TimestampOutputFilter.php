@@ -18,6 +18,7 @@ class TimestampOutputFilter implements OutputFilterInterface
     public function filter(string $message, ?string $style = null): string
     {
         $datetime = new \DateTime();
-        return $datetime->format('[Y-m-d H:i:S]') . $message;
+        $style ??= 'Y-m-d H:i:S';
+        return $datetime->format("[$style]") . $message;
     }
 }
