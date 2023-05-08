@@ -36,7 +36,13 @@ class CommandNamespace
      */
     public function loadControllers(string $commandsPath): array
     {
-        foreach (glob($commandsPath . '/' . $this->getName() . '/*Controller.php') as $controllerFile) {
+        $controllers = glob($commandsPath . '/' . $this->getName() . '/*Controller.php');
+
+        if ($controllers === false) {
+            return $this->getControllers();
+        }
+
+        foreach ($controllers as $controllerFile) {
             $this->loadCommandMap($controllerFile);
         }
 
@@ -77,6 +83,7 @@ class CommandNamespace
         $commandName = strtolower(str_replace('Controller', '', $controllerClass));
         $fullClassName = sprintf("%s\\%s", $this->getNamespace($controllerFile), $controllerClass);
 
+        /** @var ControllerInterface $controller */
         $controller = new $fullClassName();
         $this->controllers[$commandName] = $controller;
     }
@@ -89,7 +96,16 @@ class CommandNamespace
      */
     protected function getNamespace(string $filename): string
     {
-        $lines = preg_grep('/^namespace /', file($filename));
+        $file = file($filename);
+        if ($file === false) {
+            return '';
+        }
+
+        $lines = preg_grep('/^namespace /', $file);
+        if ($lines === false) {
+            return '';
+        }
+
         $namespaceLine = trim(array_shift($lines));
         $match = [];
         preg_match('/^namespace (.*);$/', $namespaceLine, $match);

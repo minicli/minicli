@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Helper;
 
+use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\Filter\ColorOutputFilter;
 
 class ThemeHelper
@@ -33,7 +34,9 @@ class ThemeHelper
     public function getOutputFilter(): ColorOutPutFilter
     {
         if (class_exists($this->theme)) {
-            return new ColorOutputFilter(new $this->theme());
+            /** @var CLIThemeInterface $theme */
+            $theme = new $this->theme();
+            return new ColorOutputFilter($theme);
         }
 
         return new ColorOutputFilter();

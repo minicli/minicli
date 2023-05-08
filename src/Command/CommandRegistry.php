@@ -44,11 +44,14 @@ class CommandRegistry implements ServiceInterface
      */
     public function autoloadNamespaces(string $commandSource): void
     {
-        foreach (glob($commandSource . '/*', GLOB_ONLYDIR) as $namespacePath) {
-            if (file_exists($namespacePath . '/composer.json')) {
-                //this looks like a 3rd party package, so lets run a sec check
+        $namespaces = glob($commandSource . '/*', GLOB_ONLYDIR);
+        if ($namespaces !== false) {
+            foreach ($namespaces as $namespacePath) {
+                if (file_exists($namespacePath . '/composer.json')) {
+                    //this looks like a 3rd party package, so lets run a sec check
+                }
+                $this->registerNamespace(basename($namespacePath), $commandSource);
             }
-            $this->registerNamespace(basename($namespacePath), $commandSource);
         }
     }
 

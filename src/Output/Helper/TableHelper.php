@@ -19,7 +19,7 @@ class TableHelper
     /**
      * style rows
      *
-     * @var array<int, array<string, string|array<string>>>
+     * @var array<int, array<string, array<int, string>|string>>
      */
     protected array $styledRows;
 
@@ -109,9 +109,13 @@ class TableHelper
 
         foreach ($this->styledRows as $item) {
             $style = $item['style'];
-            $row = $this->getRowAsString($item['row']);
+            $row = is_array($item['row'])
+                ? $this->getRowAsString($item['row'])
+                : '';
 
-            $this->formattedTable .= "\n" . $filter->filter($row, $style);
+            if (!is_array($style)) {
+                $this->formattedTable .= "\n" . $filter->filter($row, $style);
+            }
         }
 
         return $this->formattedTable;
