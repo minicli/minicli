@@ -1,71 +1,63 @@
 <?php
 
-namespace Minicli;
+declare(strict_types=1);
 
-use RuntimeException;
+namespace Minicli;
 
 class Input
 {
-    /** @var array  */
-    protected $input_history = [];
-
-    /** @var string */
-    protected $prompt;
-
     /**
-     * @throws RuntimeException if the readline extension is not loaded.
+     * @param string $prompt
+     * @param array $inputHistory
      */
-    public function __construct($prompt = 'minicli$> ')
-    {
-        $this->checkReadlineExtension();
-        $this->setPrompt($prompt);
+    public function __construct(
+        protected string $prompt = 'minicli$> ',
+        protected array $inputHistory = [],
+    ) {
     }
 
     /**
-     * @throws RuntimeException if the readline extension is not loaded.
-     */
-    public function read()
-    {
-        $this->checkReadlineExtension();
-        $input = readline($this->getPrompt());
-        $this->input_history[] = $input;
-
-        return $input;
-    }
-
-    /**
-     * @return array
-     */
-    public function getInputHistory()
-    {
-        return $this->input_history;
-    }
-
-    /**
+     * read input
+     *
      * @return string
      */
-    public function getPrompt()
+    public function read(): string
+    {
+        $input = readline($this->getPrompt());
+
+        $this->inputHistory[] = $input;
+
+        return (string) $input;
+    }
+
+    /**
+     * get input history
+     *
+     * @return array
+     */
+    public function getInputHistory(): array
+    {
+        return $this->inputHistory;
+    }
+
+    /**
+     * get prompt
+     *
+     * @return string
+     */
+    public function getPrompt(): string
     {
         return $this->prompt;
     }
 
     /**
+     * set prompt
+     *
      * @param string $prompt
+     * @return void
      */
-    public function setPrompt(string $prompt)
+    public function setPrompt(string $prompt): void
     {
         $this->prompt = $prompt;
-    }
-
-    /**
-     * @throws RuntimeException if the readline extension is not loaded.
-     */
-    private function checkReadlineExtension()
-    {
-        if (extension_loaded('readline')) {
-            return;
-        }
-
-        throw new RuntimeException('Extension readline is required.');
     }
 }

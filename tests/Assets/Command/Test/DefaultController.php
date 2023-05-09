@@ -6,7 +6,7 @@ use Minicli\Command\CommandController;
 
 class DefaultController extends CommandController
 {
-    public function handle()
+    public function handle(): void
     {
         $this->getPrinter()->rawOutput('test default');
     }

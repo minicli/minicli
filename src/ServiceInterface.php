@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli;
 
 interface ServiceInterface
 {
-    public function load(App $app);
+    /**
+     * load application
+     *
+     * @param App $app
+     * @return void
+     */
+    public function load(App $app): void;
 }

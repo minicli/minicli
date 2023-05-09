@@ -1,27 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli;
 
+use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use Throwable;
 
+/**
+ * @property Config $config
+ * @property OutputHandler $printer
+ * @property CommandRegistry $commandRegistry
+ */
 class App
 {
-    /** @var  string  */
-    protected $app_signature;
-
-    /** @var  array */
-    protected $services = [];
-
-    /** @var array  */
-    protected $loaded_services = [];
+    /**
+     * app signature
+     *
+     * @var string
+     */
+    protected string $appSignature;
 
     /**
-     * App constructor.
-     * @param array $config
+     * app services
+     *
+     * @var array<string, ServiceInterface|Closure>
+     */
+    protected array $services = [];
+
+    /**
+     * app loaded services
+     *
+     * @var array<string, ServiceInterface|Closure|bool>
+     */
+    protected array $loadedServices = [];
+
+    /**
+     * App constructor
+     *
+     * @param array<string, mixed> $config
+     * @param string $signature
      */
     public function __construct(array $config = [], string $signature = './minicli help')
     {
@@ -32,24 +55,51 @@ class App
         ], $config);
 
         $this->addService('config', new Config($config));
-        $this->addService('command_registry', new CommandRegistry($this->config->app_path));
+        $commandsPath = $this->config->app_path;
+        if (!is_array($commandsPath)) {
+            $commandsPath = [ $commandsPath ];
+        }
+
+        $commandSources = [];
+        foreach ($commandsPath as $path) {
+            if (str_starts_with($path, '@')) {
+                $path = str_replace('@', $this->getAppRoot() . '/vendor/', $path) . '/Command';
+            }
+            $commandSources[] = $path;
+        }
+        $this->addService('commandRegistry', new CommandRegistry($commandSources));
 
         $this->setSignature($signature);
         $this->setTheme($this->config->theme);
     }
 
     /**
-     * Magic method implements lazy loading for services.
-     * @param string $name
-     * @return ServiceInterface|null
+     * @return string
      */
-    public function __get($name)
+    public function getAppRoot(): string
+    {
+        $root_app = dirname(__DIR__);
+
+        if (!is_file($root_app . '/vendor/autoload.php')) {
+            $root_app = dirname(__DIR__, 4);
+        }
+
+        return $root_app;
+    }
+
+    /**
+     * Magic method implements lazy loading for services
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name): mixed
     {
         if (!array_key_exists($name, $this->services)) {
             return null;
         }
 
-        if (!array_key_exists($name, $this->loaded_services)) {
+        if (!array_key_exists($name, $this->loadedServices)) {
             $this->loadService($name);
         }
 
@@ -57,24 +107,40 @@ class App
     }
 
     /**
+     * add app service
+     *
      * @param string $name
-     * @param ServiceInterface $service
+     * @param ServiceInterface|Closure $service
+     * @return void
      */
-    public function addService($name, ServiceInterface $service)
+    public function addService(string $name, ServiceInterface|Closure $service): void
     {
         $this->services[$name] = $service;
     }
 
     /**
+     * load app service
+     *
      * @param string $name
+     * @return void
      */
-    public function loadService($name)
+    public function loadService(string $name): void
     {
-        $this->loaded_services[$name] = $this->services[$name]->load($this);
+        $service = $this->services[$name];
+
+        if ($service instanceof Closure) {
+            $this->services[$name] = $service($this);
+            $this->loadedServices[$name] = true;
+            return;
+        }
+
+        $service->load($this);
+        $this->loadedServices[$name] = true;
     }
 
     /**
      * Shortcut for accessing the Output Handler
+     *
      * @return OutputHandler
      */
     public function getPrinter(): OutputHandler
@@ -84,46 +150,58 @@ class App
 
     /**
      * Shortcut for setting the Output Handler
-     * @param OutputHandler $output_printer
-     */
-    public function setOutputHandler(OutputHandler $output_printer)
-    {
-        $this->services['printer'] = $output_printer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSignature()
-    {
-        return $this->app_signature;
-    }
-
-    /**
+     *
+     * @param OutputHandler $outputPrinter
      * @return void
      */
-    public function printSignature()
+    public function setOutputHandler(OutputHandler $outputPrinter): void
+    {
+        $this->services['printer'] = $outputPrinter;
+    }
+
+    /**
+     * get app signature
+     *
+     * @return string
+     */
+    public function getSignature(): string
+    {
+        return $this->appSignature;
+    }
+
+    /**
+     * print signature
+     *
+     * @return void
+     */
+    public function printSignature(): void
     {
         $this->getPrinter()->display($this->getSignature());
     }
+
     /**
-     * @param string $app_signature
+     * set signature
+     *
+     * @param string $appSignature
+     * @return void
      */
-    public function setSignature($app_signature)
+    public function setSignature(string $appSignature): void
     {
-        $this->app_signature = $app_signature;
+        $this->appSignature = $appSignature;
     }
 
     /**
-     * Set the Output Handler based on the App's theme config setting.
-     * @param string $theme_config
+     * Set the Output Handler based on the App's theme config setting
+     *
+     * @param string $loadedServices
+     * @return void
      */
-    public function setTheme(string $theme_config)
+    public function setTheme(string $loadedServices): void
     {
         $output = new OutputHandler();
 
         $output->registerFilter(
-            (new ThemeHelper($theme_config))
+            (new ThemeHelper($loadedServices))
             ->getOutputFilter()
         );
 
@@ -131,19 +209,26 @@ class App
     }
 
     /**
+     * register app command
+     *
      * @param string $name
      * @param callable $callable
+     * @return void
      */
-    public function registerCommand($name, $callable)
+    public function registerCommand(string $name, callable $callable): void
     {
-        $this->command_registry->registerCommand($name, $callable);
+        $this->commandRegistry->registerCommand($name, $callable);
     }
 
     /**
-     * @param array $argv
-     * @throws CommandNotFoundException
+     * run command
+     *
+     * @param array<int,string> $argv
+     * @return void
+     *
+     * @throws CommandNotFoundException|Throwable
      */
-    public function runCommand(array $argv = [])
+    public function runCommand(array $argv = []): void
     {
         $input = new CommandCall($argv);
 
@@ -152,7 +237,7 @@ class App
             return;
         }
 
-        $controller = $this->command_registry->getCallableController($input->command, $input->subcommand);
+        $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
 
         if ($controller instanceof ControllerInterface) {
             $controller->boot($this);
@@ -165,20 +250,23 @@ class App
     }
 
     /**
+     * run single
+     *
      * @param CommandCall $input
-     * @throws CommandNotFoundException
      * @return bool
+     * @throws CommandNotFoundException|Throwable
+     *
      */
-    protected function runSingle(CommandCall $input)
+    protected function runSingle(CommandCall $input): bool
     {
         try {
-            $callable = $this->command_registry->getCallable($input->command);
-        } catch (\Exception $e) {
-            if (!$this->config->debug) {
-                $this->getPrinter()->error($e->getMessage());
+            $callable = $this->commandRegistry->getCallable((string) $input->command);
+        } catch (Throwable $exception) {
+            if (! $this->config->debug) {
+                $this->getPrinter()->error($exception->getMessage());
                 return false;
             }
-            throw $e;
+            throw $exception;
         }
 
         if (is_callable($callable)) {

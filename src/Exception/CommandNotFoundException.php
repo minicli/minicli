@@ -2,6 +2,9 @@
 
 namespace Minicli\Exception;
 
-class CommandNotFoundException extends \Exception
+use Exception;
+
+class CommandNotFoundException extends Exception
 {
+    //
 }

@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -21,7 +21,10 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run test suite
-      run: ./vendor/bin/pest
+      run: composer test
 
     - name: Run php-cs-fixer
-      run: ./vendor/bin/php-cs-fixer fix
+      run: composer csfix
+
+    - name: Run PHPStan
+      run: composer analyse

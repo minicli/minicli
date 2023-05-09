@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\OutputFilterInterface;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class DefaultTheme implements CLIThemeInterface
 {
-    /** @var array $styles  */
-    public $styles = [];
+    public ThemeConfig $config;
 
     /**
      * DefaultTheme constructor.
@@ -18,41 +22,48 @@ class DefaultTheme implements CLIThemeInterface
     {
         $styles = array_merge($this->getDefaultColors(), $this->getThemeColors());
 
+        $formatted = [];
         foreach ($styles as $name => $style) {
-            $this->setStyle($name, $style);
+            $formatted[$name] = ThemeStyle::make(...$style);
         }
+
+        $this->config = ThemeConfig::make(...$formatted);
     }
 
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
-     * @param string $style_name
-     * @return array An array containing FG color and optionally BG color
+     *
+     * @param string $name
+     * @return ThemeStyle
      */
-    public function getStyle(string $style_name): array
+    public function getStyle(string $name): ThemeStyle
     {
-        return $this->styles[$style_name] ?? $this->styles['default'];
+        return $this->config->$name ?? $this->config->default;
     }
 
     /**
      * Sets a style
+     *
      * @param string $name
-     * @param array $style
+     * @param ThemeStyle $style
      */
-    public function setStyle(string $name, array $style): void
+    public function setStyle(string $name, ThemeStyle $style): void
     {
-        $this->styles[$name] = $style;
+        $this->config->$name = $style;
     }
 
     /**
      * @inheritdoc
      */
-    public function getOutputFilter()
+    public function getOutputFilter(): OutputFilterInterface
     {
         return new ColorOutputFilter($this);
     }
 
     /**
-     * Returns the default style colors
+     * get default style colors
+     *
+     * @return array<string,array<int,string>>
      */
     public function getDefaultColors(): array
     {
@@ -74,7 +85,8 @@ class DefaultTheme implements CLIThemeInterface
     }
 
     /**
-     * This method should be implemented by children themes to overwrite and set custom styles/colors.
+     * This method should be implemented by children themes to overwrite and set custom styles/colors
+     *
      * @return array
      */
     public function getThemeColors(): array

@@ -1,0 +1,20 @@
+name: Update CONTRIBUTORS file
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: minicli/action-contributors@v3.3
+        name: "Update a projects CONTRIBUTORS file"
+        env:
+          CONTRIB_REPOSITORY: 'minicli/minicli'
+          CONTRIB_OUTPUT_FILE: 'CONTRIBUTORS.md'
+      - name: Commit changes
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: 'CONTRIBUTORS.md'
+          commit-msg: Update Contributors
+          github-token: ${{ secrets.GITHUB_TOKEN }}

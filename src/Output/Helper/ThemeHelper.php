@@ -1,32 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Output\Helper;
 
+use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\OutputFilterInterface;
 
 class ThemeHelper
 {
-    /** @var array */
-    protected $theme = '';
+    /**
+     * theme
+     *
+     * @var class-string<CLIThemeInterface>|string
+     */
+    protected string $theme = '';
 
     /**
-     * ThemeHelper constructor. Takes in the App theme config value.
-     * @param string $theme_config
+     * ThemeHelper constructor. Takes in the App theme config value
+     *
+     * @param string $themeConfig
      */
-    public function __construct(string $theme_config = '')
+    public function __construct(string $themeConfig = '')
     {
-        $this->theme = $this->parseThemeSetting($theme_config);
-        return $this;
+        $this->theme = $this->parseThemeSetting($themeConfig);
     }
 
     /**
      * Initialize and return an OutputFilter based on our theme class.
+     *
      * @return OutputFilterInterface
      */
-    public function getOutputFilter()
+    public function getOutputFilter(): OutputFilterInterface
     {
         if (class_exists($this->theme)) {
-            return (new $this->theme())->getOutputFilter();
+            /**
+             * @var CLIThemeInterface $theme
+             */
+            $theme = new $this->theme();
+
+            return $theme->getOutputFilter();
         }
 
         return new ColorOutputFilter();
@@ -34,18 +48,20 @@ class ThemeHelper
 
     /**
      * Parses the theme config setting and returns a namespaced class name.
+     *
+     * @param string $themeConfig
      * @return string
      */
-    protected function parseThemeSetting($theme_config)
+    protected function parseThemeSetting(string $themeConfig): string
     {
-        if (!$theme_config) {
+        if (!$themeConfig) {
             return '';
         }
 
-        if ($theme_config[0] == '\\') {
-            return '\Minicli\Output\Theme' . $theme_config . 'Theme';  // Built-in theme.
+        if ($themeConfig[0] == '\\') {
+            return '\Minicli\Output\Theme' . $themeConfig . 'Theme';  // Built-in theme.
         }
 
-        return $theme_config . 'Theme'; // User-defined theme.
+        return $themeConfig . 'Theme'; // User-defined theme.
     }
 }

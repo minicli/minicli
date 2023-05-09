@@ -16,7 +16,7 @@
         <img src="https://readthedocs.org/projects/minicliphp/badge/?version=latest" alt="Documentation Status" title="Documentation Status">
     </a>
     <h1 align="center">
-        Minicli 2
+        Minicli 3
     </h1>
 </p>
 <br>
@@ -28,12 +28,13 @@ Quick links:
 - [Documentation](https://docs.minicli.dev)
 - [Demos](https://github.com/minicli/demos)
 - [Contributing](CONTRIBUTING.md)
+- [Contributors](CONTRIBUTORS.md)
 
 ## Dependency-free: What Does it Mean
 
 What does it mean to be dependency-free? It means that you can build a working CLI PHP application without dozens of nested user-land dependencies. The basic `minicli/minicli` package has only **testing** dependencies, and a single system requirement:
 
-- PHP >= 7.3
+- PHP >= 8.1
 
 > Note: If you want to obtain user input, then the [`readline`](https://www.php.net/manual/en/function.readline.php) PHP extension is required as well.
 
@@ -127,9 +128,11 @@ The [documentation](https://docs.minicli.dev) contains more detailed information
 
 ## Color Themes
 
-Minicli supports the use of color themes to change the style of command line output. There is currently 1 built-in theme other than the default theme:
+Minicli supports the use of color themes to change the style of command line output. There is currently 3 built-in themes other than the default theme:
 
-- Unicorn
+- **[Unicorn](https://docs.minicli.dev/en/latest/output/using-themes/#unicorn)**: a more colorful theme.
+- **[Dalton](https://docs.minicli.dev/en/latest/output/using-themes/#dalton)**: a color-blind friendly theme.
+- **[Dracula](https://docs.minicli.dev/en/latest/output/using-themes/#dracula)**: a popular dark theme.
 
 To set the theme, pass in a configuration array with a `theme` value when initializing App in the script. Built-in themes need a leading `\` character:
 
@@ -207,7 +210,3 @@ The following tutorials on [dev.to](https://dev.to/erikaheidi) compose a series 
  - Part 4: [Introducing minicli: a microframework for CLI-centric PHP applications](https://dev.to/erikaheidi/introducing-minicli-a-microframework-for-cli-centric-php-applications-44ik)
 
 _Note: Minicli has evolved a lot since that series was initially written, but that was the base for what Minicli is today._
-
-## Created with Minicli
-
-- [Dolphin](https://github.com/do-community/dolphin) - a CLI tool for managing DigitalOcean servers with Ansible.

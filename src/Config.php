@@ -1,46 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli;
 
+use AllowDynamicProperties;
+
+/**
+ * @property string|array $app_path
+ * @property string $theme
+ * @property boolean $debug
+ */
 class Config implements ServiceInterface
 {
-    /** @var  array */
-    protected $config;
-
     /**
-     * Config constructor.
      * @param array $config
      */
-    public function __construct(array $config = [])
-    {
-        $this->config = $config;
+    public function __construct(
+        protected array $config = [],
+    ) {
     }
 
     /**
+     * get config
+     *
      * @param string $name
-     * @return string|null
+     * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
-        return isset($this->config[$name]) ? $this->config[$name] : null;
+        return $this->config[$name] ?? null;
     }
 
     /**
+     * set config
+     *
      * @param string $name
      * @param string $value
      */
-    public function __set($name, $value)
+    public function __set(string $name, string $value): void
     {
         $this->config[$name] = $value;
     }
 
-    public function has($name)
+    /**
+     * check if has config
+     *
+     * @param  string $name
+     * @return boolean
+     */
+    public function has(string $name): bool
     {
         return isset($this->config[$name]);
     }
 
-    public function load(App $app)
+    /**
+     * load application instance
+     *
+     * @param App $app
+     * @return void
+     */
+    public function load(App $app): void
     {
-        return null;
     }
 }

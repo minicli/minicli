@@ -11,6 +11,17 @@ it('asserts Registry autoloads command namespaces', function () {
     $this->assertTrue($namespace instanceof CommandNamespace);
 });
 
+it('asserts Registry autoloads command namespaces in multiple source paths', function () {
+    $registry = getRegistryWithMultiplePaths();
+    $namespace1 = $registry->getNamespace("test");
+    $namespace2 = $registry->getNamespace("vendor");
+
+    $this->assertNotNull($namespace1);
+    $this->assertNotNull($namespace2);
+    $this->assertTrue($namespace1 instanceof CommandNamespace);
+    $this->assertTrue($namespace2 instanceof CommandNamespace);
+});
+
 it('asserts Registry returns null when a namespace is not found', function () {
     $registry = getRegistry();
     $namespace = $registry->getNamespace("dasdsad");
@@ -54,7 +65,16 @@ it('asserts Registry throws CommandNotFoundException when a command is not found
 it('assets Registry returns full command list', function () {
     $registry = getRegistry();
 
-    $command_list = $registry->getCommandMap();
-    $this->assertCount(2, $command_list);
-    $this->assertCount(4, $command_list['test']);
+    $commandList = $registry->getCommandMap();
+    $this->assertCount(2, $commandList);
+    $this->assertCount(4, $commandList['test']);
+});
+
+it('assets Registry returns full command list when with multiple command sources', function () {
+    $registry = getRegistryWithMultiplePaths();
+
+    $commandList = $registry->getCommandMap();
+    $this->assertCount(2, $commandList);
+    $this->assertCount(4, $commandList['test']);
+    $this->assertCount(1, $commandList['vendor']);
 });

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
@@ -9,20 +10,26 @@ use Minicli\Output\Theme\DefaultTheme;
 
 class ColorOutputFilter implements OutputFilterInterface
 {
-    /** @var CLIThemeInterface */
-    protected $theme;
+    /**
+     * theme
+     *
+     * @var CLIThemeInterface
+     */
+    protected CLIThemeInterface $theme;
 
     /**
-     * ColorOutputFilter constructor.
+     * ColorOutputFilter constructor
+     *
      * @param CLIThemeInterface|null $theme If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(CLIThemeInterface $theme = null)
+    public function __construct(null|CLIThemeInterface $theme = null)
     {
         $this->theme = $theme ?? new DefaultTheme();
     }
 
     /**
      * Gets the CLITheme
+     *
      * @return CLIThemeInterface
      */
     public function getTheme(): CLIThemeInterface
@@ -32,7 +39,9 @@ class ColorOutputFilter implements OutputFilterInterface
 
     /**
      * Sets the CLITheme
+     *
      * @param CLIThemeInterface $theme
+     * @return void
      */
     public function setTheme(CLIThemeInterface $theme): void
     {
@@ -41,34 +50,32 @@ class ColorOutputFilter implements OutputFilterInterface
 
     /**
      * Filters a string according to the specified style.
+     *
      * @param string $message
-     * @param string $style
+     * @param string|null $style
      * @return string the resulting string
      */
-    public function filter($message, $style = "default"): string
+    public function filter(string $message, null|string $style = "default"): string
     {
-        return $this->format($message, $style);
+        return $this->format($message, $style ?? 'default');
     }
 
     /**
      * Formats a message with color codes based on a CLITheme
+     *
      * @param string $message
      * @param string $style
      * @return string
      */
-    public function format($message, $style = "default"): string
+    public function format(string $message, string $style = "default"): string
     {
-        $style_colors = $this->theme->getStyle($style);
+        $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if (isset($style_colors[1])) {
-            $bg = ';' . $style_colors[1];
+        if (!empty($styleColors->background)) {
+            $bg = ';' . $styleColors->background;
         }
 
-        $fg = $style_colors[0] ?? null;
-        
-        return $fg ?
-            sprintf("\e[%s%sm%s\e[0m", $fg, $bg, $message) :
-            $message;
+        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground, $bg, $message);
     }
 }

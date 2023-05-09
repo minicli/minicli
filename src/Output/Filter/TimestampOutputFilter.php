@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
@@ -8,14 +9,16 @@ use Minicli\Output\OutputFilterInterface;
 class TimestampOutputFilter implements OutputFilterInterface
 {
     /**
-     * Adds timestamp to the message
+     * adds timestamp to the message
+     *
      * @param string $message
-     * @param null $style
+     * @param string|null $style
      * @return string
      */
-    public function filter($message, $style = null)
+    public function filter(string $message, ?string $style = null): string
     {
         $datetime = new \DateTime();
-        return $datetime->format('[Y-m-d H:i:S]') . $message;
+        $style ??= 'Y-m-d H:i:S';
+        return $datetime->format("[$style]") . $message;
     }
 }

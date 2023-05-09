@@ -2,24 +2,27 @@
 
 namespace Minicli\Output\Theme;
 
+use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\Filter\SimpleOutputFilter;
+use Minicli\Output\OutputFilterInterface;
+use Minicli\Output\ThemeStyle;
 
 class RawTheme implements CLIThemeInterface
 {
     /**
      * @inheritdoc
      */
-    public function getStyle(string $style_name): array
+    public function getStyle(string $name): ThemeStyle
     {
-        return [null];
+        return new ThemeStyle(CLIColors::$FG_WHITE);
     }
 
     /**
      * @inheritdoc
      */
-    public function getOutputFilter()
+    public function getOutputFilter(): OutputFilterInterface
     {
-        return new SimpleOutputFilter;
+        return new SimpleOutputFilter();
     }
 }

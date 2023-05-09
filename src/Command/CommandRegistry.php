@@ -1,139 +1,165 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Minicli\Command;
 
 use Minicli\App;
-use Minicli\Exception\CommandNotFoundException;
+use Minicli\ControllerInterface;
 use Minicli\ServiceInterface;
+use Minicli\Exception\CommandNotFoundException;
 
 class CommandRegistry implements ServiceInterface
 {
-    /** @var string */
-    protected $commands_path;
-
-    /** @var array */
-    protected $namespaces = [];
-
-    /** @var array */
-    protected $default_registry = [];
-
     /**
-     * CommandRegistry constructor.
-     * @param string $commands_path
+     * @param array $commandsPath
+     * @param array $namespaces
+     * @param array $defaultRegistry
      */
-    public function __construct($commands_path)
-    {
-        $this->commands_path = $commands_path;
-    }
-
-    public function load(App $app)
-    {
-        $this->autoloadNamespaces();
+    public function __construct(
+        protected array $commandsPath,
+        protected array $namespaces = [],
+        protected array $defaultRegistry = [],
+    ) {
     }
 
     /**
+     * load app
+     *
+     * @param App $app
      * @return void
      */
-    public function autoloadNamespaces()
+    public function load(App $app): void
     {
-        foreach (glob($this->getCommandsPath() . '/*', GLOB_ONLYDIR) as $namespace_path) {
-            $this->registerNamespace(basename($namespace_path));
+        foreach ($this->getCommandsPath() as $commandSource) {
+            $this->autoloadNamespaces($commandSource);
         }
     }
 
     /**
-     * @param string $command_namespace
+     * autoload namespaces
+     *
+     * @param string $commandSource
      * @return void
      */
-    public function registerNamespace($command_namespace)
+    public function autoloadNamespaces(string $commandSource): void
     {
-        $namespace = new CommandNamespace($command_namespace);
-        $namespace->loadControllers($this->getCommandsPath());
-        $this->namespaces[strtolower($command_namespace)] = $namespace;
+        $paths = (array) glob($commandSource . '/*', GLOB_ONLYDIR);
+
+        /**
+         * @var string $namespacePath
+         */
+        foreach ($paths as $namespacePath) {
+            if (file_exists($namespacePath . '/composer.json')) {
+                //this looks like a 3rd party package, so lets run a sec check
+            }
+            $this->registerNamespace(basename($namespacePath), $commandSource);
+        }
     }
 
     /**
+     * register namespace
+     *
+     * @param string $commandNamespace
+     * @param string $commandSource
+     * @return void
+     */
+    public function registerNamespace(string $commandNamespace, string $commandSource): void
+    {
+        $namespace = new CommandNamespace($commandNamespace);
+        $namespace->loadControllers($commandSource);
+        $this->namespaces[strtolower($commandNamespace)] = $namespace;
+    }
+
+    /**
+     * get namespace
+     *
      * @param string $command
-     * @return CommandNamespace
+     * @return ?CommandNamespace
      */
-    public function getNamespace($command)
+    public function getNamespace(string $command): ?CommandNamespace
     {
-        return isset($this->namespaces[$command]) ? $this->namespaces[$command] : null;
+        return $this->namespaces[$command] ?? null;
     }
 
     /**
-     * @return string
+     * get commands path
+     *
+     * @return array
      */
-    public function getCommandsPath()
+    public function getCommandsPath(): array
     {
-        return $this->commands_path;
+        return $this->commandsPath;
     }
 
     /**
-     * Registers an anonymous function as single command.
+     * Registers an anonymous function as single command
+     *
      * @param string $name
      * @param callable $callable
+     * @return void
      */
-    public function registerCommand($name, $callable)
+    public function registerCommand(string $name, callable $callable): void
     {
-        $this->default_registry[$name] = $callable;
+        $this->defaultRegistry[$name] = $callable;
     }
 
     /**
+     * get command
+     *
      * @param string $command
      * @return callable|null
      */
-    public function getCommand($command)
+    public function getCommand(string $command): ?callable
     {
-        return isset($this->default_registry[$command]) ? $this->default_registry[$command] : null;
+        return $this->defaultRegistry[$command] ?? null;
     }
 
     /**
+     * get callable controller
+     *
      * @param string $command
      * @param string $subcommand
-     * @return CommandController | null
+     * @return ControllerInterface|null
      */
-    public function getCallableController($command, $subcommand = "default")
+    public function getCallableController(string $command, string $subcommand = "default"): ?ControllerInterface
     {
         $namespace = $this->getNamespace($command);
 
-        if ($namespace !== null) {
-            return $namespace->getController($subcommand);
-        }
-
-        return null;
+        return $namespace?->getController($subcommand);
     }
 
     /**
+     * get callable
+     *
      * @param string $command
      * @return callable|null
-     * @throws \Exception
+     *
+     * @throws CommandNotFoundException
      */
-    public function getCallable($command)
+    public function getCallable(string $command): ?callable
     {
-        $single_command = $this->getCommand($command);
-        if ($single_command === null) {
+        $singleCommand = $this->getCommand($command);
+        if ($singleCommand === null) {
             throw new CommandNotFoundException(sprintf("Command \"%s\" not found.", $command));
         }
 
-        return $single_command;
+        return $singleCommand;
     }
 
     /**
+     * get command map
+     *
      * @return array
      */
-    public function getCommandMap()
+    public function getCommandMap(): array
     {
         $map = [];
 
-        foreach ($this->default_registry as $command => $callback) {
+        foreach ($this->defaultRegistry as $command => $callback) {
             $map[$command] = $callback;
         }
 
-        /**
-         * @var  string $command
-         * @var  CommandNamespace $namespace
-         */
         foreach ($this->namespaces as $command => $namespace) {
             $controllers = $namespace->getControllers();
             $subs = [];

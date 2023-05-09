@@ -7,21 +7,34 @@
   "keywords": ["cli","command-line"],
   "autoload": {
     "psr-4": {
-      "Minicli\\": "src/",
+      "Minicli\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "Assets\\": "tests/Assets"
     }
   },
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=7.3"
+    "php": ">=8.1",
+    "ext-readline": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.0",
-    "pestphp/pest": "^1.0",
-    "friendsofphp/php-cs-fixer": "^2.16"
+    "friendsofphp/php-cs-fixer": "^3.5",
+    "pestphp/pest": "^2.5",
+    "mockery/mockery": "^1.5",
+    "phpstan/phpstan": "^1.10"
   },
-  "suggest": {
-    "ext-readline": "For obtaining user input"
+  "scripts": {
+    "test" : ["pest"],
+    "csfix": ["php-cs-fixer fix"],
+    "analyse": ["phpstan analyse"]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }
