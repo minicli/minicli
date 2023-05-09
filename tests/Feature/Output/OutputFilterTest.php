@@ -45,3 +45,13 @@ it('asserts that TimestampOutputFilter adds timestamp to messages', function () 
     $this->assertStringContainsString($today, $time->filter($message));
     $this->assertStringContainsString($message, $time->filter($message));
 });
+
+it('asserts that TimestampOutputFilter adds formatted timestamp to messages', function () {
+    $time = new TimestampOutputFilter();
+
+    $message = "test timestamp";
+    $today = (new DateTime())->format('m/d/Y');
+
+    $this->assertStringContainsString($today, $time->filter($message, 'm/d/Y'));
+    $this->assertStringContainsString($message, $time->filter($message, 'm/d/Y'));
+});
