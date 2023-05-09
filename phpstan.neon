@@ -1,4 +1,14 @@
 parameters:
-    level: 7
+
+    level: 9
+
     paths:
         - src/
+
+    ignoreErrors:
+
+    excludePaths:
+
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false

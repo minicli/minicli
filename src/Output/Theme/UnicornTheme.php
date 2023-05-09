@@ -11,7 +11,7 @@ class UnicornTheme extends DefaultTheme
     /**
      * get theme colors
      *
-     * @return array<string, array<int, string>>
+     * @return array<string,array<int,string>>
      */
     public function getThemeColors(): array
     {

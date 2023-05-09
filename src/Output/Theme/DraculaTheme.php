@@ -11,7 +11,7 @@ class DraculaTheme extends DefaultTheme
     /**
      * get the colors
      *
-     * @return array<string, array<int, string>>
+     * @return array<string,array<int,string>>
      */
     public function getThemeColors(): array
     {

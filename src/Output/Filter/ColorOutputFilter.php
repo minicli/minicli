@@ -22,7 +22,7 @@ class ColorOutputFilter implements OutputFilterInterface
      *
      * @param CLIThemeInterface|null $theme If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(CLIThemeInterface $theme = null)
+    public function __construct(null|CLIThemeInterface $theme = null)
     {
         $this->theme = $theme ?? new DefaultTheme();
     }
@@ -55,9 +55,9 @@ class ColorOutputFilter implements OutputFilterInterface
      * @param string|null $style
      * @return string the resulting string
      */
-    public function filter(string $message, ?string $style = "default"): string
+    public function filter(string $message, null|string $style = "default"): string
     {
-        return $this->format($message, $style);
+        return $this->format($message, $style ?? 'default');
     }
 
     /**
@@ -72,10 +72,10 @@ class ColorOutputFilter implements OutputFilterInterface
         $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if (isset($styleColors[1])) {
-            $bg = ';' . $styleColors[1];
+        if (!empty($styleColors->background)) {
+            $bg = ';' . $styleColors->background;
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $styleColors[0], $bg, $message);
+        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground, $bg, $message);
     }
 }

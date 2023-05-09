@@ -12,7 +12,7 @@ class ThemeHelper
     /**
      * theme
      *
-     * @var string
+     * @var class-string<CLIThemeInterface>|string
      */
     protected string $theme = '';
 
@@ -34,7 +34,9 @@ class ThemeHelper
     public function getOutputFilter(): ColorOutPutFilter
     {
         if (class_exists($this->theme)) {
-            /** @var CLIThemeInterface $theme */
+            /**
+             * @var CLIThemeInterface $theme
+             */
             $theme = new $this->theme();
             return new ColorOutputFilter($theme);
         }

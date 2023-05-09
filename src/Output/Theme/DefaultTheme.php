@@ -6,15 +6,12 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class DefaultTheme implements CLIThemeInterface
 {
-    /**
-     * styles
-     *
-     * @var array<string, array<int, string>>
-     */
-    public array $styles = [];
+    public ThemeConfig $config;
 
     /**
      * DefaultTheme constructor.
@@ -23,37 +20,40 @@ class DefaultTheme implements CLIThemeInterface
     {
         $styles = array_merge($this->getDefaultColors(), $this->getThemeColors());
 
+        $formatted = [];
         foreach ($styles as $name => $style) {
-            $this->setStyle($name, $style);
+            $formatted[$name] = ThemeStyle::make(...$style);
         }
+
+        $this->config = ThemeConfig::make(...$formatted);
     }
 
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
      *
      * @param string $name
-     * @return array<int, string> An array containing FG color and optionally BG color
+     * @return ThemeStyle
      */
-    public function getStyle(string $name): array
+    public function getStyle(string $name): ThemeStyle
     {
-        return $this->styles[$name] ?? $this->styles['default'];
+        return $this->config->$name ?? $this->config->default;
     }
 
     /**
      * Sets a style
      *
      * @param string $name
-     * @param array<int, string> $style
+     * @param ThemeStyle $style
      */
-    public function setStyle(string $name, array $style): void
+    public function setStyle(string $name, ThemeStyle $style): void
     {
-        $this->styles[$name] = $style;
+        $this->config->$name = $style;
     }
 
     /**
      * get default style colors
      *
-     * @return array<string, array<int, string>>
+     * @return array<string,array<int,string>>
      */
     public function getDefaultColors(): array
     {

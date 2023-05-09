@@ -237,7 +237,7 @@ class App
             return;
         }
 
-        $controller = $this->commandRegistry->getCallableController($input->command, $input->subcommand);
+        $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
 
         if ($controller instanceof ControllerInterface) {
             $controller->boot($this);
@@ -260,7 +260,7 @@ class App
     protected function runSingle(CommandCall $input): bool
     {
         try {
-            $callable = $this->commandRegistry->getCallable($input->command);
+            $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
             if (! $this->config->debug) {
                 $this->getPrinter()->error($exception->getMessage());
