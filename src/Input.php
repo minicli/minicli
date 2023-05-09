@@ -23,11 +23,11 @@ class Input
      */
     public function read(): string
     {
-        $input = readline($this->getPrompt());
+        $input = (string) readline($this->getPrompt());
 
         $this->inputHistory[] = $input;
 
-        return (string) $input;
+        return $input;
     }
 
     /**
