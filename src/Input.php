@@ -24,9 +24,10 @@ class Input
     public function read(): string
     {
         $input = readline($this->getPrompt());
+
         $this->inputHistory[] = $input;
 
-        return $input;
+        return (string) $input;
     }
 
     /**

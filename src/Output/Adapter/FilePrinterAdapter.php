@@ -27,7 +27,9 @@ class FilePrinterAdapter implements PrinterAdapterInterface
     public function out(string $message, ?string $style = null): string
     {
         $fp = fopen($this->outputFile, "a+");
+        /** @phpstan-ignore-next-line  */
         fwrite($fp, $message);
+        /** @phpstan-ignore-next-line  */
         fclose($fp);
 
         return $message;
