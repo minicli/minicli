@@ -6,16 +6,12 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLIColors;
 use Minicli\Output\CLIThemeInterface;
+use Minicli\Output\ThemeConfig;
 use Minicli\Output\ThemeStyle;
 
 class DefaultTheme implements CLIThemeInterface
 {
-    /**
-     * styles
-     *
-     * @var array<string,ThemeStyle>
-     */
-    public array $styles = [];
+    public ThemeConfig $config;
 
     /**
      * DefaultTheme constructor.
@@ -24,9 +20,12 @@ class DefaultTheme implements CLIThemeInterface
     {
         $styles = array_merge($this->getDefaultColors(), $this->getThemeColors());
 
+        $formatted = [];
         foreach ($styles as $name => $style) {
-            $this->setStyle($name, ThemeStyle::make(...$style));
+            $formatted[$name] = ThemeStyle::make(...$style);
         }
+
+        $this->config = ThemeConfig::make(...$formatted);
     }
 
     /**
@@ -37,7 +36,7 @@ class DefaultTheme implements CLIThemeInterface
      */
     public function getStyle(string $name): ThemeStyle
     {
-        return $this->styles[$name] ?? $this->styles['default'];
+        return $this->config->$name ?? $this->config->default;
     }
 
     /**
@@ -48,7 +47,7 @@ class DefaultTheme implements CLIThemeInterface
      */
     public function setStyle(string $name, ThemeStyle $style): void
     {
-        $this->styles[$name] = $style;
+        $this->config->$name = $style;
     }
 
     /**

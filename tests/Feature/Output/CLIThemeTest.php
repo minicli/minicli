@@ -22,12 +22,9 @@ it('asserts that default theme returns expected colors for default text', functi
 });
 
 it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme) {
-    expect($theme->styles)
-        ->toHaveKeys([
-            'italic',
-            'bold',
-            'dim',
-            'underline',
-            'invert',
-        ]);
+    expect($theme->config->italic)->toBeInstanceOf(ThemeStyle::class)
+        ->and($theme->config->bold)->toBeInstanceOf(ThemeStyle::class)
+        ->and($theme->config->dim)->toBeInstanceOf(ThemeStyle::class)
+        ->and($theme->config->underline)->toBeInstanceOf(ThemeStyle::class)
+        ->and($theme->config->invert)->toBeInstanceOf(ThemeStyle::class);
 })->with('themes');
