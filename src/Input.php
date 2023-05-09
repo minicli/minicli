@@ -6,7 +6,6 @@ namespace Minicli;
 
 class Input
 {
-
     /**
      * @param string $prompt
      * @param array $inputHistory
@@ -14,7 +13,8 @@ class Input
     public function __construct(
         protected string $prompt = 'minicli$> ',
         protected array $inputHistory = [],
-    ) {}
+    ) {
+    }
 
     /**
      * read input

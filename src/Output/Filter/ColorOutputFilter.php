@@ -72,10 +72,10 @@ class ColorOutputFilter implements OutputFilterInterface
         $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if (isset($styleColors[1])) {
-            $bg = ';' . $styleColors[1];
+        if (!empty($styleColors->background)) {
+            $bg = ';' . $styleColors->background;
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $styleColors[0], $bg, $message);
+        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground, $bg, $message);
     }
 }
