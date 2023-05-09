@@ -5,6 +5,7 @@ use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\CLIColors;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Filter\ColorOutputFilter;
+use Minicli\Output\ThemeStyle;
 
 /** Color Output Helpers */
 
@@ -91,7 +92,7 @@ it('asserts that its possible to overwrite default styles', function () {
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('default', [CLIColors::$FG_MAGENTA]);
+    $myCustomTheme->setStyle('default', ThemeStyle::make(CLIColors::$FG_MAGENTA));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->display("custom theme");
@@ -102,7 +103,7 @@ it('asserts that custom styles can be used with the out method', function () {
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('custom', [CLIColors::$FG_MAGENTA]);
+    $myCustomTheme->setStyle('custom', ThemeStyle::make(CLIColors::$FG_MAGENTA));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->out("custom theme", 'custom');

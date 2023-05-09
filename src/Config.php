@@ -18,7 +18,8 @@ class Config implements ServiceInterface
      */
     public function __construct(
         protected array $config = [],
-    ) {}
+    ) {
+    }
 
     /**
      * get config
