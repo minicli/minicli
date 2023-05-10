@@ -21,7 +21,9 @@ it('asserts that FilePrinterAdapter saves content to file', function () {
 });
 
 it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided')
-    ->expect(fn () => (new OutputHandler(
-        new FilePrinterAdapter('/root/cant_write_here')))->rawOutput('writing output to file')
+    ->expect(
+        fn () => (new OutputHandler(
+            new FilePrinterAdapter('/root/cant_write_here')
+        ))->rawOutput('writing output to file')
     )
     ->throws(TypeError::class);
