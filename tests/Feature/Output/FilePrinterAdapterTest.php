@@ -16,13 +16,12 @@ it('asserts that FilePrinterAdapter saves content to file', function () {
     (new OutputHandler(new FilePrinterAdapter($file_path)))
         ->rawOutput('writing output to file');
 
-    $this->assertEquals(file_get_contents($file_path), 'writing output to file');
+    expect(file_exists($file_path))->toBeTrue()
+        ->and(file_get_contents($file_path))->toBe('writing output to file');
 });
 
-it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided', function () {
-    (new OutputHandler(
-        new FilePrinterAdapter(
-            '/root/cant_write_here'
-        )
-    ))->rawOutput('writing output to file');
-})->expectException(TypeError::class);
+it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided')
+    ->expect(fn () => (new OutputHandler(
+        new FilePrinterAdapter('/root/cant_write_here')))->rawOutput('writing output to file')
+    )
+    ->throws(TypeError::class);
