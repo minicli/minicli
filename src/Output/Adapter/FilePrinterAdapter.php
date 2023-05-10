@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Output\Adapter;
 
 use Minicli\Output\PrinterAdapterInterface;
+use TypeError;
 
 class FilePrinterAdapter implements PrinterAdapterInterface
 {
@@ -23,13 +24,17 @@ class FilePrinterAdapter implements PrinterAdapterInterface
      * @param string $message
      * @param string|null $style
      * @return string
+     * @throws TypeError
      */
     public function out(string $message, ?string $style = null): string
     {
         $fp = fopen($this->outputFile, "a+");
-        /** @phpstan-ignore-next-line  */
+
+        if ($fp === false) {
+            throw new TypeError("Could not open file {$this->outputFile} for writing.");
+        }
+
         fwrite($fp, $message);
-        /** @phpstan-ignore-next-line  */
         fclose($fp);
 
         return $message;

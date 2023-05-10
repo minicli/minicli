@@ -12,9 +12,9 @@ use Minicli\Exception\CommandNotFoundException;
 class CommandRegistry implements ServiceInterface
 {
     /**
-     * @param array $commandsPath
-     * @param array $namespaces
-     * @param array $defaultRegistry
+     * @param array<int, string> $commandsPath
+     * @param array<string, CommandNamespace> $namespaces
+     * @param array<string, callable> $defaultRegistry
      */
     public function __construct(
         protected array $commandsPath,
@@ -85,7 +85,7 @@ class CommandRegistry implements ServiceInterface
     /**
      * get commands path
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getCommandsPath(): array
     {
@@ -150,7 +150,7 @@ class CommandRegistry implements ServiceInterface
     /**
      * get command map
      *
-     * @return array
+     * @return array<string, callable|array<string>>
      */
     public function getCommandMap(): array
     {

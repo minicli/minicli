@@ -9,49 +9,49 @@ class CommandCall
     /**
      * command
      *
-     * @param string|null $command
+     * @var string|null $command
      */
     public ?string $command;
 
     /**
     * sub command
     *
-    * @param string $subcommand
+    * @var string $subcommand
     */
     public string $subcommand;
 
     /**
      * arguments
      *
-     * @param array $args
+     * @var array<int, string> $args
      */
     public array $args = [];
 
     /**
     * raw arguments
     *
-    * @param array $rawArgs
+    * @var array<int, string> $rawArgs
     */
     public array $rawArgs = [];
 
     /**
      * parameters
      *
-     * @param array $params
+     * @var array<string, string> $params
      */
     public array $params = [];
 
     /**
      * flags
      *
-     * @param array $flags
+     * @var array<int|string, string> $flags
      */
     public array $flags = [];
 
     /**
      * CommandCall constructor.
      *
-     * @param array $argv
+     * @param array<int, string> $argv
      */
     public function __construct(array $argv)
     {
@@ -67,7 +67,7 @@ class CommandCall
     /**
      * parse command
      *
-     * @param array $argv
+     * @param array<int, string> $argv
      * @return void
      */
     protected function parseCommand(array $argv): void
@@ -129,7 +129,7 @@ class CommandCall
     /**
      * get raw args
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getRawArgs(): array
     {
@@ -139,7 +139,7 @@ class CommandCall
     /**
      * get flags
      *
-     * @return array
+     * @return array<int|string, string>
      */
     public function getFlags(): array
     {

@@ -11,7 +11,7 @@ class DaltonTheme extends DefaultTheme
     /**
      * get the colors
      *
-     * @return array
+     * @return array<string, array<int, string>>
      */
     public function getThemeColors(): array
     {

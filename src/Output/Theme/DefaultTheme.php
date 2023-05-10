@@ -77,7 +77,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * This method should be implemented by children themes to overwrite and set custom styles/colors
      *
-     * @return array
+     * @return array<string, array<int, string>>
      */
     public function getThemeColors(): array
     {

@@ -65,7 +65,7 @@ abstract class CommandController implements ControllerInterface
     /**
      * get arguments
      *
-     * @return array
+     * @return array<int, string>
      */
     protected function getArgs(): array
     {
@@ -75,7 +75,7 @@ abstract class CommandController implements ControllerInterface
     /**
      * get parameters
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function getParams(): array
     {

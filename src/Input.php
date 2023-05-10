@@ -8,7 +8,7 @@ class Input
 {
     /**
      * @param string $prompt
-     * @param array $inputHistory
+     * @param array<int, string> $inputHistory
      */
     public function __construct(
         protected string $prompt = 'minicli$> ',
@@ -23,17 +23,17 @@ class Input
      */
     public function read(): string
     {
-        $input = readline($this->getPrompt());
+        $input = (string) readline($this->getPrompt());
 
         $this->inputHistory[] = $input;
 
-        return (string) $input;
+        return $input;
     }
 
     /**
      * get input history
      *
-     * @return array
+     * @return array<int, string>
      */
     public function getInputHistory(): array
     {

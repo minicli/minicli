@@ -10,7 +10,7 @@ final class AppFactory
 {
     /**
      * Create a new Instance of an App.
-     * @param array $config
+     * @param array<string, mixed> $config
      * @param string $signature
      * @return App
      */
