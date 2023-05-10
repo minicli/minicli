@@ -2,37 +2,27 @@
 
 use Minicli\Command\CommandCall;
 
-it('asserts input arguments are loaded and properties are set', function () {
-    $call = new CommandCall(["minicli", "help", "test"]);
+it('asserts input arguments are loaded and properties are set')
+    ->expect(fn () => new CommandCall(["minicli", "help", "test"]))
+    ->getRawArgs()->toHaveCount(3)
+    ->command->toBe("help")
+    ->subcommand->toBe("test");
 
-    $this->assertCount(3, $call->getRawArgs());
-    $this->assertEquals("help", $call->command);
-    $this->assertEquals("test", $call->subcommand);
-});
+it('asserts flags are correctly set')
+    ->expect(fn () => new CommandCall(["minicli", "help", "test", "--flag"]))
+    ->hasFlag("--flag")->toBeTrue()
+    ->getFlags()->toContain("--flag");
 
-it('asserts flags are correctly set', function () {
-    $call = new CommandCall(["minicli", "help", "test", "--flag"]);
+it('asserts flags can be obtained without "--"')
+    ->expect(fn () => new CommandCall(["minicli", "help", "test", "--flag"]))
+    ->hasFlag("flag")->toBeTrue();
 
-    $this->assertTrue($call->hasFlag('--flag'));
-    $this->assertContains("--flag", $call->getFlags());
-});
+it('asserts params are correctly set')
+    ->expect(fn () => new CommandCall(["minicli", "help", "test", "name=test"]))
+    ->hasParam("name")->toBeTrue()
+    ->getParam("name")->toBe("test");
 
-it('asserts flags can be obtained without "--"', function () {
-    $call = new CommandCall(["minicli", "help", "test", "--flag"]);
-
-    $this->assertTrue($call->hasFlag('flag'));
-});
-
-it('asserts params are correctly set', function () {
-    $call = new CommandCall(["minicli", "help", "test", "name=test"]);
-
-    $this->assertTrue($call->hasParam('name'));
-    $this->assertEquals('test', $call->getParam('name'));
-});
-
-it('asserts params are correctly set if value contains "="', function () {
-    $call = new CommandCall(["minicli", "help", "test", "name=first=john&last=doe"]);
-
-    $this->assertTrue($call->hasParam('name'));
-    $this->assertEquals('first=john&last=doe', $call->getParam('name'));
-});
+it('asserts params are correctly set if value contains "="')
+    ->expect(fn () => new CommandCall(["minicli", "help", "test", "name=first=john&last=doe"]))
+    ->hasParam("name")->toBeTrue()
+    ->getParam("name")->toBe("first=john&last=doe");
