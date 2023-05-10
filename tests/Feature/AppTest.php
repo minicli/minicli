@@ -1,72 +1,54 @@
 <?php
 
+use Minicli\App;
 use Minicli\Command\CommandRegistry;
 use Minicli\Config;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Exception\CommandNotFoundException;
 
-it('asserts App is created', function () {
-    $app = getBasicApp();
-
-    $this->assertTrue($app instanceof \Minicli\App);
-});
+it('assert App is created')
+    ->expect(fn () => getBasicApp())
+    ->toBeInstanceOf(App::class);
 
 it('asserts App sets, gets and prints signature', function () {
     $app = getBasicApp();
     $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
-
-    $this->assertStringContainsString("minicli", $app->getSignature());
+    expect($app->getSignature())->toContain("minicli");
 
     $app->setSignature("Testing minicli");
-    $this->assertEquals("Testing minicli", $app->getSignature());
+    expect($app->getSignature())->toBe("Testing minicli");
 
     $app->printSignature();
 })->expectOutputString("\nTesting minicli\n");
 
-it('asserts App has Config Service', function () {
-    $app = getBasicApp();
+it('asserts App has Config Service')
+    ->expect(fn () => getBasicApp()->config)
+    ->toBeInstanceOf(Config::class);
 
-    $config = $app->config;
+it('asserts App has CommandRegistry Service')
+    ->expect(fn () => getBasicApp()->commandRegistry)
+    ->toBeInstanceOf(CommandRegistry::class);
 
-    $this->assertTrue($config instanceof Config);
-});
+it('asserts App has Printer Service')
+    ->expect(fn () => getBasicApp()->printer)
+    ->toBeInstanceOf(OutputHandler::class);
 
-it('asserts App has CommandRegistry Service', function () {
-    $app = getBasicApp();
-
-    $registry = $app->commandRegistry;
-
-    $this->assertTrue($registry instanceof CommandRegistry);
-});
+it('asserts App returns null when a service is not found')
+    ->expect(fn () => getBasicApp()->inexistent_service)
+    ->toBeNull();
 
 it('asserts App parses command path with @vendor tag', function () {
-    $app = new \Minicli\App([
+    $app = new App([
         'app_path' => '@namespace/command'
     ]);
 
     $registry = $app->commandRegistry;
     $paths = $registry->getCommandsPath();
-    $this->assertIsArray($paths);
-    $this->assertCount(1, $paths);
-    var_dump($paths);
-    $this->assertStringEndsWith("namespace/command/Command", $paths[0]);
-});
 
-it('asserts App has Printer service', function () {
-    $app = getBasicApp();
-
-    $printer = $app->printer;
-
-    $this->assertTrue($printer instanceof OutputHandler);
-});
-
-it('asserts App returns null when a service is not found', function () {
-    $app = getBasicApp();
-
-    $service = $app->inexistent_service;
-
-    $this->assertNull($service);
+    expect($paths)->toBeArray()
+        ->toHaveCount(1)
+        ->and($paths[0])->toEndWith("namespace/command/Command");
 });
 
 it('asserts App can handle a closure as a service', function () {
@@ -75,7 +57,7 @@ it('asserts App can handle a closure as a service', function () {
         return 'closure';
     });
 
-    $this->assertEquals('closure', $app->closure);
+    expect($app->closure)->toBe('closure');
 });
 
 it('asserts Closure service gets passed the App instance', function () {
@@ -84,7 +66,7 @@ it('asserts Closure service gets passed the App instance', function () {
         return $app;
     });
 
-    $this->assertEquals($app, $app->closure);
+    expect($app->closure)->toBe($app);
 });
 
 it('asserts App registers and executes single command', function () {
@@ -95,7 +77,7 @@ it('asserts App registers and executes single command', function () {
     });
 
     $command = $app->commandRegistry->getCallable('minicli-test');
-    $this->assertIsCallable($command);
+    expect($command)->toBeCallable();
 
     $app->runCommand(['minicli', 'minicli-test']);
 })->expectOutputString("testing minicli");
@@ -124,7 +106,7 @@ it('asserts App throws exception when command is not callable', function () {
     $app->registerCommand('minicli-test-error', "not a callable");
 })->expectException(\TypeError::class);
 
-$app = new \Minicli\App();
+$app = new App();
 $errorNotFound = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
 
 it('asserts App shows error when debug is set to false and command is not found', function () {

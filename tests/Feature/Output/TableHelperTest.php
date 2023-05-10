@@ -8,15 +8,13 @@ it('asserts that TableHelper creates table from constructor', function () {
         ['value1', 'value2', 'value3']
     ];
 
-
     $tableHelper = new TableHelper($table);
-
-    $this->assertEquals(2, $tableHelper->totalRows());
     $tableContent = $tableHelper->getFormattedTable();
 
-    $this->assertStringContainsString('value1', $tableContent);
-    $this->assertStringContainsString('value2', $tableContent);
-    $this->assertStringContainsString('value3', $tableContent);
+    expect($tableHelper->totalRows())->toBe(2)
+        ->and($tableContent)->toContain('value1')
+        ->and($tableContent)->toContain('value2')
+        ->and($tableContent)->toContain('value3');
 });
 
 it('asserts that TableHelper sets and outputs table rows', function () {
@@ -34,12 +32,12 @@ it('asserts that TableHelper sets and outputs table rows', function () {
         ]);
     }
 
-    $this->assertEquals(11, $table->totalRows());
     $tableContent = $table->getFormattedTable();
 
-    $this->assertStringContainsString('ID', $tableContent);
-    $this->assertStringContainsString('NAME', $tableContent);
-    $this->assertStringContainsString('FIELD3', $tableContent);
+    expect($table->totalRows())->toBe(11)
+        ->and($tableContent)->toContain('ID')
+        ->and($tableContent)->toContain('NAME')
+        ->and($tableContent)->toContain('FIELD3');
 });
 
 it('asserts that all fields respect column sizes', function () {
@@ -57,5 +55,5 @@ it('asserts that all fields respect column sizes', function () {
     $sizeAtFirst = strlen($rows[1]);
     $sizeAtLast = strlen($rows[count($rows)-1]);
 
-    $this->assertSame($sizeAtFirst, $sizeAtLast);
+    expect($sizeAtFirst)->toBe($sizeAtLast);
 });

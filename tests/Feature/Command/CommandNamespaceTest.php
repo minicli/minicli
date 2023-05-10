@@ -8,24 +8,17 @@ function getCommandNamespace()
     return new CommandNamespace("Test");
 }
 
-it('asserts that a name is set as expected', function () {
-    $namespace = getCommandNamespace();
+it('asserts that a name is set as expected')
+    ->expect(fn () => getCommandNamespace()->getName())
+    ->toBe("Test");
 
-    $this->assertEquals("Test", $namespace->getName());
-});
+it('asserts that controllers are loaded successfully')
+    ->expect(fn () => getCommandNamespace()->loadControllers(getCommandsPath()))
+    ->toBeArray()
+    ->not()->toBeEmpty()
+    ->toContainOnlyInstancesOf(CommandController::class);
 
-it('asserts that controllers are loaded successfully', function () {
-    $namespace = getCommandNamespace();
-    $controllers = $namespace->loadControllers(getCommandsPath());
-
-    $this->assertIsArray($controllers);
-    $this->assertNotEmpty($controllers);
-    $this->assertContainsOnly(CommandController::class, $controllers);
-});
-
-it('asserts that no controllers are returned if the namespace is empty', function () {
-    $namespace = new CommandNamespace("Empty");
-    $controllers = $namespace->loadControllers(getCommandsPath());
-
-    $this->assertCount(0, $controllers);
-});
+it('asserts that no controllers are returned if the namespace is empty')
+    ->expect(fn () => (new CommandNamespace("Empty"))->loadControllers(getCommandsPath()))
+    ->toBeArray()
+    ->toBeEmpty();

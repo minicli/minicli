@@ -57,16 +57,13 @@ it('asserts a question can be asked', function (): void {
     $printer = Mockery::mock(OutputHandler::class);
     $printer->shouldReceive('ask');
 
-    expect(
-        $printer->ask('Test'),
-    )->toBeString();
+    expect($printer->ask('Test'))
+        ->toBeString();
 });
 
-it('throws an exception if asking a question and display method does not exist', function (): void {
-    $printer = getSimpleOutputHandler();
-
-    $printer->ask(
+it('throws an exception if asking a question and display method does not exist')
+    ->expect(fn () => getSimpleOutputHandler()->ask(
         content: 'test',
         method: 'awesome',
-    );
-})->throws(InvalidArgumentException::class);
+    ))
+    ->throws(InvalidArgumentException::class);
