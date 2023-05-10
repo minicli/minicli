@@ -15,11 +15,9 @@ it('asserts that themes set all default styles', function (DefaultTheme $theme) 
         ->and($theme->getStyle('success_alt'))->toBeInstanceOf(ThemeStyle::class);
 })->with('themes');
 
-it('asserts that default theme returns expected colors for default text', function () {
-    $themeDefault = new DefaultTheme();
-
-    expect($themeDefault->getStyle('default')->foreground)->toBe(CLIColors::$FG_WHITE);
-});
+it('asserts that default theme returns expected colors for default text')
+    ->expect(fn () => (new DefaultTheme())->getStyle('default')->foreground)
+    ->toBe(CLIColors::$FG_WHITE);
 
 it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme) {
     expect($theme->config->italic)->toBeInstanceOf(ThemeStyle::class)
