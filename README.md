@@ -18,10 +18,11 @@
     <h1 align="center">
         Minicli
     </h1>
-    <p align="center">
+    <h4 align="center">
         Minimalist, dependency-free framework for building CLI-centric PHP applications
-    </p>
-<br>
+    </h4>
+</p>
+<hr>
 
 [Minicli](https://docs.minicli.dev) is a minimalist, dependency-free framework for building CLI-centric PHP applications. It provides a structured way to organize your commands, as well as various helpers to facilitate working with command arguments, obtaining input from users, and printing colored output.
 
