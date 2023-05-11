@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Minicli\Command;
 
 use Minicli\App;
+use Minicli\Config;
 use Minicli\ControllerInterface;
 use Minicli\Output\OutputHandler;
+use Minicli\Output\PrinterProxy;
 
 abstract class CommandController implements ControllerInterface
 {
+    use PrinterProxy;
+
     /**
      * app instance.
      *
@@ -18,11 +22,25 @@ abstract class CommandController implements ControllerInterface
     protected App $app;
 
     /**
+     * config instance.
+     *
+     * @param Config $config
+     */
+    protected Config $config;
+
+    /**
      * command call instance.
      *
      * @param CommandCall $input
      */
     protected CommandCall $input;
+
+    /**
+     * output handler instance.
+     *
+     * @param OutputHandler $printer
+     */
+    private OutputHandler $printer;
 
     /**
      * handle command.
@@ -40,6 +58,8 @@ abstract class CommandController implements ControllerInterface
     public function boot(App $app): void
     {
         $this->app = $app;
+        $this->config = $app->config;
+        $this->printer = $app->getPrinter();
     }
 
     /**
@@ -132,6 +152,6 @@ abstract class CommandController implements ControllerInterface
      */
     protected function getPrinter(): OutputHandler
     {
-        return $this->getApp()->getPrinter();
+        return $this->printer;
     }
 }

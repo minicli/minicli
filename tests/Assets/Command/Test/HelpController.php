@@ -22,6 +22,6 @@ class HelpController extends CommandController
             $shout = true;
         }
 
-        $this->getPrinter()->rawOutput($shout ? strtoupper("Hello $name") : "Hello $name");
+        $this->rawOutput($shout ? strtoupper("Hello $name") : "Hello $name");
     }
 }

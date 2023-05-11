@@ -14,6 +14,6 @@ class ParamsController extends CommandController
             $print = count($this->getParams());
         }
 
-        $this->getPrinter()->rawOutput($print);
+        $this->rawOutput((string) $print);
     }
 }

@@ -10,6 +10,7 @@ use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use Minicli\Output\PrinterProxy;
 use Throwable;
 
 /**
@@ -19,6 +20,8 @@ use Throwable;
  */
 class App
 {
+    use PrinterProxy;
+
     /**
      * app signature
      *
@@ -176,7 +179,7 @@ class App
      */
     public function printSignature(): void
     {
-        $this->getPrinter()->display($this->getSignature());
+        $this->display($this->getSignature());
     }
 
     /**
@@ -263,7 +266,7 @@ class App
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
             if (! $this->config->debug) {
-                $this->getPrinter()->error($exception->getMessage());
+                $this->error($exception->getMessage());
                 return false;
             }
             throw $exception;
@@ -275,7 +278,7 @@ class App
         }
 
         if (!$this->config->debug) {
-            $this->getPrinter()->error("The registered command is not a callable function.");
+            $this->error("The registered command is not a callable function.");
             return false;
         }
 
