@@ -10,18 +10,22 @@ use Minicli\Exception\BindingResolutionException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
+use ReflectionParameter;
 
-class Container implements ArrayAccess
+/**
+ * @implements ArrayAccess<string,mixed>
+ */
+final class Container implements ArrayAccess
 {
     protected static null|Container $instance = null;
 
     /**
-     * @var array[]
+     * @var array<string,array{concrete:Closure|string|null,shared:bool}>
      */
     protected array $bindings = [];
 
     /**
-     * @var object[]
+     * @var array<string,mixed>
      */
     private array $instances = [];
 
@@ -133,11 +137,11 @@ class Container implements ArrayAccess
             return $concrete($this);
         }
 
-        try {
-            $reflector = new ReflectionClass($concrete);
-        } catch (ReflectionException $e) {
-            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
+        if (!class_exists($concrete)) {
+            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0);
         }
+
+        $reflector = new ReflectionClass($concrete);
 
         if (!$reflector->isInstantiable()) {
             throw new BindingResolutionException("Target [$concrete] is not instantiable.");
@@ -157,7 +161,7 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param array $dependencies
+     * @param array<ReflectionParameter>$dependencies
      * @return array<int,mixed>
      * @throws BindingResolutionException|ReflectionException
      */
@@ -170,7 +174,8 @@ class Container implements ArrayAccess
             $type = $dependency->getType(); // ReflectionType|null
 
             if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$dependency->getDeclaringClass()->getName()}");
+                $declaringClass = is_null($dependency->getDeclaringClass()) ? '' : $dependency->getDeclaringClass()->getName();
+                throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$declaringClass}");
             }
 
             $results[] = $this->make($type->getName());
@@ -189,10 +194,10 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param mixed $offset
+     * @param string $offset
      * @return bool
      */
-    public function offsetExists(mixed $offset): bool
+    public function offsetExists($offset): bool
     {
         return $this->contains(
             abstract: $offset,
@@ -212,11 +217,11 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param mixed $offset
-     * @param mixed $value
+     * @param string $offset
+     * @param Closure|null|string $value
      * @return void
      */
-    public function offsetSet(mixed $offset, mixed $value): void
+    public function offsetSet($offset, $value): void
     {
         $this->bind(
             abstract: $offset,
