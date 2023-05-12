@@ -8,3 +8,5 @@ parameters:
     ignoreErrors:
 
     excludePaths:
+
+    checkGenericClassInNonGenericObjectType: false
