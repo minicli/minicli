@@ -7,6 +7,7 @@ namespace Minicli;
 use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\DI\Container;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
@@ -41,18 +42,40 @@ class App
     protected array $loadedServices = [];
 
     /**
+     * The DI Container.
+     *
+     * @var Container
+     */
+    protected Container $container;
+
+    /**
      * App constructor
      *
      * @param array<string, mixed> $config
      * @param string $signature
      */
-    public function __construct(array $config = [], string $signature = './minicli help')
+    public function __construct(
+        array $config = [],
+        string $signature = './minicli help',
+    ) {
+        $this->container = Container::getInstance();
+
+        $this->boot($config, $signature);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     * @param string $signature
+     */
+    public function boot(array $config, string $signature): void
     {
         $config = array_merge([
             'app_path' => __DIR__ . '/../app/Command',
             'theme' => '',
             'debug' => true,
         ], $config);
+
+        $this->setSignature($signature);
 
         $this->addService('config', new Config($config));
         $commandsPath = $this->config->app_path;
@@ -68,8 +91,6 @@ class App
             $commandSources[] = $path;
         }
         $this->addService('commandRegistry', new CommandRegistry($commandSources));
-
-        $this->setSignature($signature);
         $this->setTheme($this->config->theme);
     }
 
