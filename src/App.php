@@ -63,6 +63,10 @@ class App
         $this->boot($config, $signature);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     * @param string $signature
+     */
     public function boot(array $config, string $signature): void
     {
         $config = array_merge([

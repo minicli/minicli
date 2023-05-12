@@ -179,7 +179,9 @@ class Api
 
 class MakeBreak
 {
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function build(): static
     {
