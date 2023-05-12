@@ -10,6 +10,7 @@ use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use Minicli\Scheduler\Kernel;
 use Throwable;
 
 /**
@@ -68,6 +69,10 @@ class App
             $commandSources[] = $path;
         }
         $this->addService('commandRegistry', new CommandRegistry($commandSources));
+        $this->addService(
+            name: 'scheduler',
+            service: fn () => new Kernel(),
+        );
 
         $this->setSignature($signature);
         $this->setTheme($this->config->theme);
