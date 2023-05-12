@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Minicli;
 
+use BadMethodCallException;
 use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
-use Minicli\Output\PrinterProxy;
 use Throwable;
 
 /**
  * @property Config $config
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
+ * @mixin OutputHandler
  */
 class App
 {
-    use PrinterProxy;
-
     /**
      * app signature
      *
@@ -107,6 +106,20 @@ class App
         }
 
         return $this->services[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param array<int,mixed> $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (method_exists($this->getPrinter(), $name)) {
+            return $this->getPrinter()->$name(...$arguments);
+        }
+
+        throw new BadMethodCallException("Method $name does not exist.");
     }
 
     /**
