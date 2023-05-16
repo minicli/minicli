@@ -150,6 +150,7 @@ abstract class CommandController implements ControllerInterface
      * get output handler instance
      *
      * @return OutputHandler
+     * @deprecated
      */
     protected function getPrinter(): OutputHandler
     {

@@ -158,6 +158,7 @@ class App
      * Shortcut for accessing the Output Handler
      *
      * @return OutputHandler
+     * @deprecated
      */
     public function getPrinter(): OutputHandler
     {
