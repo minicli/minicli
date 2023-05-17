@@ -87,7 +87,7 @@ chmod +x minicli
 
 ### Structured App (Recommended)
 
-For a more structured application using Controllers and Services, it's best to use [Command Namespaces](https://minicliphp.readthedocs.io/en/latest/#using-command-controllers).
+For a more structured application using Controllers and Services, it's best to use [Command Namespaces](https://docs.minicli.dev/en/latest/getting_started/creating-controllers/#creating-command-controllers).
 Our [application template repository](https://github.com/minicli/application) is a great starting point / template to set up Minicli that way.
 
 To create a new project using the `minicli/application` template, run:
