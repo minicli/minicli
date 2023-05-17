@@ -94,6 +94,8 @@ class Input
      */
     private function useShellPrompt(): string
     {
-        return shell_exec('read -rp ' . escapeshellarg($this->getPrompt()) . ' input; echo $input');
+        $command='read -rp ' . escapeshellarg($this->getPrompt()) . ' input; echo $input';
+        
+        return shell_exec($command);
     }
 }
