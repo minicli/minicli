@@ -23,7 +23,7 @@ class Input
      */
     public function read(): string
     {
-        $input = (string) readline($this->getPrompt());
+        $input = (string) $this->detectAndReturnPrompt();
 
         $this->inputHistory[] = $input;
 
@@ -59,5 +59,41 @@ class Input
     public function setPrompt(string $prompt): void
     {
         $this->prompt = $prompt;
+    }
+    
+
+    /**
+     * Blah
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function detectAndReturnPrompt(): string
+    {
+        return match (true) {
+            null !== shell_exec("command -v read")  => $this->useShellPrompt(),
+            extension_loaded("readline") => $this->useReadlinePrompt(),
+            default => throw new \Exception('Unexpected match value'),
+        };
+    }
+
+    /**
+     * Blah
+     *
+     * @return string
+     */
+    private function useReadlinePrompt(): string
+    {
+        return readline($this->getPrompt());
+    }
+
+    /**
+     * Blah
+     *
+     * @return string
+     */
+    private function useShellPrompt(): string
+    {
+        return shell_exec('read -rp ' . escapeshellarg($this->getPrompt()) . ' input; echo $input');
     }
 }
