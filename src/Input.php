@@ -68,7 +68,7 @@ class Input
      * @return string
      * @throws \Exception
      */
-    public function detectAndReturnPrompt(): string
+    private function detectAndReturnPrompt(): string
     {
         return match (true) {
             null !== shell_exec("command -v read")  => $this->useShellPrompt(),
