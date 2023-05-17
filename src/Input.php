@@ -71,8 +71,8 @@ class Input
     private function detectAndReturnPrompt(): string
     {
         return match (true) {
-            null !== shell_exec("command -v read")  => $this->useShellPrompt(),
             extension_loaded("readline") => $this->useReadlinePrompt(),
+            null !== shell_exec("command -v read")  => $this->useShellPrompt(),
             default => throw new \Exception('Unexpected match value'),
         };
     }
