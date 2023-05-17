@@ -84,7 +84,7 @@ class Input
      */
     private function useReadlinePrompt(): string
     {
-        return readline($this->getPrompt());
+        return (string) readline($this->getPrompt());
     }
 
     /**
@@ -96,6 +96,6 @@ class Input
     {
         $command = 'read -rp ' . escapeshellarg($this->getPrompt()) . ' input; echo $input';
         
-        return shell_exec($command);
+        return (string) shell_exec($command);
     }
 }
