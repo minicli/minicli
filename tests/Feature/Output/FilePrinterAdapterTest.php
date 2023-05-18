@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Minicli\Output\Adapter\FilePrinterAdapter;
 use Minicli\Output\OutputHandler;
 
-it('asserts that FilePrinterAdapter saves content to file', function () {
-    $file_path = sys_get_temp_dir() . '/minicli-output-test.log';
+it('asserts that FilePrinterAdapter saves content to file', function (): void {
+    $file_path = sys_get_temp_dir().'/minicli-output-test.log';
 
     //makes sure we get a new empty file
     if (file_exists($file_path)) {

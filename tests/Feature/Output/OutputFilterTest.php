@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Output\Filter\SimpleOutputFilter;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\CLIColors;
@@ -14,7 +16,7 @@ it('asserts that ColorOutputFilter returns styled content with default theme')
     ->expect((new ColorOutputFilter())->filter("My content"))
     ->toBe(sprintf("\e[%sm%s\e[0m", CLIColors::$FG_WHITE, "My content"));
 
-it('asserts that ColorOutputFilter sets theme correctly and formats with style', function () {
+it('asserts that ColorOutputFilter sets theme correctly and formats with style', function (): void {
     $color = new ColorOutputFilter();
     $color->setTheme(new UnicornTheme());
 

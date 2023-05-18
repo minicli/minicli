@@ -168,6 +168,6 @@ abstract class CommandController implements ControllerInterface
             return $this->printer->$name(...$arguments);
         }
 
-        throw new BadMethodCallException("Method $name does not exist.");
+        throw new BadMethodCallException("Method {$name} does not exist.");
     }
 }

@@ -143,7 +143,7 @@ interface MailerInterface
 
 class ArrayMailer implements MailerInterface
 {
-    public function send($message)
+    public function send($message): void
     {
         // ..
     }
@@ -155,7 +155,7 @@ class SmtpMailer implements MailerInterface
     {
     }
 
-    public function send($message)
+    public function send($message): void
     {
         // ...
     }
@@ -167,7 +167,7 @@ class ApiMailer implements MailerInterface
     {
     }
 
-    public function send($message)
+    public function send($message): void
     {
         // ...
     }

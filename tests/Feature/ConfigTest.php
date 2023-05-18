@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Config;
 
-it('asserts that config sets properties from constructor', function () {
+it('asserts that config sets properties from constructor', function (): void {
     $config = new Config([
         "param1" => "value1",
         "param2" => "value2"
@@ -13,7 +15,7 @@ it('asserts that config sets properties from constructor', function () {
 });
 
 
-it('asserts that config sets and gets properties', function () {
+it('asserts that config sets and gets properties', function (): void {
     $config = new Config([
         "param1" => "value1",
         "param2" => "value2"

@@ -188,9 +188,9 @@ class OutputHandler implements ServiceInterface
      */
     public function ask(string $content, string $method = 'display'): string
     {
-        if (! method_exists($this, $method)) {
+        if ( ! method_exists($this, $method)) {
             throw new InvalidArgumentException(
-                message: "No output for [$method]",
+                message: "No output for [{$method}]",
             );
         }
 

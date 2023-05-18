@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Assets\Command\Test;
 
 use Minicli\Command\CommandController;
@@ -22,6 +24,6 @@ class HelpController extends CommandController
             $shout = true;
         }
 
-        $this->rawOutput($shout ? strtoupper("Hello $name") : "Hello $name");
+        $this->rawOutput($shout ? mb_strtoupper("Hello {$name}") : "Hello {$name}");
     }
 }

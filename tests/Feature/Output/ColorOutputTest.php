@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\CLIColors;
@@ -49,45 +51,45 @@ function getThemedOutput($text)
 
 /** TESTS */
 
-it('asserts that OutputHandler outputs correct style', function () {
+it('asserts that OutputHandler outputs correct style', function (): void {
     $printer = getColorOutputHandler();
     $printer->out("testing minicli", "alt");
 })->expectOutputString(getAltOutput("testing minicli"));
 
-it('asserts that OutputHandler outputs newline', function () {
+it('asserts that OutputHandler outputs newline', function (): void {
     $printer = getColorOutputHandler();
     $printer->newline();
 })->expectOutputString("\n");
 
-it('asserts that OutputHandler displays content wrapped in newlines', function () {
+it('asserts that OutputHandler displays content wrapped in newlines', function (): void {
     $printer = getColorOutputHandler();
     $printer->display("testing minicli");
-})->expectOutputString("\n" . getDefaultOutput("testing minicli") . "\n");
+})->expectOutputString("\n".getDefaultOutput("testing minicli")."\n");
 
-it('asserts that OutputHandler displays error with expected style', function () {
+it('asserts that OutputHandler displays error with expected style', function (): void {
     $printer = getColorOutputHandler();
     $printer->error("error minicli");
-})->expectOutputString("\n" . getErrorOutput("error minicli") . "\n");
+})->expectOutputString("\n".getErrorOutput("error minicli")."\n");
 
-it('asserts that OutputHandler displays info with expected style', function () {
+it('asserts that OutputHandler displays info with expected style', function (): void {
     $printer = getColorOutputHandler();
     $printer->info("info minicli");
-})->expectOutputString("\n" . getInfoOutput("info minicli") . "\n");
+})->expectOutputString("\n".getInfoOutput("info minicli")."\n");
 
-it('asserts that OutputHandler displays success with expected style', function () {
+it('asserts that OutputHandler displays success with expected style', function (): void {
     $printer = getColorOutputHandler();
     $printer->success("success minicli");
-})->expectOutputString("\n" . getSuccessOutput("success minicli") . "\n");
+})->expectOutputString("\n".getSuccessOutput("success minicli")."\n");
 
-it('asserts that OutputHandler allows changing theme', function () {
+it('asserts that OutputHandler allows changing theme', function (): void {
     $printer = getColorOutputHandler();
     $printer->clearFilters();
     $printer->registerFilter(new ColorOutputFilter(new UnicornTheme()));
 
     $printer->info("themed info minicli");
-})->expectOutputString("\n" . getThemedOutput("themed info minicli"). "\n");
+})->expectOutputString("\n".getThemedOutput("themed info minicli")."\n");
 
-it('asserts that its possible to overwrite default styles', function () {
+it('asserts that its possible to overwrite default styles', function (): void {
     $printer = getColorOutputHandler();
     $printer->clearFilters();
 
@@ -96,9 +98,9 @@ it('asserts that its possible to overwrite default styles', function () {
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->display("custom theme");
-})->expectOutputString("\n" . getThemedOutput("custom theme"). "\n");
+})->expectOutputString("\n".getThemedOutput("custom theme")."\n");
 
-it('asserts that custom styles can be used with the out method', function () {
+it('asserts that custom styles can be used with the out method', function (): void {
     $printer = getColorOutputHandler();
     $printer->clearFilters();
 
@@ -109,7 +111,7 @@ it('asserts that custom styles can be used with the out method', function () {
     $printer->out("custom theme", 'custom');
 })->expectOutputString(getThemedOutput("custom theme"));
 
-it('asserts that out method sets style to default when style is not passed', function () {
+it('asserts that out method sets style to default when style is not passed', function (): void {
     $printer = getColorOutputHandler();
     $printer->out("testing minicli");
 })->expectOutputString(getDefaultOutput("testing minicli"));

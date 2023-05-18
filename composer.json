@@ -22,15 +22,15 @@
     "ext-readline": "*"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.5",
     "pestphp/pest": "^2.5",
     "mockery/mockery": "^1.5",
-    "phpstan/phpstan": "^1.10"
+    "phpstan/phpstan": "^1.10",
+    "laravel/pint": "^1.10"
   },
   "scripts": {
     "test" : ["pest"],
-    "csfix": ["php-cs-fixer fix"],
-    "analyse": ["phpstan analyse"]
+    "lint": ["pint"],
+    "stan": ["phpstan analyse"]
   },
   "config": {
     "allow-plugins": {
