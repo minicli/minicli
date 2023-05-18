@@ -8,6 +8,6 @@ class DefaultController extends CommandController
 {
     public function handle(): void
     {
-        $this->getPrinter()->rawOutput('test default');
+        $this->rawOutput('test default');
     }
 }

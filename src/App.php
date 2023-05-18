@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli;
 
+use BadMethodCallException;
 use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
@@ -17,6 +18,7 @@ use Throwable;
  * @property Config $config
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
+ * @mixin OutputHandler
  */
 class App
 {
@@ -128,6 +130,20 @@ class App
     }
 
     /**
+     * @param string $name
+     * @param array<int,mixed> $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (method_exists($this->getPrinter(), $name)) {
+            return $this->getPrinter()->$name(...$arguments);
+        }
+
+        throw new BadMethodCallException("Method $name does not exist.");
+    }
+
+    /**
      * add app service
      *
      * @param string $name
@@ -163,6 +179,7 @@ class App
      * Shortcut for accessing the Output Handler
      *
      * @return OutputHandler
+     * @deprecated
      */
     public function getPrinter(): OutputHandler
     {
@@ -197,7 +214,7 @@ class App
      */
     public function printSignature(): void
     {
-        $this->getPrinter()->display($this->getSignature());
+        $this->display($this->getSignature());
     }
 
     /**
@@ -284,7 +301,7 @@ class App
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
             if (! $this->config->debug) {
-                $this->getPrinter()->error($exception->getMessage());
+                $this->error($exception->getMessage());
                 return false;
             }
             throw $exception;
@@ -296,7 +313,7 @@ class App
         }
 
         if (!$this->config->debug) {
-            $this->getPrinter()->error("The registered command is not a callable function.");
+            $this->error("The registered command is not a callable function.");
             return false;
         }
 

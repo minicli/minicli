@@ -16,10 +16,13 @@
         <img src="https://readthedocs.org/projects/minicliphp/badge/?version=latest" alt="Documentation Status" title="Documentation Status">
     </a>
     <h1 align="center">
-        Minicli 3
+        Minicli
     </h1>
+    <h4 align="center">
+        Minimalist, dependency-free framework for building CLI-centric PHP applications
+    </h4>
 </p>
-<br>
+<hr>
 
 [Minicli](https://docs.minicli.dev) is a minimalist, dependency-free framework for building CLI-centric PHP applications. It provides a structured way to organize your commands, as well as various helpers to facilitate working with command arguments, obtaining input from users, and printing colored output.
 

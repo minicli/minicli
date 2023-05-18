@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Minicli\Command;
 
+use BadMethodCallException;
 use Minicli\App;
+use Minicli\Config;
 use Minicli\ControllerInterface;
 use Minicli\Output\OutputHandler;
 
+/**
+ * @mixin OutputHandler
+ */
 abstract class CommandController implements ControllerInterface
 {
     /**
@@ -18,11 +23,25 @@ abstract class CommandController implements ControllerInterface
     protected App $app;
 
     /**
+     * config instance.
+     *
+     * @param Config $config
+     */
+    protected Config $config;
+
+    /**
      * command call instance.
      *
      * @param CommandCall $input
      */
     protected CommandCall $input;
+
+    /**
+     * output handler instance.
+     *
+     * @param OutputHandler $printer
+     */
+    private OutputHandler $printer;
 
     /**
      * handle command.
@@ -40,6 +59,8 @@ abstract class CommandController implements ControllerInterface
     public function boot(App $app): void
     {
         $this->app = $app;
+        $this->config = $app->config;
+        $this->printer = $app->getPrinter();
     }
 
     /**
@@ -129,9 +150,24 @@ abstract class CommandController implements ControllerInterface
      * get output handler instance
      *
      * @return OutputHandler
+     * @deprecated
      */
     protected function getPrinter(): OutputHandler
     {
-        return $this->getApp()->getPrinter();
+        return $this->printer;
+    }
+
+    /**
+     * @param string $name
+     * @param array<int,mixed> $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (method_exists($this->printer, $name)) {
+            return $this->printer->$name(...$arguments);
+        }
+
+        throw new BadMethodCallException("Method $name does not exist.");
     }
 }
