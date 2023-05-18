@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://minicli.dev/images/minicli_logo_term_pink.png" align="center" alt="logo" title="Minicli logo" alt="Minicli Logo" width="160">
+<img src="https://docs.minicli.dev/en/latest/images/logo/minicli_logo_term_pink.png" align="center" alt="logo" title="Minicli logo" alt="Minicli Logo" width="160">
 </p>
 
 <p align="center">
