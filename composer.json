@@ -28,10 +28,15 @@
     "laravel/pint": "^1.10"
   },
   "scripts": {
-    "test" : ["pest"],
     "lint": ["pint"],
-    "lint:test": ["pint --test"],
-    "stan": ["phpstan analyse"]
+    "test:lint": ["pint --test"],
+    "test:stan": ["phpstan analyse"],
+    "test:unit": ["pest"],
+    "test": [
+      "@test:lint",
+      "@test:stan",
+      "@test:unit"
+    ]
   },
   "config": {
     "allow-plugins": {

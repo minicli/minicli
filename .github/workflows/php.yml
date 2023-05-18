@@ -20,11 +20,11 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Run test suite
-      run: composer test
-
     - name: Check code style
-      run: composer lint:test
+      run: composer test:lint
 
     - name: Run PHPStan
-      run: composer stan
+      run: composer test:stan
+
+    - name: Run test suite
+      run: composer test:unit
