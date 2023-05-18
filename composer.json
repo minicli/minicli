@@ -30,6 +30,7 @@
   "scripts": {
     "test" : ["pest"],
     "lint": ["pint"],
+    "lint:test": ["pint --test"],
     "stan": ["phpstan analyse"]
   },
   "config": {

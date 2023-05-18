@@ -24,7 +24,7 @@ jobs:
       run: composer test
 
     - name: Check code style
-      run: composer lint --test
+      run: composer lint:test
 
     - name: Run PHPStan
       run: composer stan
