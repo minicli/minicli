@@ -11,14 +11,14 @@ There are many ways in which you can contribute. Here are some ideas:
 - Code 
   - bug fixes and new features that are within the main project scope
   - bug fixes and new features on the Minicli ecosystem ([application template](https://github.com/minicli/application), [curly](https://github.com/minicli/curly))
-  - add-owns that can live in a separate package repository
+  - add-ons that can live in a separate package repository
   - CLI themes
   - improving test coverage
 - Documentation (lives in the [website](https://github.com/minicli/website) repository)
   - corrections, new docs, improvements to the docs appearance
 - Demos (lives in the [demos](https://github.com/minicli/demos) repository)
 
-Apart from the main `minicli/minicli` package, the Minicli project has other repositories that you can contribute to. Most of the additional repositories are still experimental, working as add-owns to the main Minicli framework.
+Apart from the main `minicli/minicli` package, the Minicli project has other repositories that you can contribute to. Most of the additional repositories are still experimental, working as add-ons to the main Minicli framework.
 
 ## Pull Request Process
 
