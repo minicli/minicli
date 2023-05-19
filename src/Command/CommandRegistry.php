@@ -44,13 +44,13 @@ class CommandRegistry implements ServiceInterface
      */
     public function autoloadNamespaces(string $commandSource): void
     {
-        $paths = (array) glob($commandSource . '/*', GLOB_ONLYDIR);
+        $paths = (array) glob($commandSource.'/*', GLOB_ONLYDIR);
 
         /**
          * @var string $namespacePath
          */
         foreach ($paths as $namespacePath) {
-            if (file_exists($namespacePath . '/composer.json')) {
+            if (file_exists($namespacePath.'/composer.json')) {
                 //this looks like a 3rd party package, so lets run a sec check
             }
             $this->registerNamespace(basename($namespacePath), $commandSource);
@@ -68,7 +68,7 @@ class CommandRegistry implements ServiceInterface
     {
         $namespace = new CommandNamespace($commandNamespace);
         $namespace->loadControllers($commandSource);
-        $this->namespaces[strtolower($commandNamespace)] = $namespace;
+        $this->namespaces[mb_strtolower($commandNamespace)] = $namespace;
     }
 
     /**
@@ -140,7 +140,7 @@ class CommandRegistry implements ServiceInterface
     public function getCallable(string $command): ?callable
     {
         $singleCommand = $this->getCommand($command);
-        if ($singleCommand === null) {
+        if (null === $singleCommand) {
             throw new CommandNotFoundException(sprintf("Command \"%s\" not found.", $command));
         }
 

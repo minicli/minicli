@@ -14,10 +14,10 @@ class CommandCall
     public ?string $command;
 
     /**
-    * sub command
-    *
-    * @var string $subcommand
-    */
+     * sub command
+     *
+     * @var string $subcommand
+     */
     public string $subcommand;
 
     /**
@@ -28,10 +28,10 @@ class CommandCall
     public array $args = [];
 
     /**
-    * raw arguments
-    *
-    * @var array<int, string> $rawArgs
-    */
+     * raw arguments
+     *
+     * @var array<int, string> $rawArgs
+     */
     public array $rawArgs = [];
 
     /**
@@ -112,7 +112,7 @@ class CommandCall
             return true;
         }
 
-        return in_array('--' . $flag, $this->flags);
+        return in_array('--'.$flag, $this->flags);
     }
 
     /**

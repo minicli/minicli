@@ -72,7 +72,7 @@ class App
     public function boot(array $config, string $signature): void
     {
         $config = array_merge([
-            'app_path' => __DIR__ . '/../app/Command',
+            'app_path' => __DIR__.'/../app/Command',
             'theme' => '',
             'debug' => true,
         ], $config);
@@ -81,14 +81,14 @@ class App
 
         $this->addService('config', new Config($config));
         $commandsPath = $this->config->app_path;
-        if (!is_array($commandsPath)) {
-            $commandsPath = [ $commandsPath ];
+        if ( ! is_array($commandsPath)) {
+            $commandsPath = [$commandsPath];
         }
 
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with($path, '@')) {
-                $path = str_replace('@', $this->getAppRoot() . '/vendor/', $path) . '/Command';
+                $path = str_replace('@', $this->getAppRoot().'/vendor/', $path).'/Command';
             }
             $commandSources[] = $path;
         }
@@ -103,7 +103,7 @@ class App
     {
         $root_app = dirname(__DIR__);
 
-        if (!is_file($root_app . '/vendor/autoload.php')) {
+        if ( ! is_file($root_app.'/vendor/autoload.php')) {
             $root_app = dirname(__DIR__, 4);
         }
 
@@ -118,11 +118,11 @@ class App
      */
     public function __get(string $name): mixed
     {
-        if (!array_key_exists($name, $this->services)) {
+        if ( ! array_key_exists($name, $this->services)) {
             return null;
         }
 
-        if (!array_key_exists($name, $this->loadedServices)) {
+        if ( ! array_key_exists($name, $this->loadedServices)) {
             $this->loadService($name);
         }
 
@@ -140,7 +140,7 @@ class App
             return $this->getPrinter()->$name(...$arguments);
         }
 
-        throw new BadMethodCallException("Method $name does not exist.");
+        throw new BadMethodCallException("Method {$name} does not exist.");
     }
 
     /**
@@ -240,7 +240,7 @@ class App
 
         $output->registerFilter(
             (new ThemeHelper($loadedServices))
-            ->getOutputFilter()
+                ->getOutputFilter()
         );
 
         $this->addService('printer', $output);
@@ -300,7 +300,7 @@ class App
         try {
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
-            if (! $this->config->debug) {
+            if ( ! $this->config->debug) {
                 $this->error($exception->getMessage());
                 return false;
             }
@@ -312,7 +312,7 @@ class App
             return true;
         }
 
-        if (!$this->config->debug) {
+        if ( ! $this->config->debug) {
             $this->error("The registered command is not a callable function.");
             return false;
         }

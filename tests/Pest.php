@@ -8,7 +8,7 @@ use Minicli\Command\CommandRegistry;
 
 function getCommandsPath(): string
 {
-    return __DIR__ . '/Assets/Command';
+    return __DIR__.'/Assets/Command';
 }
 
 function getBasicApp(): App
@@ -44,9 +44,7 @@ function getRegistry(): CommandRegistry
     $app = new App([
         'app_path' => getCommandsPath()
     ]);
-    $app->registerCommand("minicli-test", function () {
-        return true;
-    });
+    $app->registerCommand("minicli-test", fn () => true);
 
     /** @var CommandRegistry $registry */
     $registry = $app->commandRegistry;
@@ -59,7 +57,7 @@ function getRegistryWithMultiplePaths(): CommandRegistry
     $app = new App([
         'app_path' => [
             getCommandsPath(),
-            __DIR__ . '/Assets/VendorCommand'
+            __DIR__.'/Assets/VendorCommand'
         ]
     ]);
 

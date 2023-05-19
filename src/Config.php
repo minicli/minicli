@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Minicli;
 
-use AllowDynamicProperties;
-
 /**
  * @property string|array $app_path
  * @property string $theme

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\CLIColors;
 use Minicli\Output\ThemeStyle;
 
-it('asserts that themes set all default styles', function (DefaultTheme $theme) {
+it('asserts that themes set all default styles', function (DefaultTheme $theme): void {
     expect($theme->getStyle('default'))->toBeInstanceOf(ThemeStyle::class)
         ->and($theme->getStyle('alt'))->toBeInstanceOf(ThemeStyle::class)
         ->and($theme->getStyle('info'))->toBeInstanceOf(ThemeStyle::class)
@@ -19,7 +21,7 @@ it('asserts that default theme returns expected colors for default text')
     ->expect(fn () => (new DefaultTheme())->getStyle('default')->foreground)
     ->toBe(CLIColors::$FG_WHITE);
 
-it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme) {
+it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme): void {
     expect($theme->config->italic)->toBeInstanceOf(ThemeStyle::class)
         ->and($theme->config->bold)->toBeInstanceOf(ThemeStyle::class)
         ->and($theme->config->dim)->toBeInstanceOf(ThemeStyle::class)

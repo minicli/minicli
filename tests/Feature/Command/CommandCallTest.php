@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Command\CommandCall;
 
 it('asserts input arguments are loaded and properties are set')

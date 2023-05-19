@@ -52,14 +52,14 @@ class ThemeHelper
      */
     protected function parseThemeSetting(string $themeConfig): string
     {
-        if (!$themeConfig) {
+        if ( ! $themeConfig) {
             return '';
         }
 
-        if ($themeConfig[0] == '\\') {
-            return '\Minicli\Output\Theme' . $themeConfig . 'Theme';  // Built-in theme.
+        if ('\\' === $themeConfig[0]) {
+            return '\Minicli\Output\Theme'.$themeConfig.'Theme';  // Built-in theme.
         }
 
-        return $themeConfig . 'Theme'; // User-defined theme.
+        return $themeConfig.'Theme'; // User-defined theme.
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Command\CommandNamespace;
 use Minicli\Exception\CommandNotFoundException;
 
@@ -42,7 +44,7 @@ it('asserts Registry throws CommandNotFoundException when a command is not found
     ->expect(fn () => getRegistry()->getCallable("dasdakjsdasd"))
     ->throws(CommandNotFoundException::class);
 
-it('assets Registry returns full command list', function () {
+it('assets Registry returns full command list', function (): void {
     $registry = getRegistry();
     $commandList = $registry->getCommandMap();
 
@@ -51,7 +53,7 @@ it('assets Registry returns full command list', function () {
         ->and($commandList['test'])->toBeArray()->toHaveCount(4);
 });
 
-it('assets Registry returns full command list when with multiple command sources', function () {
+it('assets Registry returns full command list when with multiple command sources', function (): void {
     $registry = getRegistryWithMultiplePaths();
     $commandList = $registry->getCommandMap();
 

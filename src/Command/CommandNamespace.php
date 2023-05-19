@@ -36,7 +36,7 @@ class CommandNamespace
      */
     public function loadControllers(string $commandsPath): array
     {
-        $controllers = (array) glob($commandsPath . '/' . $this->getName() . '/*Controller.php');
+        $controllers = (array) glob($commandsPath.'/'.$this->getName().'/*Controller.php');
 
         /**
          * @var string $controllerFile
@@ -79,7 +79,7 @@ class CommandNamespace
         $filename = basename($controllerFile);
 
         $controllerClass = str_replace('.php', '', $filename);
-        $commandName = strtolower(str_replace('Controller', '', $controllerClass));
+        $commandName = mb_strtolower(str_replace('Controller', '', $controllerClass));
         $fullClassName = sprintf("%s\\%s", $this->getNamespace($controllerFile), $controllerClass);
 
         /** @var ControllerInterface $controller */

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Minicli\Output\Theme\DaltonTheme;
 use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\Theme\DraculaTheme;

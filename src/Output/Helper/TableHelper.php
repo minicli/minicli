@@ -113,8 +113,8 @@ class TableHelper
                 ? $this->getRowAsString($item['row'])
                 : '';
 
-            if (!is_array($style)) {
-                $this->formattedTable .= "\n" . $filter->filter($row, $style);
+            if ( ! is_array($style)) {
+                $this->formattedTable .= "\n".$filter->filter($row, $style);
             }
         }
 
@@ -131,7 +131,7 @@ class TableHelper
     protected function insertTableRow(array $row, string $style = 'default'): void
     {
         $this->tableRows[] = $row;
-        $this->styledRows[] = [ 'row' => $row, 'style' => $style ];
+        $this->styledRows[] = ['row' => $row, 'style' => $style];
     }
 
     /**
@@ -149,8 +149,8 @@ class TableHelper
 
             foreach ($rowContent as $cell) {
                 $columnSizes[$columnCount] = $columnSizes[$columnCount] ?? $minColSize;
-                if (strlen($cell) >= $columnSizes[$columnCount]) {
-                    $columnSizes[$columnCount] = strlen($cell) + 2;
+                if (mb_strlen($cell) >= $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = mb_strlen($cell) + 2;
                 }
                 $columnCount++;
             }

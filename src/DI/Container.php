@@ -137,19 +137,19 @@ final class Container implements ArrayAccess
             return $concrete($this);
         }
 
-        if (!class_exists($concrete)) {
-            throw new BindingResolutionException("Target class [$concrete] does not exist.", 0);
+        if ( ! class_exists($concrete)) {
+            throw new BindingResolutionException("Target class [{$concrete}] does not exist.", 0);
         }
 
         $reflector = new ReflectionClass($concrete);
 
-        if (!$reflector->isInstantiable()) {
-            throw new BindingResolutionException("Target [$concrete] is not instantiable.");
+        if ( ! $reflector->isInstantiable()) {
+            throw new BindingResolutionException("Target [{$concrete}] is not instantiable.");
         }
 
         $constructor = $reflector->getConstructor();
 
-        if (is_null($constructor)) {
+        if (null === $constructor) {
             return new $concrete();
         }
 
@@ -173,9 +173,9 @@ final class Container implements ArrayAccess
             // This is a much simpler version of what Laravel does
             $type = $dependency->getType(); // ReflectionType|null
 
-            if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                $declaringClass = is_null($dependency->getDeclaringClass()) ? '' : $dependency->getDeclaringClass()->getName();
-                throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$declaringClass}");
+            if ( ! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                $declaringClass = null === $dependency->getDeclaringClass() ? '' : $dependency->getDeclaringClass()->getName();
+                throw new BindingResolutionException("Unresolvable dependency resolving [{$dependency}] in class {$declaringClass}");
             }
 
             $results[] = $this->make($type->getName());

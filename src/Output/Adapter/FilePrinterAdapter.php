@@ -30,7 +30,7 @@ class FilePrinterAdapter implements PrinterAdapterInterface
     {
         $fp = fopen($this->outputFile, "a+");
 
-        if ($fp === false) {
+        if (false === $fp) {
             throw new TypeError("Could not open file {$this->outputFile} for writing.");
         }
 
