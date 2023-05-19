@@ -121,7 +121,7 @@ app
 Each directory inside `app/Command` represents a Command Namespace.
 The classes inside `app/Command/Help` represent subcommands that you can access through the main `help` command.
 
-You can now run the boostrapped application with:
+You can now run the bootstrapped application with:
 
 ```bash
 ./minicli help
