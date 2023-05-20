@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Minicli\App;
 use Minicli\Config;
 use Minicli\ControllerInterface;
+use Minicli\Exception\MissingParametersException;
 use Minicli\Output\OutputHandler;
 
 /**
@@ -54,13 +55,21 @@ abstract class CommandController implements ControllerInterface
      * Called before `run`
      *
      * @param App $app
+     * @param CommandCall $input
      * @return void
+     * @throws MissingParametersException
      */
-    public function boot(App $app): void
+    public function boot(App $app, CommandCall $input): void
     {
         $this->app = $app;
         $this->config = $app->config;
         $this->printer = $app->getPrinter();
+
+        $missing = array_diff($this->required(), array_keys($input->params));
+
+        if ([] !== $missing) {
+            throw new MissingParametersException($missing);
+        }
     }
 
     /**
@@ -72,6 +81,16 @@ abstract class CommandController implements ControllerInterface
     {
         $this->input = $input;
         $this->handle();
+    }
+
+    /**
+     * The list of parameters required by the command.
+     *
+     * @return array<int, string>
+     */
+    public function required(): array
+    {
+        return [];
     }
 
     /**

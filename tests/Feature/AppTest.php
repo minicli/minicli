@@ -71,7 +71,7 @@ it('asserts App registers and executes single command', function (): void {
     $app = getBasicApp();
 
     $app->registerCommand('minicli-test', function () use ($app): void {
-        $app->getPrinter()->rawOutput("testing minicli");
+        $app->rawOutput("testing minicli");
     });
 
     $command = $app->commandRegistry->getCallable('minicli-test');
@@ -105,10 +105,23 @@ it('asserts App throws exception when command is not callable', function (): voi
 })->expectException(\TypeError::class);
 
 $app = new App();
-$errorNotFound = $app->getPrinter()->filterOutput("Command \"inexistent-command\" not found.", 'error');
+$errorNotFound = $app->filterOutput("Command \"inexistent-command\" not found.", 'error');
+$errorMissingParams = $app->filterOutput("Missing required parameter(s): name", 'error');
 
 it('asserts App shows error when debug is set to false and command is not found', function (): void {
     $app = getProdApp();
 
     $app->runCommand(['minicli', 'inexistent-command']);
-})->expectOutputString("\n".$errorNotFound."\n");
+})->expectOutputString("\n{$errorNotFound}\n");
+
+it('asserts App runs command successfully when required parameters are provided', function (): void {
+    $app = getProdApp();
+
+    $app->runCommand(['minicli', 'test', 'required', 'name=erika']);
+})->expectOutputString('Hello, erika');
+
+it('asserts App shows error when required parameters are not provided', function (): void {
+    $app = getProdApp();
+
+    $app->runCommand(['minicli', 'test', 'required']);
+})->expectOutputString("\n{$errorMissingParams}\n");

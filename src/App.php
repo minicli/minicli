@@ -10,6 +10,7 @@ use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\DI\Container;
 use Minicli\Exception\CommandNotFoundException;
+use Minicli\Exception\MissingParametersException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
 use Throwable;
@@ -278,10 +279,17 @@ class App
         $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
 
         if ($controller instanceof ControllerInterface) {
-            $controller->boot($this);
-            $controller->run($input);
-            $controller->teardown();
-            return;
+            try {
+                $controller->boot($this, $input);
+                $controller->run($input);
+                $controller->teardown();
+
+                return;
+            } catch (MissingParametersException $exception) {
+                $this->error($exception->getMessage());
+
+                return;
+            }
         }
 
         $this->runSingle($input);
