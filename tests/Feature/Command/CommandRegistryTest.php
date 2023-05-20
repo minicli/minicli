@@ -50,7 +50,7 @@ it('assets Registry returns full command list', function (): void {
 
     expect($commandList)->toBeArray()
         ->toHaveCount(2)
-        ->and($commandList['test'])->toBeArray()->toHaveCount(4);
+        ->and($commandList['test'])->toBeArray()->toHaveCount(5);
 });
 
 it('assets Registry returns full command list when with multiple command sources', function (): void {
@@ -59,6 +59,6 @@ it('assets Registry returns full command list when with multiple command sources
 
     expect($commandList)->toBeArray()
         ->toHaveCount(2)
-        ->and($commandList['test'])->toBeArray()->toHaveCount(4)
+        ->and($commandList['test'])->toBeArray()->toHaveCount(5)
         ->and($commandList['vendor'])->toBeArray()->toHaveCount(1);
 });
