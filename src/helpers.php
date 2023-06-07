@@ -10,14 +10,14 @@ function load_config(array $defaultConfig): array
 {
     $config = [];
 
-    foreach ((array) glob(__DIR__.'/../config/*.php') as $configFile) {
+    foreach ((array) glob(__DIR__.'/../../../../config/*.php') as $configFile) {
         $configData = include $configFile;
         if (is_array($configData)) {
-            $config = array_merge($config, $configData);
+            $config = [...$config, ...$configData];
         }
     }
 
-    return array_merge($defaultConfig, $config);
+    return [...$defaultConfig, ...$config];
 }
 
 function envconfig(string $key, ?string $default = null): ?string
