@@ -23,6 +23,8 @@ use Throwable;
  */
 class App
 {
+    private const DEFAULT_SIGNATURE = './minicli help';
+
     /**
      * app signature
      *
@@ -59,7 +61,7 @@ class App
      */
     public function __construct(
         array $config = [],
-        string $signature = './minicli help',
+        string $signature = self::DEFAULT_SIGNATURE,
     ) {
         $this->container = Container::getInstance();
 
@@ -78,9 +80,14 @@ class App
             'debug' => true,
         ], $config);
 
-        $this->setSignature($signature);
-
         $this->addService('config', new Config(load_config($config)));
+
+        $appSignature = self::DEFAULT_SIGNATURE === $signature && $this->config->app_name
+            ? $this->config->app_name
+            : $signature;
+
+        $this->setSignature($appSignature);
+
         $commandsPath = $this->config->app_path;
         if ( ! is_array($commandsPath)) {
             $commandsPath = [$commandsPath];
