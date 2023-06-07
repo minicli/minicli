@@ -5,6 +5,5 @@ parameters:
     paths:
         - src/
 
-    ignoreErrors:
-
-    excludePaths:
+    universalObjectCratesClasses:
+        - Minicli\Config

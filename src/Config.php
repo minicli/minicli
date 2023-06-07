@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli;
 
 /**
+ * @property string $app_name
  * @property string|array $app_path
  * @property string $theme
  * @property boolean $debug

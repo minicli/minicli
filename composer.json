@@ -8,7 +8,10 @@
   "autoload": {
     "psr-4": {
       "Minicli\\": "src/"
-    }
+    },
+    "files": [
+      "src/helpers.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
