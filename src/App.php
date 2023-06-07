@@ -80,7 +80,7 @@ class App
 
         $this->setSignature($signature);
 
-        $this->addService('config', new Config($config));
+        $this->addService('config', new Config(load_config($config)));
         $commandsPath = $this->config->app_path;
         if ( ! is_array($commandsPath)) {
             $commandsPath = [$commandsPath];
