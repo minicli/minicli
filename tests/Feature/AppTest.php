@@ -24,6 +24,15 @@ it('asserts App sets, gets and prints signature', function (): void {
     $app->printSignature();
 })->expectOutputString("\nTesting minicli\n");
 
+it('asserts App reads configuration from config folder', function (): void {
+    $app = getConfiguredApp();
+
+    expect($app->getSignature())->toBe('Configured App')
+        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__.'/../Assets/Command'))
+        ->and($app->config->theme)->toBe('unicorn')
+        ->and($app->config->debug)->toBe(true);
+});
+
 it('asserts App has Config Service')
     ->expect(fn () => getBasicApp()->config)
     ->toBeInstanceOf(Config::class);

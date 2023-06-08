@@ -13,80 +13,49 @@ use Minicli\Exception\CommandNotFoundException;
 use Minicli\Exception\MissingParametersException;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use ReflectionException;
 use Throwable;
 
 /**
  * @property Config $config
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
+ * @property string $appSignature
+ * @property string $base_path
+ * @property string $config_path
  * @mixin OutputHandler
  */
 class App
 {
     private const DEFAULT_SIGNATURE = './minicli help';
 
-    /**
-     * app signature
-     *
-     * @var string
-     */
-    protected string $appSignature;
-
-    /**
-     * app services
-     *
-     * @var array<string, ServiceInterface|Closure>
-     */
-    protected array $services = [];
-
-    /**
-     * app loaded services
-     *
-     * @var array<string, ServiceInterface|Closure|bool>
-     */
-    protected array $loadedServices = [];
-
-    /**
-     * The DI Container.
-     *
-     * @var Container
-     */
     protected Container $container;
 
     /**
-     * App constructor
-     *
      * @param array<string, mixed> $config
      * @param string $signature
+     * @param string|null $appRoot
+     * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __construct(
         array $config = [],
         string $signature = self::DEFAULT_SIGNATURE,
+        ?string $appRoot = null
     ) {
         $this->container = Container::getInstance();
 
+        $this->bindPaths($appRoot);
         $this->boot($config, $signature);
     }
 
     /**
      * @param array<string, mixed> $config
      * @param string $signature
+     * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function boot(array $config, string $signature): void
     {
-        $config = array_merge([
-            'app_path' => __DIR__.'/../app/Command',
-            'theme' => '',
-            'debug' => true,
-        ], $config);
-
-        $this->addService('config', new Config(load_config($config)));
-
-        $appSignature = self::DEFAULT_SIGNATURE === $signature && $this->config->app_name
-            ? $this->config->app_name
-            : $signature;
-
-        $this->setSignature($appSignature);
+        $this->loadConfig($config, $signature);
 
         $commandsPath = $this->config->app_path;
         if ( ! is_array($commandsPath)) {
@@ -96,7 +65,7 @@ class App
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with($path, '@')) {
-                $path = str_replace('@', $this->getAppRoot().'/vendor/', $path).'/Command';
+                $path = str_replace('@', $this->base_path.'/vendor/', $path).'/Command';
             }
             $commandSources[] = $path;
         }
@@ -104,9 +73,6 @@ class App
         $this->setTheme($this->config->theme);
     }
 
-    /**
-     * @return string
-     */
     public function getAppRoot(): string
     {
         $root_app = dirname(__DIR__);
@@ -119,22 +85,13 @@ class App
     }
 
     /**
-     * Magic method implements lazy loading for services
-     *
-     * @param string $name
-     * @return mixed
+     * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __get(string $name): mixed
     {
-        if ( ! array_key_exists($name, $this->services)) {
-            return null;
-        }
-
-        if ( ! array_key_exists($name, $this->loadedServices)) {
-            $this->loadService($name);
-        }
-
-        return $this->services[$name];
+        return $this->container->has($name)
+            ? $this->container->get($name)
+            : null;
     }
 
     /**
@@ -152,41 +109,22 @@ class App
     }
 
     /**
-     * add app service
-     *
      * @param string $name
      * @param ServiceInterface|Closure $service
      * @return void
      */
     public function addService(string $name, ServiceInterface|Closure $service): void
     {
-        $this->services[$name] = $service;
-    }
-
-    /**
-     * load app service
-     *
-     * @param string $name
-     * @return void
-     */
-    public function loadService(string $name): void
-    {
-        $service = $this->services[$name];
-
         if ($service instanceof Closure) {
-            $this->services[$name] = $service($this);
-            $this->loadedServices[$name] = true;
+            $this->container->bind($name, fn () => $service($this));
             return;
         }
 
         $service->load($this);
-        $this->loadedServices[$name] = true;
+        $this->container->bind($name, fn () => $service);
     }
 
     /**
-     * Shortcut for accessing the Output Handler
-     *
-     * @return OutputHandler
      * @deprecated
      */
     public function getPrinter(): OutputHandler
@@ -194,84 +132,48 @@ class App
         return $this->printer;
     }
 
-    /**
-     * Shortcut for setting the Output Handler
-     *
-     * @param OutputHandler $outputPrinter
-     * @return void
-     */
     public function setOutputHandler(OutputHandler $outputPrinter): void
     {
-        $this->services['printer'] = $outputPrinter;
+        $this->container->remove('printer');
+        $this->addService('printer', $outputPrinter);
     }
 
-    /**
-     * get app signature
-     *
-     * @return string
-     */
     public function getSignature(): string
     {
         return $this->appSignature;
     }
 
-    /**
-     * print signature
-     *
-     * @return void
-     */
     public function printSignature(): void
     {
         $this->display($this->getSignature());
     }
 
-    /**
-     * set signature
-     *
-     * @param string $appSignature
-     * @return void
-     */
     public function setSignature(string $appSignature): void
     {
-        $this->appSignature = $appSignature;
+        $this->container->remove('appSignature');
+        $this->container->bind('appSignature', fn () => $appSignature);
     }
 
-    /**
-     * Set the Output Handler based on the App's theme config setting
-     *
-     * @param string $loadedServices
-     * @return void
-     */
-    public function setTheme(string $loadedServices): void
+    public function setTheme(string $theme): void
     {
         $output = new OutputHandler();
 
         $output->registerFilter(
-            (new ThemeHelper($loadedServices))
+            (new ThemeHelper($theme))
                 ->getOutputFilter()
         );
 
         $this->addService('printer', $output);
     }
 
-    /**
-     * register app command
-     *
-     * @param string $name
-     * @param callable $callable
-     * @return void
-     */
     public function registerCommand(string $name, callable $callable): void
     {
         $this->commandRegistry->registerCommand($name, $callable);
     }
 
     /**
-     * run command
-     *
      * @param array<int,string> $argv
      * @return void
-     *
      * @throws CommandNotFoundException|Throwable
      */
     public function runCommand(array $argv = []): void
@@ -303,12 +205,7 @@ class App
     }
 
     /**
-     * run single
-     *
-     * @param CommandCall $input
-     * @return bool
      * @throws CommandNotFoundException|Throwable
-     *
      */
     protected function runSingle(CommandCall $input): bool
     {
@@ -333,5 +230,36 @@ class App
         }
 
         throw new CommandNotFoundException("The registered command is not a callable function.");
+    }
+
+    protected function bindPaths(?string $appRoot): void
+    {
+        $appRoot ??= $this->getAppRoot();
+
+        $this->container->bind('base_path', fn () => $appRoot);
+        $this->container->bind('config_path', fn () => "{$appRoot}/config");
+    }
+
+    /**
+     * @param array<string,mixed> $config
+     * @param string $signature
+     * @return void
+     * @throws Exception\BindingResolutionException|ReflectionException
+     */
+    protected function loadConfig(array $config, string $signature): void
+    {
+        $config = array_merge([
+            'app_path' => $this->base_path.'/Command',
+            'theme' => '',
+            'debug' => true,
+        ], $config);
+
+        $this->addService('config', new Config(load_config($config, $this->config_path)));
+
+        $appSignature = self::DEFAULT_SIGNATURE === $signature && $this->config->app_name
+            ? $this->config->app_name
+            : $signature;
+
+        $this->setSignature($appSignature);
     }
 }
