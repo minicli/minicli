@@ -34,15 +34,17 @@ class App
     /**
      * @param array<string, mixed> $config
      * @param string $signature
+     * @param string|null $appRoot
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __construct(
         array $config = [],
-        string $signature = self::DEFAULT_SIGNATURE
+        string $signature = self::DEFAULT_SIGNATURE,
+        ?string $appRoot = null
     ) {
         $this->container = Container::getInstance();
 
-        $this->bindPaths();
+        $this->bindPaths($appRoot);
         $this->boot($config, $signature);
     }
 
@@ -230,9 +232,9 @@ class App
         throw new CommandNotFoundException("The registered command is not a callable function.");
     }
 
-    protected function bindPaths(): void
+    protected function bindPaths(?string $appRoot): void
     {
-        $appRoot = $this->getAppRoot();
+        $appRoot ??= $this->getAppRoot();
 
         $this->container->bind('base_path', fn () => $appRoot);
         $this->container->bind('config_path', fn () => "{$appRoot}/config");
