@@ -170,7 +170,16 @@ class App
     {
         $this->commandRegistry->registerCommand($name, $callable);
     }
-
+    /**
+     * @param array<string, callable> $commands
+     * @return void
+     */
+    public function registerCommands(array $commands): void
+    {
+        foreach ($commands as $name => $callable) {
+            $this->registerCommand($name, $callable);
+        }
+    }
     /**
      * @param array<int,string> $argv
      * @return void
