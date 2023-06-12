@@ -76,6 +76,11 @@ it('asserts Closure service gets passed the App instance', function (): void {
     expect($app->closure)->toBe($app);
 });
 
+it('asserts App can load service from config file', function (): void {
+    $app = getConfiguredApp();
+    expect($app->test->hello())->toBe('Hello World!');
+});
+
 it('asserts App registers and executes single command', function (): void {
     $app = getBasicApp();
 

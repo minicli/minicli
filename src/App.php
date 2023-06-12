@@ -56,6 +56,7 @@ class App
     public function boot(array $config, string $signature): void
     {
         $this->loadConfig($config, $signature);
+        $this->loadServices();
 
         $commandsPath = $this->config->app_path;
         if ( ! is_array($commandsPath)) {
@@ -261,5 +262,17 @@ class App
             : $signature;
 
         $this->setSignature($appSignature);
+    }
+
+    protected function loadServices(): void
+    {
+        $services = $this->config->services ?? [];
+        if ([] === $services) {
+            return;
+        }
+
+        foreach ($services as $name => $service) {
+            $this->addService($name, new $service());
+        }
     }
 }
