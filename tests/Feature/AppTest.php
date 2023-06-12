@@ -94,19 +94,19 @@ it('asserts App executes command from namespace', function (): void {
 
     $app->runCommand(['minicli', 'test']);
 })->expectOutputString("test default");
-it('registers multiple commands', function ():void {
+it('registers multiple commands', function (): void {
     // Create a new instance of the App
     $app = getBasicApp();
 
     // Define the commands to register
     $commands = [
-        'command1' => function ($input) use($app) {
-            $app->success('Hello World!' , false);
-            $app->info('With Background!' , true);
+        'command1' => function ($input) use ($app): void {
+            $app->success('Hello World!', false);
+            $app->info('With Background!', true);
         },
-        'command2' => function ($input) use($app)  {
-            $app->success('Hello World!' , false);
-            $app->info('With Background!' , true);
+        'command2' => function ($input) use ($app): void {
+            $app->success('Hello World!', false);
+            $app->info('With Background!', true);
         },
         // Add more commands here
     ];
