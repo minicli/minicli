@@ -8,6 +8,7 @@ namespace Minicli;
  * @property string $app_name
  * @property string|array $app_path
  * @property string $theme
+ * @property array<string, class-string<ServiceInterface>> $services
  * @property boolean $debug
  */
 class Config implements ServiceInterface
