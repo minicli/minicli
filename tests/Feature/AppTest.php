@@ -99,7 +99,32 @@ it('asserts App executes command from namespace', function (): void {
 
     $app->runCommand(['minicli', 'test']);
 })->expectOutputString("test default");
+it('registers multiple commands', function (): void {
+    // Create a new instance of the App
+    $app = getBasicApp();
 
+    // Define the commands to register
+    $commands = [
+        'command1' => function ($input) use ($app): void {
+            $app->success('Hello World!', false);
+            $app->info('With Background!', true);
+        },
+        'command2' => function ($input) use ($app): void {
+            $app->success('Hello World!', false);
+            $app->info('With Background!', true);
+        },
+        // Add more commands here
+    ];
+
+    // Call the registerCommands method
+    $app->registerCommands($commands);
+    $commandRegistry = $app->commandRegistry;
+
+    // Assert that each command is registered correctly
+    foreach ($commands as $command => $callable) {
+        expect($commandRegistry->getCallable($command))->toBe($callable);
+    }
+});
 it('asserts App prints signature when no command is specified', function (): void {
     $app = getBasicApp();
     $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
