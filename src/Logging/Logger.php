@@ -90,6 +90,10 @@ class Logger implements ServiceInterface
 
     private function writeLog(string $message): void
     {
+        if ( ! is_dir($this->logsPath)) {
+            mkdir($this->logsPath, 0775, true);
+        }
+
         $logFile = $this->getLogFilePath();
 
         if ( ! file_exists($logFile)) {
