@@ -9,6 +9,7 @@ use Minicli\App;
 use Minicli\Config;
 use Minicli\ControllerInterface;
 use Minicli\Exception\MissingParametersException;
+use Minicli\Logging\Logger;
 use Minicli\Output\OutputHandler;
 
 /**
@@ -29,6 +30,13 @@ abstract class CommandController implements ControllerInterface
      * @param Config $config
      */
     protected Config $config;
+
+    /**
+     * logger instance.
+     *
+     * @param Logger $logger
+     */
+    protected Logger $logger;
 
     /**
      * command call instance.
@@ -63,6 +71,7 @@ abstract class CommandController implements ControllerInterface
     {
         $this->app = $app;
         $this->config = $app->config;
+        $this->logger = $app->logger;
         $this->printer = $app->getPrinter();
 
         $missing = array_diff($this->required(), array_keys($input->params));
