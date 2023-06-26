@@ -208,6 +208,7 @@ class App
 
                 return;
             } catch (MissingParametersException $exception) {
+                $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
                 return;
@@ -226,7 +227,9 @@ class App
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
             if ( ! $this->config->debug) {
+                $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
+
                 return false;
             }
             throw $exception;
