@@ -11,6 +11,7 @@ use Minicli\Command\CommandRegistry;
 use Minicli\DI\Container;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Exception\MissingParametersException;
+use Minicli\Logging\Logger;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
 use ReflectionException;
@@ -18,11 +19,13 @@ use Throwable;
 
 /**
  * @property Config $config
+ * @property Logger $logger
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
  * @property string $appSignature
  * @property string $base_path
  * @property string $config_path
+ * @property string $logs_path
  * @mixin OutputHandler
  */
 class App
@@ -205,6 +208,7 @@ class App
 
                 return;
             } catch (MissingParametersException $exception) {
+                $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
                 return;
@@ -223,7 +227,9 @@ class App
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
             if ( ! $this->config->debug) {
+                $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
+
                 return false;
             }
             throw $exception;
@@ -248,6 +254,7 @@ class App
 
         $this->container->bind('base_path', fn () => $appRoot);
         $this->container->bind('config_path', fn () => "{$appRoot}/config");
+        $this->container->bind('logs_path', fn () => "{$appRoot}/logs");
     }
 
     /**
@@ -275,6 +282,8 @@ class App
 
     protected function loadServices(): void
     {
+        $this->loadDefaultServices();
+
         $services = $this->config->services ?? [];
         if ([] === $services) {
             return;
@@ -283,5 +292,10 @@ class App
         foreach ($services as $name => $service) {
             $this->addService($name, new $service());
         }
+    }
+
+    protected function loadDefaultServices(): void
+    {
+        $this->addService('logger', new Logger());
     }
 }
