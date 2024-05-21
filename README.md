@@ -152,7 +152,7 @@ User-defined themes can also be created and defined in your project. In this cas
 
 ```php
 $app = new App([
-    'theme' => 'App\Theme\Blue'
+    'theme' => 'App\Theme\BlueTheme'
 ]);
 ```
 
