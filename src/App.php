@@ -62,14 +62,14 @@ class App
         $this->loadServices();
 
         $commandsPath = $this->config->app_path;
-        if ( ! is_array($commandsPath)) {
+        if (! is_array($commandsPath)) {
             $commandsPath = [$commandsPath];
         }
 
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with($path, '@')) {
-                $path = str_replace('@', $this->base_path.'/vendor/', $path).'/Command';
+                $path = str_replace('@', $this->base_path . '/vendor/', $path) . '/Command';
             }
             $commandSources[] = $path;
         }
@@ -81,7 +81,7 @@ class App
     {
         $root_app = dirname(__DIR__);
 
-        if ( ! is_file($root_app.'/vendor/autoload.php')) {
+        if (! is_file($root_app . '/vendor/autoload.php')) {
             $root_app = dirname(__DIR__, 4);
         }
 
@@ -120,12 +120,12 @@ class App
     public function addService(string $name, ServiceInterface|Closure $service): void
     {
         if ($service instanceof Closure) {
-            $this->container->bind($name, fn () => $service($this));
+            $this->container->bind($name, fn() => $service($this));
             return;
         }
 
         $service->load($this);
-        $this->container->bind($name, fn () => $service);
+        $this->container->bind($name, fn() => $service);
     }
 
     /**
@@ -155,7 +155,7 @@ class App
     public function setSignature(string $appSignature): void
     {
         $this->container->remove('appSignature');
-        $this->container->bind('appSignature', fn () => $appSignature);
+        $this->container->bind('appSignature', fn() => $appSignature);
     }
 
     public function setTheme(string $theme): void
@@ -226,7 +226,7 @@ class App
         try {
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
-            if ( ! $this->config->debug) {
+            if (! $this->config->debug) {
                 $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
@@ -240,7 +240,7 @@ class App
             return true;
         }
 
-        if ( ! $this->config->debug) {
+        if (! $this->config->debug) {
             $this->error("The registered command is not a callable function.");
             return false;
         }
@@ -252,9 +252,9 @@ class App
     {
         $appRoot ??= $this->getAppRoot();
 
-        $this->container->bind('base_path', fn () => $appRoot);
-        $this->container->bind('config_path', fn () => "{$appRoot}/config");
-        $this->container->bind('logs_path', fn () => "{$appRoot}/logs");
+        $this->container->bind('base_path', fn() => $appRoot);
+        $this->container->bind('config_path', fn() => "{$appRoot}/config");
+        $this->container->bind('logs_path', fn() => "{$appRoot}/logs");
     }
 
     /**
@@ -266,7 +266,7 @@ class App
     protected function loadConfig(array $config, string $signature): void
     {
         $config = array_merge([
-            'app_path' => $this->base_path.'/Command',
+            'app_path' => $this->base_path . '/Command',
             'theme' => '',
             'debug' => true,
         ], $config);
@@ -297,5 +297,26 @@ class App
     protected function loadDefaultServices(): void
     {
         $this->addService('logger', new Logger());
+    }
+
+    /**
+     * List all registered services.
+     *
+     * @return array
+     */
+    public function listServices(): array
+    {
+        return $this->container->getBindings();
+    }
+
+    /**
+     * Check if a service is registered.
+     *
+     * @param string $serviceName
+     * @return bool
+     */
+    public function hasService(string $serviceName): bool
+    {
+        return $this->container->has($serviceName);
     }
 }
