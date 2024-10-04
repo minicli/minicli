@@ -17,7 +17,7 @@ use ReflectionParameter;
  */
 final class Container implements ArrayAccess
 {
-    protected static null|Container $instance = null;
+    protected static ?Container $instance = null;
 
     /**
      * @var array<string,array{concrete:Closure|string|null,shared:bool}>
@@ -36,24 +36,15 @@ final class Container implements ArrayAccess
     {
     }
 
-    /**
-     * @return static
-     */
     public static function getInstance(): static
     {
-        if (null === static::$instance) {
-            static::$instance = new static();
+        if (null === self::$instance) {
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
-    /**
-     * @param string $abstract
-     * @param Closure|string|null $concrete
-     * @param bool $shared
-     * @return void
-     */
     public function bind(string $abstract, Closure|string|null $concrete = null, bool $shared = false): void
     {
         $this->bindings[$abstract] = [
@@ -62,29 +53,17 @@ final class Container implements ArrayAccess
         ];
     }
 
-    /**
-     * @param string $abstract
-     * @param Closure|string|null $concrete
-     * @return void
-     */
     public function singleton(string $abstract, Closure|string|null $concrete = null): void
     {
         $this->bind($abstract, $concrete, true);
     }
 
-    /**
-     * @param string $abstract
-     * @param mixed $instance
-     * @return void
-     */
     public function instance(string $abstract, mixed $instance): void
     {
         $this->instances[$abstract] = $instance;
     }
 
     /**
-     * @param string $abstract
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function make(string $abstract): mixed
@@ -108,27 +87,17 @@ final class Container implements ArrayAccess
         return $object;
     }
 
-    /**
-     * @param string $abstract
-     * @return bool
-     */
     public function contains(string $abstract): bool
     {
         return array_key_exists($abstract, $this->bindings);
     }
 
-    /**
-     * @param string $abstract
-     * @return void
-     */
     public function remove(string $abstract): void
     {
         unset($this->bindings[$abstract]);
     }
 
     /**
-     * @param Closure|string $concrete
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function build(Closure|string $concrete): mixed
@@ -161,8 +130,9 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param array<ReflectionParameter>$dependencies
+     * @param  array<ReflectionParameter>  $dependencies
      * @return array<int,mixed>
+     *
      * @throws BindingResolutionException|ReflectionException
      */
     protected function resolveDependencies(array $dependencies): array
@@ -184,9 +154,6 @@ final class Container implements ArrayAccess
         return $results;
     }
 
-    /**
-     * @return void
-     */
     public function flush(): void
     {
         $this->bindings = [];
@@ -194,8 +161,7 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return bool
+     * @param  string  $offset
      */
     public function offsetExists($offset): bool
     {
@@ -205,8 +171,8 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return mixed
+     * @param  string  $offset
+     *
      * @throws BindingResolutionException|ReflectionException
      */
     public function offsetGet($offset): mixed
@@ -217,9 +183,8 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @param Closure|null|string $value
-     * @return void
+     * @param  string  $offset
+     * @param  Closure|null|string  $value
      */
     public function offsetSet($offset, $value): void
     {
@@ -230,8 +195,7 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return void
+     * @param  string  $offset
      */
     public function offsetUnset($offset): void
     {
@@ -241,8 +205,6 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $id
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function get(string $id): mixed
@@ -252,14 +214,18 @@ final class Container implements ArrayAccess
         );
     }
 
-    /**
-     * @param string $id
-     * @return bool
-     */
     public function has(string $id): bool
     {
         return $this->contains(
             abstract: $id,
         );
+    }
+
+    /**
+     * @return array<string,array{concrete:Closure|string|null,shared:bool}>
+     */
+    public function getBindings(): array
+    {
+        return $this->bindings;
     }
 }

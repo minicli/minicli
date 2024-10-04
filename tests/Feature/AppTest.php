@@ -164,3 +164,24 @@ it('asserts App shows error when required parameters are not provided', function
 
     $app->runCommand(['minicli', 'test', 'required']);
 })->expectOutputString("\n{$errorMissingParams}\n");
+
+
+it('asserts App can check if a service is registered', function (): void {
+    $app = getBasicApp();
+    $app->addService('test_service', fn () => 'test');
+
+    expect($app->hasService('test_service'))->toBeTrue();
+    expect($app->hasService('non_existent_service'))->toBeFalse();
+});
+
+it('asserts App can list all registered services', function (): void {
+    $app = getBasicApp();
+    $app->addService('service1', fn () => 'service1');
+    $app->addService('service2', fn () => 'service2');
+
+    $services = $app->listServices();
+
+    expect($services)->toBeArray();
+    expect(array_key_exists('service1', $services))->toBeTrue();
+    expect(array_key_exists('service2', $services))->toBeTrue();
+});
