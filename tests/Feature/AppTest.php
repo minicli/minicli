@@ -141,7 +141,7 @@ it('asserts App throws exception when single command is not found', function ():
 it('asserts App throws exception when command is not callable', function (): void {
     $app = getBasicApp();
     $app->registerCommand('minicli-test-error', "not a callable");
-})->expectException(\TypeError::class);
+})->expectException(TypeError::class);
 
 $app = new App();
 $errorNotFound = $app->filterOutput("Command \"inexistent-command\" not found.", 'error');
