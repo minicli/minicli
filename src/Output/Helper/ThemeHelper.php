@@ -29,9 +29,9 @@ class ThemeHelper
     /**
      * Initialize and return an OutputFilter based on our theme class
      *
-     * @return ColorOutPutFilter
+     * @return ColorOutputFilter
      */
-    public function getOutputFilter(): ColorOutPutFilter
+    public function getOutputFilter(): ColorOutputFilter
     {
         if (class_exists($this->theme)) {
             /**

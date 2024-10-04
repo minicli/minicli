@@ -187,6 +187,6 @@ class TableHelper
      */
     protected function getPaddedString(string $tableCell, int $colSize = 5): string
     {
-        return str_pad($tableCell, $colSize);
+        return mb_str_pad($tableCell, $colSize);
     }
 }
