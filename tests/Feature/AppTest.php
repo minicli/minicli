@@ -10,7 +10,7 @@ use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Exception\CommandNotFoundException;
 
 it('assert App is created')
-    ->expect(fn() => getBasicApp())
+    ->expect(fn () => getBasicApp())
     ->toBeInstanceOf(App::class);
 
 it('asserts App sets, gets and prints signature', function (): void {
@@ -28,25 +28,25 @@ it('asserts App reads configuration from config folder', function (): void {
     $app = getConfiguredApp();
 
     expect($app->getSignature())->toBe('Configured App')
-        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__ . '/../Assets/Command'))
+        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__.'/../Assets/Command'))
         ->and($app->config->theme)->toBe('unicorn')
         ->and($app->config->debug)->toBe(true);
 });
 
 it('asserts App has Config Service')
-    ->expect(fn() => getBasicApp()->config)
+    ->expect(fn () => getBasicApp()->config)
     ->toBeInstanceOf(Config::class);
 
 it('asserts App has CommandRegistry Service')
-    ->expect(fn() => getBasicApp()->commandRegistry)
+    ->expect(fn () => getBasicApp()->commandRegistry)
     ->toBeInstanceOf(CommandRegistry::class);
 
 it('asserts App has Printer Service')
-    ->expect(fn() => getBasicApp()->printer)
+    ->expect(fn () => getBasicApp()->printer)
     ->toBeInstanceOf(OutputHandler::class);
 
 it('asserts App returns null when a service is not found')
-    ->expect(fn() => getBasicApp()->inexistent_service)
+    ->expect(fn () => getBasicApp()->inexistent_service)
     ->toBeNull();
 
 it('asserts App parses command path with @vendor tag', function (): void {
@@ -64,14 +64,14 @@ it('asserts App parses command path with @vendor tag', function (): void {
 
 it('asserts App can handle a closure as a service', function (): void {
     $app = getBasicApp();
-    $app->addService('closure', fn() => 'closure');
+    $app->addService('closure', fn () => 'closure');
 
     expect($app->closure)->toBe('closure');
 });
 
 it('asserts Closure service gets passed the App instance', function (): void {
     $app = getBasicApp();
-    $app->addService('closure', fn($app) => $app);
+    $app->addService('closure', fn ($app) => $app);
 
     expect($app->closure)->toBe($app);
 });
@@ -168,7 +168,7 @@ it('asserts App shows error when required parameters are not provided', function
 
 it('asserts App can check if a service is registered', function (): void {
     $app = getBasicApp();
-    $app->addService('test_service', fn() => 'test');
+    $app->addService('test_service', fn () => 'test');
 
     expect($app->hasService('test_service'))->toBeTrue();
     expect($app->hasService('non_existent_service'))->toBeFalse();
@@ -176,8 +176,8 @@ it('asserts App can check if a service is registered', function (): void {
 
 it('asserts App can list all registered services', function (): void {
     $app = getBasicApp();
-    $app->addService('service1', fn() => 'service1');
-    $app->addService('service2', fn() => 'service2');
+    $app->addService('service1', fn () => 'service1');
+    $app->addService('service2', fn () => 'service2');
 
     $services = $app->listServices();
 

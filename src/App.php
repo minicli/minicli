@@ -26,6 +26,7 @@ use Throwable;
  * @property string $base_path
  * @property string $config_path
  * @property string $logs_path
+ *
  * @mixin OutputHandler
  */
 class App
@@ -35,9 +36,8 @@ class App
     protected Container $container;
 
     /**
-     * @param array<string, mixed> $config
-     * @param string $signature
-     * @param string|null $appRoot
+     * @param  array<string, mixed>  $config
+     *
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __construct(
@@ -52,8 +52,8 @@ class App
     }
 
     /**
-     * @param array<string, mixed> $config
-     * @param string $signature
+     * @param  array<string, mixed>  $config
+     *
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function boot(array $config, string $signature): void
@@ -62,14 +62,14 @@ class App
         $this->loadServices();
 
         $commandsPath = $this->config->app_path;
-        if (! is_array($commandsPath)) {
+        if ( ! is_array($commandsPath)) {
             $commandsPath = [$commandsPath];
         }
 
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with($path, '@')) {
-                $path = str_replace('@', $this->base_path . '/vendor/', $path) . '/Command';
+                $path = str_replace('@', $this->base_path.'/vendor/', $path).'/Command';
             }
             $commandSources[] = $path;
         }
@@ -81,7 +81,7 @@ class App
     {
         $root_app = dirname(__DIR__);
 
-        if (! is_file($root_app . '/vendor/autoload.php')) {
+        if ( ! is_file($root_app.'/vendor/autoload.php')) {
             $root_app = dirname(__DIR__, 4);
         }
 
@@ -99,9 +99,7 @@ class App
     }
 
     /**
-     * @param string $name
-     * @param array<int,mixed> $arguments
-     * @return mixed
+     * @param  array<int,mixed>  $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {
@@ -112,20 +110,16 @@ class App
         throw new BadMethodCallException("Method {$name} does not exist.");
     }
 
-    /**
-     * @param string $name
-     * @param ServiceInterface|Closure $service
-     * @return void
-     */
     public function addService(string $name, ServiceInterface|Closure $service): void
     {
         if ($service instanceof Closure) {
-            $this->container->bind($name, fn() => $service($this));
+            $this->container->bind($name, fn () => $service($this));
+
             return;
         }
 
         $service->load($this);
-        $this->container->bind($name, fn() => $service);
+        $this->container->bind($name, fn () => $service);
     }
 
     /**
@@ -155,7 +149,7 @@ class App
     public function setSignature(string $appSignature): void
     {
         $this->container->remove('appSignature');
-        $this->container->bind('appSignature', fn() => $appSignature);
+        $this->container->bind('appSignature', fn () => $appSignature);
     }
 
     public function setTheme(string $theme): void
@@ -174,9 +168,9 @@ class App
     {
         $this->commandRegistry->registerCommand($name, $callable);
     }
+
     /**
-     * @param array<string, callable> $commands
-     * @return void
+     * @param  array<string, callable>  $commands
      */
     public function registerCommands(array $commands): void
     {
@@ -184,9 +178,10 @@ class App
             $this->registerCommand($name, $callable);
         }
     }
+
     /**
-     * @param array<int,string> $argv
-     * @return void
+     * @param  array<int,string>  $argv
+     *
      * @throws CommandNotFoundException|Throwable
      */
     public function runCommand(array $argv = []): void
@@ -195,6 +190,7 @@ class App
 
         if (count($input->args) < 2) {
             $this->printSignature();
+
             return;
         }
 
@@ -226,7 +222,7 @@ class App
         try {
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
-            if (! $this->config->debug) {
+            if ( ! $this->config->debug) {
                 $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
@@ -237,36 +233,37 @@ class App
 
         if (is_callable($callable)) {
             call_user_func($callable, $input);
+
             return true;
         }
 
-        if (! $this->config->debug) {
-            $this->error("The registered command is not a callable function.");
+        if ( ! $this->config->debug) {
+            $this->error('The registered command is not a callable function.');
+
             return false;
         }
 
-        throw new CommandNotFoundException("The registered command is not a callable function.");
+        throw new CommandNotFoundException('The registered command is not a callable function.');
     }
 
     protected function bindPaths(?string $appRoot): void
     {
         $appRoot ??= $this->getAppRoot();
 
-        $this->container->bind('base_path', fn() => $appRoot);
-        $this->container->bind('config_path', fn() => "{$appRoot}/config");
-        $this->container->bind('logs_path', fn() => "{$appRoot}/logs");
+        $this->container->bind('base_path', fn () => $appRoot);
+        $this->container->bind('config_path', fn () => "{$appRoot}/config");
+        $this->container->bind('logs_path', fn () => "{$appRoot}/logs");
     }
 
     /**
-     * @param array<string,mixed> $config
-     * @param string $signature
-     * @return void
+     * @param  array<string,mixed>  $config
+     *
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     protected function loadConfig(array $config, string $signature): void
     {
         $config = array_merge([
-            'app_path' => $this->base_path . '/Command',
+            'app_path' => $this->base_path.'/Command',
             'theme' => '',
             'debug' => true,
         ], $config);
@@ -301,8 +298,7 @@ class App
 
     /**
      * List all registered services.
-     *
-     * @return array
+     * @return array<string, mixed>
      */
     public function listServices(): array
     {
@@ -311,9 +307,6 @@ class App
 
     /**
      * Check if a service is registered.
-     *
-     * @param string $serviceName
-     * @return bool
      */
     public function hasService(string $serviceName): bool
     {

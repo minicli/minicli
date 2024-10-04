@@ -17,7 +17,7 @@ use ReflectionParameter;
  */
 final class Container implements ArrayAccess
 {
-    protected static null|Container $instance = null;
+    protected static ?Container $instance = null;
 
     /**
      * @var array<string,array{concrete:Closure|string|null,shared:bool}>
@@ -32,26 +32,19 @@ final class Container implements ArrayAccess
     /**
      * @return void
      */
-    private function __construct() {}
-
-    /**
-     * @return static
-     */
-    public static function getInstance(): static
+    private function __construct()
     {
-        if (null === static::$instance) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
     }
 
-    /**
-     * @param string $abstract
-     * @param Closure|string|null $concrete
-     * @param bool $shared
-     * @return void
-     */
+    public static function getInstance(): static
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     public function bind(string $abstract, Closure|string|null $concrete = null, bool $shared = false): void
     {
         $this->bindings[$abstract] = [
@@ -60,29 +53,17 @@ final class Container implements ArrayAccess
         ];
     }
 
-    /**
-     * @param string $abstract
-     * @param Closure|string|null $concrete
-     * @return void
-     */
     public function singleton(string $abstract, Closure|string|null $concrete = null): void
     {
         $this->bind($abstract, $concrete, true);
     }
 
-    /**
-     * @param string $abstract
-     * @param mixed $instance
-     * @return void
-     */
     public function instance(string $abstract, mixed $instance): void
     {
         $this->instances[$abstract] = $instance;
     }
 
     /**
-     * @param string $abstract
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function make(string $abstract): mixed
@@ -106,27 +87,17 @@ final class Container implements ArrayAccess
         return $object;
     }
 
-    /**
-     * @param string $abstract
-     * @return bool
-     */
     public function contains(string $abstract): bool
     {
         return array_key_exists($abstract, $this->bindings);
     }
 
-    /**
-     * @param string $abstract
-     * @return void
-     */
     public function remove(string $abstract): void
     {
         unset($this->bindings[$abstract]);
     }
 
     /**
-     * @param Closure|string $concrete
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function build(Closure|string $concrete): mixed
@@ -135,13 +106,13 @@ final class Container implements ArrayAccess
             return $concrete($this);
         }
 
-        if (! class_exists($concrete)) {
+        if ( ! class_exists($concrete)) {
             throw new BindingResolutionException("Target class [{$concrete}] does not exist.", 0);
         }
 
         $reflector = new ReflectionClass($concrete);
 
-        if (! $reflector->isInstantiable()) {
+        if ( ! $reflector->isInstantiable()) {
             throw new BindingResolutionException("Target [{$concrete}] is not instantiable.");
         }
 
@@ -159,8 +130,9 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param array<ReflectionParameter>$dependencies
+     * @param  array<ReflectionParameter>  $dependencies
      * @return array<int,mixed>
+     *
      * @throws BindingResolutionException|ReflectionException
      */
     protected function resolveDependencies(array $dependencies): array
@@ -171,7 +143,7 @@ final class Container implements ArrayAccess
             // This is a much simpler version of what Laravel does
             $type = $dependency->getType(); // ReflectionType|null
 
-            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            if ( ! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
                 $declaringClass = null === $dependency->getDeclaringClass() ? '' : $dependency->getDeclaringClass()->getName();
                 throw new BindingResolutionException("Unresolvable dependency resolving [{$dependency}] in class {$declaringClass}");
             }
@@ -182,9 +154,6 @@ final class Container implements ArrayAccess
         return $results;
     }
 
-    /**
-     * @return void
-     */
     public function flush(): void
     {
         $this->bindings = [];
@@ -192,8 +161,7 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return bool
+     * @param  string  $offset
      */
     public function offsetExists($offset): bool
     {
@@ -203,8 +171,8 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return mixed
+     * @param  string  $offset
+     *
      * @throws BindingResolutionException|ReflectionException
      */
     public function offsetGet($offset): mixed
@@ -215,9 +183,8 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @param Closure|null|string $value
-     * @return void
+     * @param  string  $offset
+     * @param  Closure|null|string  $value
      */
     public function offsetSet($offset, $value): void
     {
@@ -228,8 +195,7 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @return void
+     * @param  string  $offset
      */
     public function offsetUnset($offset): void
     {
@@ -239,8 +205,6 @@ final class Container implements ArrayAccess
     }
 
     /**
-     * @param string $id
-     * @return mixed
      * @throws BindingResolutionException|ReflectionException
      */
     public function get(string $id): mixed
@@ -250,10 +214,6 @@ final class Container implements ArrayAccess
         );
     }
 
-    /**
-     * @param string $id
-     * @return bool
-     */
     public function has(string $id): bool
     {
         return $this->contains(
