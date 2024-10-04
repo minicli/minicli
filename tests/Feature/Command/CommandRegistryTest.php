@@ -26,11 +26,11 @@ it('asserts Registry returns null when a namespace is not found')
 
 it('asserts Registry returns correct controller from namespace when no subcommand is passed')
     ->expect(fn () => getRegistry()->getCallableController("test"))
-    ->toBeInstanceOf(\Assets\Command\Test\DefaultController::class);
+    ->toBeInstanceOf(Assets\Command\Test\DefaultController::class);
 
 it('asserts Registry returns correct controller from namespace when a subcommand is passed')
     ->expect(fn () => getRegistry()->getCallableController("test", "help"))
-    ->toBeInstanceOf(\Assets\Command\Test\HelpController::class);
+    ->toBeInstanceOf(Assets\Command\Test\HelpController::class);
 
 it('asserts Registry returns null when a namespace controller is not found')
     ->expect(fn () => getRegistry()->getCallableController("dasdsad"))

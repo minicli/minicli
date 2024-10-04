@@ -55,7 +55,7 @@ it('asserts that all fields respect column sizes', function (): void {
 
     $rows = explode("\n", $tableContent);
     $sizeAtFirst = mb_strlen($rows[1]);
-    $sizeAtLast = mb_strlen($rows[count($rows)-1]);
+    $sizeAtLast = mb_strlen($rows[count($rows) - 1]);
 
     expect($sizeAtFirst)->toBe($sizeAtLast);
 });
