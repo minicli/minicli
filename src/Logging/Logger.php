@@ -35,7 +35,7 @@ class Logger implements ServiceInterface
      * @param LogLevel|null $level
      * @return void
      */
-    public function log(string $message, array $context = [], LogLevel $level = null): void
+    public function log(string $message, array $context = [], ?LogLevel $level = null): void
     {
         $level ??= $this->logLevel;
 
