@@ -103,7 +103,7 @@ class TableHelper
      * @param OutputFilterInterface|null $filter In case no filter is provided, a SimpleOutputFilter is used by default.
      * @return string
      */
-    public function getFormattedTable(OutputFilterInterface $filter = null): string
+    public function getFormattedTable(?OutputFilterInterface $filter = null): string
     {
         $filter = $filter ?? new SimpleOutputFilter();
 
