@@ -35,6 +35,8 @@ class App
 
     protected Container $container;
 
+    public readonly string $me;
+
     /**
      * @param  array<string, mixed>  $config
      *
@@ -49,6 +51,8 @@ class App
 
         $this->bindPaths($appRoot);
         $this->boot($config, $signature);
+
+        $this->me = $this->findBinFileName();
     }
 
     /**
@@ -311,5 +315,13 @@ class App
     public function hasService(string $serviceName): bool
     {
         return $this->container->has($serviceName);
+    }
+
+    protected function findBinFileName(): string
+    {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+        // Index 0 is current method, index 1 is the instantiation
+        return basename($backtrace[1]['file'] ?? 'minicli');
     }
 }
