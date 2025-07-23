@@ -93,6 +93,7 @@ class App
     }
 
     /**
+     * Gets a service from the container (typically objects) or configured values (strings)
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __get(string $name): mixed
@@ -103,7 +104,12 @@ class App
     }
 
     /**
-     * @param  array<int,mixed>  $arguments
+     * Delegates method calls to the printer (OutputHandler)
+     * Most printer methods return void, but some return string (e.g., ask(), filterOutput())
+     *
+     * @param string $name
+     * @param array<int,mixed> $arguments
+     * @return mixed Most commonly void, but can return string for interactive methods
      */
     public function __call(string $name, array $arguments): mixed
     {

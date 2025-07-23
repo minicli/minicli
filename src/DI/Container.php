@@ -175,7 +175,7 @@ final class Container implements ArrayAccess
      *
      * @throws BindingResolutionException|ReflectionException
      */
-    public function offsetGet($offset): mixed
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->make(
             abstract: $offset,

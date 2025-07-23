@@ -23,10 +23,10 @@ class Config implements ServiceInterface
     }
 
     /**
-     * get config
+     * Get configuration value
      *
-     * @param string $name
-     * @return mixed
+     * @param string $name Configuration key
+     * @return mixed Configuration value (typically string, array, bool, int) or null if not found
      */
     public function __get(string $name): mixed
     {
@@ -34,12 +34,12 @@ class Config implements ServiceInterface
     }
 
     /**
-     * set config
+     * Set configuration value
      *
-     * @param string $name
-     * @param string $value
+     * @param string $name Configuration key
+     * @param mixed $value Configuration value (typically string, array, bool, int)
      */
-    public function __set(string $name, string $value): void
+    public function __set(string $name, mixed $value): void
     {
         $this->config[$name] = $value;
     }

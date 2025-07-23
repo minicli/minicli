@@ -186,9 +186,12 @@ abstract class CommandController implements ControllerInterface
     }
 
     /**
+     * Delegates method calls to the printer (OutputHandler)
+     * Most printer methods return void, but some return string (e.g., ask(), filterOutput())
+     *
      * @param string $name
      * @param array<int,mixed> $arguments
-     * @return mixed
+     * @return mixed Most commonly void, but can return string for interactive methods
      */
     public function __call(string $name, array $arguments): mixed
     {
