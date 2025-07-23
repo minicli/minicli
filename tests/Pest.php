@@ -39,7 +39,7 @@ function getConfiguredApp(): App
     return new App([], './minicli help', __DIR__.'/Assets');
 }
 
-function getCommandCall(array $parameters = null): CommandCall
+function getCommandCall(?array $parameters = null): CommandCall
 {
     return new CommandCall(array_merge(['minicli'], $parameters));
 }

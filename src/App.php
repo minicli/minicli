@@ -236,7 +236,7 @@ class App
         }
 
         if (is_callable($callable)) {
-            call_user_func($callable, $input);
+            $callable($input);
 
             return true;
         }

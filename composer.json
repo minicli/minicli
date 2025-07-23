@@ -21,7 +21,7 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.2 || ^8.4",
     "ext-readline": "*"
   },
   "require-dev": {
