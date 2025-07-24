@@ -20,19 +20,13 @@ class DefaultTheme implements CLIThemeInterface
     {
         $styles = array_merge($this->getDefaultColors(), $this->getThemeColors());
 
-        $formatted = [];
-        foreach ($styles as $name => $style) {
-            $formatted[$name] = ThemeStyle::make(...$style);
-        }
+        $formatted = array_map(fn ($style) => ThemeStyle::make(...$style), $styles);
 
         $this->config = ThemeConfig::make(...$formatted);
     }
 
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
-     *
-     * @param string $name
-     * @return ThemeStyle
      */
     public function getStyle(string $name): ThemeStyle
     {
@@ -41,9 +35,6 @@ class DefaultTheme implements CLIThemeInterface
 
     /**
      * Sets a style
-     *
-     * @param string $name
-     * @param ThemeStyle $style
      */
     public function setStyle(string $name, ThemeStyle $style): void
     {
@@ -70,7 +61,7 @@ class DefaultTheme implements CLIThemeInterface
             'dim'         => [CLIColors::$DIM],
             'italic'      => [CLIColors::$ITALIC],
             'underline'   => [CLIColors::$UNDERLINE],
-            'invert'      => [CLIColors::$INVERT]
+            'invert'      => [CLIColors::$INVERT],
         ];
     }
 
