@@ -16,7 +16,27 @@ final class Help extends CommandController
     {
         /** @var AppConfig $config */
         $config = $this->config('app');
-        $this->info($config->name);
+        $this->out($config->name);
+
+        $commands = $this->app->commandRegistry->getCommandMap();
+        ksort($commands);
+
+        $this->newline();
+        $this->info('Available commands:');
+        $this->newline();
+
+        foreach ($commands as $name => $commandInfo) {
+            $isSubcommand = str_contains($name, ' ');
+            $padding = $isSubcommand ? "\t" : '';
+
+            $description = $commandInfo->description !== ''
+                ? " - {$commandInfo->description}"
+                : '';
+
+            $this->info("{$padding}{$name}{$description}");
+        }
+
+        $this->newline();
 
         return ExitCode::Success;
     }
