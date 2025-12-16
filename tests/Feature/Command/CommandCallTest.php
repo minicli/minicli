@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Command\CommandCall;
+use Minicli\Console\CommandCall;
 
 it('asserts input arguments are loaded and properties are set')
     ->expect(fn (): CommandCall => new CommandCall(['minicli', 'help', 'test']))

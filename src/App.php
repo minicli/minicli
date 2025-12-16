@@ -6,11 +6,11 @@ namespace Minicli;
 
 use BadMethodCallException;
 use Closure;
-use Minicli\Attributes\Config;
 use Minicli\Attributes\Service;
-use Minicli\Command\CommandCall;
-use Minicli\Command\CommandRegistry;
 use Minicli\Config\AppConfig;
+use Minicli\Console\CommandCall;
+use Minicli\Console\CommandInfo;
+use Minicli\Console\CommandRegistry;
 use Minicli\Container\Container;
 use Minicli\Contracts\ControllerInterface;
 use Minicli\Contracts\ServiceInterface;
@@ -21,11 +21,9 @@ use Minicli\Exceptions\MissingParametersException;
 use Minicli\Log\Logger;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use ReflectionClass;
+use Minicli\Support\ConfigLoader;
+use Minicli\Support\ServiceLoader;
 use ReflectionException;
-use RuntimeException;
 use Throwable;
 
 /**
@@ -82,33 +80,25 @@ final readonly class App
      */
     public function boot(): void
     {
-        $this->loadConfig();
-        $this->loadServices();
+        new ConfigLoader()->load($this);
+        new ServiceLoader()->load($this);
 
         /** @var AppConfig $config */
         $config = $this->config('app');
 
-        $commandsPath = $config->commandPaths;
-        $commandSources = [];
-        foreach ($commandsPath as $path) {
-            if (str_starts_with((string) $path, '@')) {
-                $path = str_replace('@', $this->basePath() . '/vendor/', $path) . '/Commands';
-            }
-            $commandSources[] = $path;
-        }
-        $this->addService('commandRegistry', new CommandRegistry($commandSources));
+        $this->addService('commandRegistry', new CommandRegistry());
         $this->setTheme($config->theme);
     }
 
-    public function getAppRoot(): string
+    public function appRoot(): string
     {
-        $root_app = dirname(__DIR__);
+        $root = dirname(__DIR__);
 
-        if (! is_file($root_app . '/vendor/autoload.php')) {
+        if (! is_file("{$root}/vendor/autoload.php")) {
             return dirname(__DIR__, 4);
         }
 
-        return $root_app;
+        return $root;
     }
 
     public function addService(string $name, ServiceInterface|Closure $service): void
@@ -121,6 +111,11 @@ final readonly class App
 
         $service->load($this);
         $this->container->bind($name, fn (): ServiceInterface => $service);
+    }
+
+    public function addConfig(string $name, object $configInstance): void
+    {
+        $this->container->singleton($this->configKey($name), fn (): object => $configInstance);
     }
 
     public function setOutputHandler(OutputHandler $outputPrinter): void
@@ -192,18 +187,18 @@ final readonly class App
         $this->addService('printer', $output);
     }
 
-    public function registerCommand(string $name, callable $callable): void
+    public function registerCommand(string $name, CommandInfo $commandInfo): void
     {
-        $this->commandRegistry->registerCommand($name, $callable);
+        $this->commandRegistry->registerCommand($name, $commandInfo);
     }
 
     /**
-     * @param  array<string, callable>  $commands
+     * @param  array<string, CommandInfo>  $commands
      */
     public function registerCommands(array $commands): void
     {
-        foreach ($commands as $name => $callable) {
-            $this->registerCommand($name, $callable);
+        foreach ($commands as $name => $commandInfo) {
+            $this->registerCommand($name, $commandInfo);
         }
     }
 
@@ -222,24 +217,26 @@ final readonly class App
             return;
         }
 
-        $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
+        // TODO: Update how to get and call commands from registry
 
-        if ($controller instanceof ControllerInterface) {
-            try {
-                $controller->boot($this, $input);
-                $controller->run($input);
-                $controller->teardown();
-
-                return;
-            } catch (MissingParametersException $exception) {
-                $this->logger->error($exception->getMessage());
-                $this->error($exception->getMessage());
-
-                return;
-            }
-        }
-
-        $this->runSingle($input);
+        //        $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
+        //
+        //        if ($controller instanceof ControllerInterface) {
+        //            try {
+        //                $controller->boot($this, $input);
+        //                $controller->run($input);
+        //                $controller->teardown();
+        //
+        //                return;
+        //            } catch (MissingParametersException $exception) {
+        //                $this->logger->error($exception->getMessage());
+        //                $this->error($exception->getMessage());
+        //
+        //                return;
+        //            }
+        //        }
+        //
+        //        $this->runSingle($input);
     }
 
     /**
@@ -261,171 +258,20 @@ final readonly class App
     }
 
     /**
-     * @throws CommandNotFoundException|Throwable
+     * @throws ReflectionException|BindingResolutionException
      */
-    private function runSingle(CommandCall $input): bool
+    public function make(string $abstract): mixed
     {
-        /** @var AppConfig $config */
-        $config = $this->config('app');
-
-        try {
-            $callable = $this->commandRegistry->getCallable((string) $input->command);
-        } catch (Throwable $exception) {
-            if (! $config->debug) {
-                $this->logger->error($exception->getMessage());
-                $this->error($exception->getMessage());
-
-                return false;
-            }
-            throw $exception;
-        }
-
-        if (is_callable($callable)) {
-            call_user_func($callable, $input);
-
-            return true;
-        }
-
-        if (! $config->debug) {
-            $this->error('The registered command is not a callable function.');
-
-            return false;
-        }
-
-        throw new CommandNotFoundException('The registered command is not a callable function.');
+        return $this->container->make($abstract);
     }
 
     private function bindPaths(?string $appRoot): void
     {
-        $appRoot ??= $this->getAppRoot();
+        $appRoot ??= $this->appRoot();
 
         $this->container->bind('base_path', fn (): string => $appRoot);
         $this->container->bind('config_path', fn (): string => "{$appRoot}/config");
         $this->container->bind('logs_path', fn (): string => "{$appRoot}/logs");
-    }
-
-    /**
-     * @throws BindingResolutionException|ReflectionException
-     */
-    private function loadConfig(): void
-    {
-        $configPath = $this->configPath();
-
-        if (! is_dir($configPath)) {
-            return;
-        }
-
-        $configFiles = glob($configPath . '/*.php');
-
-        if ($configFiles === false || $configFiles === []) {
-            return;
-        }
-
-        foreach ($configFiles as $configFile) {
-            require_once $configFile;
-
-            $className = basename($configFile, '.php');
-
-            if (! class_exists($className)) {
-                continue;
-            }
-
-            $reflectionClass = new ReflectionClass($className);
-            $configAttributes = $reflectionClass->getAttributes(Config::class);
-
-            if ($configAttributes === []) {
-                throw new RuntimeException("Configuration class {$className} must have a Config attribute.");
-            }
-
-            $configAttribute = $configAttributes[0]->newInstance();
-            $configName = $configAttribute->name;
-
-            $configInstance = new $className();
-            $this->container->singleton($this->configKey($configName), fn (): object => $configInstance);
-        }
-    }
-
-    private function loadServices(): void
-    {
-        $this->loadDefaultServices();
-
-        $basePath = $this->basePath();
-
-        if (! is_dir($basePath)) {
-            return;
-        }
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($basePath, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        $processedClasses = [];
-
-        foreach ($iterator as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-            if ($file->getExtension() !== 'php') {
-                continue;
-            }
-            $filePath = $file->getRealPath();
-            // Skip vendor and config directories
-            if (str_contains((string) $filePath, '/vendor/')) {
-                continue;
-            }
-            if (str_contains((string) $filePath, '/config/')) {
-                continue;
-            }
-
-            // Track classes before requiring file
-            $classesBefore = get_declared_classes();
-
-            require_once $filePath;
-
-            // Get newly declared classes from this file
-            $classesAfter = get_declared_classes();
-            $newClasses = array_diff($classesAfter, $classesBefore);
-
-            foreach ($newClasses as $className) {
-                // Skip if already processed
-                if (isset($processedClasses[$className])) {
-                    continue;
-                }
-
-                $processedClasses[$className] = true;
-
-                if (! class_exists($className)) {
-                    continue;
-                }
-
-                $reflectionClass = new ReflectionClass($className);
-
-                // Check if class has Service attribute
-                $serviceAttributes = $reflectionClass->getAttributes(Service::class);
-
-                if ($serviceAttributes === []) {
-                    continue;
-                }
-
-                // Check if class implements ServiceInterface
-                if (! $reflectionClass->implementsInterface(ServiceInterface::class)) {
-                    continue;
-                }
-
-                $serviceAttribute = $serviceAttributes[0]->newInstance();
-                $serviceName = $serviceAttribute->name;
-
-                /** @var ServiceInterface $serviceInstance */
-                $serviceInstance = new $className();
-                $this->addService($serviceName, $serviceInstance);
-            }
-        }
-    }
-
-    private function loadDefaultServices(): void
-    {
-        $this->addService('logger', new Logger());
     }
 
     private function findBinFileName(): string

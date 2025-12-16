@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Minicli\Command\CommandController;
-use Minicli\Command\CommandNamespace;
+use Minicli\Console\CommandController;
+use Minicli\Console\CommandNamespace;
 
 function getCommandNamespace(): CommandNamespace
 {

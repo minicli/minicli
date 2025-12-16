@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use Minicli\Command\CommandNamespace;
+use Minicli\Console\CommandNamespace;
 use Minicli\Exceptions\CommandNotFoundException;
 
 it('asserts Registry autoloads command namespaces')
-    ->expect(fn (): ?\Minicli\Command\CommandNamespace => getRegistry()->getNamespace('test'))
+    ->expect(fn (): ?\Minicli\Console\CommandNamespace => getRegistry()->getNamespace('test'))
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class);
 
 it('asserts Registry autoloads command namespaces in multiple source paths')
-    ->expect(fn (): Minicli\Command\CommandRegistry => getRegistryWithMultiplePaths())
+    ->expect(fn (): Minicli\Console\CommandRegistry => getRegistryWithMultiplePaths())
     ->getNamespace('test')
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class)
@@ -20,7 +20,7 @@ it('asserts Registry autoloads command namespaces in multiple source paths')
     ->toBeInstanceOf(CommandNamespace::class);
 
 it('asserts Registry returns null when a namespace is not found')
-    ->expect(fn (): ?\Minicli\Command\CommandNamespace => getRegistry()->getNamespace('dasdsad'))
+    ->expect(fn (): ?\Minicli\Console\CommandNamespace => getRegistry()->getNamespace('dasdsad'))
     ->toBeNull();
 
 it('asserts Registry returns correct controller from namespace when no subcommand is passed')

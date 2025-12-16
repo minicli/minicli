@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Command;
+namespace Minicli\Console;
 
 use BadMethodCallException;
 use Minicli\App;
 use Minicli\Contracts\ControllerInterface;
-use Minicli\Exceptions\MissingParametersException;
 use Minicli\Log\Logger;
 use Minicli\Output\OutputHandler;
 
@@ -16,32 +15,12 @@ use Minicli\Output\OutputHandler;
  */
 abstract class CommandController implements ControllerInterface
 {
-    /**
-     * app instance.
-     *
-     * @param  App  $app
-     */
     protected App $app;
 
-    /**
-     * logger instance.
-     *
-     * @param  Logger  $logger
-     */
     protected Logger $logger;
 
-    /**
-     * command call instance.
-     *
-     * @param  CommandCall  $input
-     */
     protected CommandCall $input;
 
-    /**
-     * output handler instance.
-     *
-     * @param  OutputHandler  $printer
-     */
     private OutputHandler $printer;
 
     /**
@@ -57,55 +36,21 @@ abstract class CommandController implements ControllerInterface
     }
 
     /**
-     * Called when `run` is successfully finished.
+     * Called after the command execution
      */
     public function teardown(): void {}
 
     /**
-     * handle command.
-     */
-    abstract public function handle(): void;
-
-    /**
-     * Called before `run`
-     *
-     * @throws MissingParametersException
+     * Called before the command execution
      */
     public function boot(App $app, CommandCall $input): void
     {
         $this->app = $app;
         $this->logger = $app->logger;
         $this->printer = $app->printer;
-
-        $missing = array_diff($this->required(), array_keys($input->params));
-
-        if ($missing !== []) {
-            throw new MissingParametersException($missing);
-        }
     }
 
     /**
-     * run command
-     */
-    public function run(CommandCall $input): void
-    {
-        $this->input = $input;
-        $this->handle();
-    }
-
-    /**
-     * The list of parameters required by the command.
-     *
-     * @return array<int, string>
-     */
-    public function required(): array
-    {
-        return [];
-    }
-
-    /**
-     * get arguments
-     *
      * @return array<int, string>
      */
     protected function getArgs(): array
@@ -114,8 +59,6 @@ abstract class CommandController implements ControllerInterface
     }
 
     /**
-     * get parameters
-     *
      * @return array<string, string>
      */
     protected function getParams(): array
@@ -123,35 +66,18 @@ abstract class CommandController implements ControllerInterface
         return $this->input->params;
     }
 
-    /**
-     * check has parameter
-     */
     protected function hasParam(string $param): bool
     {
         return $this->input->hasParam($param);
     }
 
-    /**
-     * check has flag
-     */
     protected function hasFlag(string $flag): bool
     {
         return $this->input->hasFlag($flag);
     }
 
-    /**
-     * get parameter
-     */
     protected function getParam(string $param): ?string
     {
         return $this->input->getParam($param);
-    }
-
-    /**
-     * get app instance
-     */
-    protected function getApp(): App
-    {
-        return $this->app;
     }
 }

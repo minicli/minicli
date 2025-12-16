@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Assets\Command\Test;
 
-use Minicli\Command\CommandController;
+use Minicli\Console\CommandController;
 
 class ParamsController extends CommandController
 {

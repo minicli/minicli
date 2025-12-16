@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Command;
+namespace Minicli\Console;
 
 use Minicli\Contracts\ControllerInterface;
 

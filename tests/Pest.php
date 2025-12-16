@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Minicli\App;
-use Minicli\Command\CommandCall;
-use Minicli\Command\CommandRegistry;
+use Minicli\Console\CommandCall;
+use Minicli\Console\CommandRegistry;
 
 function getCommandsPath(): string
 {
