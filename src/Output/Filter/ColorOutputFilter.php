@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
-use Minicli\Output\CLIThemeInterface;
+use Minicli\Contracts\ThemeInterface;
 use Minicli\Output\OutputFilterInterface;
 use Minicli\Output\Theme\DefaultTheme;
 
 class ColorOutputFilter implements OutputFilterInterface
 {
-    protected CLIThemeInterface $theme;
+    protected ThemeInterface $theme;
 
     /**
      * ColorOutputFilter constructor
      *
-     * @param  CLIThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
+     * @param  ThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(?CLIThemeInterface $theme = null)
+    public function __construct(?ThemeInterface $theme = null)
     {
         $this->theme = $theme ?? new DefaultTheme();
     }
@@ -25,7 +25,7 @@ class ColorOutputFilter implements OutputFilterInterface
     /**
      * Gets the CLITheme
      */
-    public function getTheme(): CLIThemeInterface
+    public function getTheme(): ThemeInterface
     {
         return $this->theme;
     }
@@ -33,7 +33,7 @@ class ColorOutputFilter implements OutputFilterInterface
     /**
      * Sets the CLITheme
      */
-    public function setTheme(CLIThemeInterface $theme): void
+    public function setTheme(ThemeInterface $theme): void
     {
         $this->theme = $theme;
     }
@@ -53,7 +53,7 @@ class ColorOutputFilter implements OutputFilterInterface
      */
     public function format(string $message, string $style = 'default'): string
     {
-        $styleColors = $this->theme->getStyle($style);
+        $styleColors = $this->theme->style($style);
 
         $bg = '';
         if (! in_array($styleColors->background, [null, '', '0'], true)) {

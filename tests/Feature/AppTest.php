@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Minicli\App;
 use Minicli\Command\CommandRegistry;
-use Minicli\Config;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\OutputHandler;
@@ -24,19 +23,6 @@ it('asserts App sets, gets and prints signature', function (): void {
     $app->printSignature();
 })->expectOutputString("\nTesting minicli\n");
 
-it('asserts App reads configuration from config folder', function (): void {
-    $app = getConfiguredApp();
-
-    expect($app->getSignature())->toBe('Configured App')
-        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__ . '/../Assets/Command'))
-        ->and($app->config->theme)->toBe('unicorn')
-        ->and($app->config->debug)->toBe(true);
-});
-
-it('asserts App has Config Service')
-    ->expect(fn () => getBasicApp()->config)
-    ->toBeInstanceOf(Config::class);
-
 it('asserts App has CommandRegistry Service')
     ->expect(fn () => getBasicApp()->commandRegistry)
     ->toBeInstanceOf(CommandRegistry::class);
@@ -48,19 +34,6 @@ it('asserts App has Printer Service')
 it('asserts App returns null when a service is not found')
     ->expect(fn () => getBasicApp()->inexistent_service)
     ->toBeNull();
-
-it('asserts App parses command path with @vendor tag', function (): void {
-    $app = new App([
-        'app_path' => '@namespace/command',
-    ]);
-
-    $registry = $app->commandRegistry;
-    $paths = $registry->getCommandsPath();
-
-    expect($paths)->toBeArray()
-        ->toHaveCount(1)
-        ->and($paths[0])->toEndWith('namespace/command/Command');
-});
 
 it('asserts App can handle a closure as a service', function (): void {
     $app = getBasicApp();
@@ -99,6 +72,7 @@ it('asserts App executes command from namespace', function (): void {
 
     $app->runCommand(['minicli', 'test']);
 })->expectOutputString('test default');
+
 it('registers multiple commands', function (): void {
     // Create a new instance of the App
     $app = getBasicApp();

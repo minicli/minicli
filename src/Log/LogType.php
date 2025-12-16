@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Logging;
+namespace Minicli\Log;
 
 enum LogType: string
 {

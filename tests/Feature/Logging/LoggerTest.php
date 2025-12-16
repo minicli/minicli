@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 beforeEach(function (): void {
     $this->app = getConfiguredApp();
-    $this->logPath = "{$this->app->logs_path}/minicli.log";
+    $this->logPath = "{$this->app->logsPath()}/minicli.log";
 });
 
 it('asserts App can log data', function (): void {

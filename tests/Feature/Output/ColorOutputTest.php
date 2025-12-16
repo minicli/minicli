@@ -54,12 +54,12 @@ it('asserts that OutputHandler outputs correct style', function (): void {
     $printer->out('testing minicli', 'alt');
 })->expectOutputString(getAltOutput('testing minicli'));
 
-it('asserts that OutputHandler outputs newline', function (): void {
+it('ColorOutput - asserts that OutputHandler outputs newline', function (): void {
     $printer = getColorOutputHandler();
     $printer->newline();
 })->expectOutputString("\n");
 
-it('asserts that OutputHandler displays content wrapped in newlines', function (): void {
+it('ColorOutput - asserts that OutputHandler displays content wrapped in newlines', function (): void {
     $printer = getColorOutputHandler();
     $printer->display('testing minicli');
 })->expectOutputString("\n" . getDefaultOutput('testing minicli') . "\n");

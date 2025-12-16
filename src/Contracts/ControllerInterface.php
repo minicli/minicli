@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Minicli;
+namespace Minicli\Contracts;
 
+use Minicli\App;
 use Minicli\Command\CommandCall;
 use Minicli\Exception\MissingParametersException;
 

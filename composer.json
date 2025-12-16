@@ -61,6 +61,11 @@
             "@test:types",
             "@test:stan",
             "@test:unit"
+        ],
+        "check": [
+            "@test:lint",
+            "@test:types",
+            "@test:stan"
         ]
     },
     "config": {

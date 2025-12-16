@@ -6,57 +6,57 @@ namespace Minicli;
 
 use BadMethodCallException;
 use Closure;
+use Minicli\Attributes\Config;
+use Minicli\Attributes\Service;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
+use Minicli\Config\AppConfig;
 use Minicli\Container\Container;
+use Minicli\Contracts\ControllerInterface;
+use Minicli\Contracts\ServiceInterface;
+use Minicli\Contracts\ThemeInterface;
+use Minicli\Exception\BindingResolutionException;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Exception\MissingParametersException;
-use Minicli\Logging\Logger;
+use Minicli\Log\Logger;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
 use ReflectionException;
+use RuntimeException;
 use Throwable;
 
 /**
- * @property Config $config
  * @property Logger $logger
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
  * @property string $appSignature
- * @property string $base_path
- * @property string $config_path
- * @property string $logs_path
  *
  * @mixin OutputHandler
  */
-class App
+final readonly class App
 {
-    private const string DEFAULT_SIGNATURE = './minicli help';
+    public string $me;
 
-    public readonly string $me;
-
-    protected Container $container;
+    private Container $container;
 
     /**
-     * @param  array<string, mixed>  $config
-     *
-     * @throws Exception\BindingResolutionException|ReflectionException
+     * @throws BindingResolutionException|ReflectionException
      */
-    public function __construct(
-        array $config = [],
-        string $signature = self::DEFAULT_SIGNATURE,
-        ?string $appRoot = null
-    ) {
+    public function __construct(?string $appRoot = null)
+    {
         $this->container = Container::getInstance();
 
         $this->bindPaths($appRoot);
-        $this->boot($config, $signature);
+        $this->boot();
 
         $this->me = $this->findBinFileName();
     }
 
     /**
-     * @throws Exception\BindingResolutionException|ReflectionException
+     * @throws BindingResolutionException|ReflectionException
      */
     public function __get(string $name): mixed
     {
@@ -78,29 +78,26 @@ class App
     }
 
     /**
-     * @param  array<string, mixed>  $config
-     *
-     * @throws Exception\BindingResolutionException|ReflectionException
+     * @throws BindingResolutionException|ReflectionException
      */
-    public function boot(array $config, string $signature): void
+    public function boot(): void
     {
-        $this->loadConfig($config, $signature);
+        $this->loadConfig();
         $this->loadServices();
 
-        $commandsPath = $this->config->app_path;
-        if (! is_array($commandsPath)) {
-            $commandsPath = [$commandsPath];
-        }
+        /** @var AppConfig $config */
+        $config = $this->config('app');
 
+        $commandsPath = $config->commandPaths;
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with((string) $path, '@')) {
-                $path = str_replace('@', $this->base_path . '/vendor/', $path) . '/Command';
+                $path = str_replace('@', $this->basePath() . '/vendor/', $path) . '/Command';
             }
             $commandSources[] = $path;
         }
         $this->addService('commandRegistry', new CommandRegistry($commandSources));
-        $this->setTheme($this->config->theme);
+        $this->setTheme($config->theme);
     }
 
     public function getAppRoot(): string
@@ -132,6 +129,42 @@ class App
         $this->addService('printer', $outputPrinter);
     }
 
+    /**
+     * @throws BindingResolutionException|ReflectionException
+     */
+    public function config(string $name): ?object
+    {
+        $configKey = $this->configKey($name);
+
+        return $this->container->has($configKey)
+            ? $this->container->get($configKey)
+            : null;
+    }
+
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
+    public function basePath(): string
+    {
+        return $this->container->get('base_path');
+    }
+
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
+    public function configPath(): string
+    {
+        return $this->container->get('config_path');
+    }
+
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
+    public function logsPath(): string
+    {
+        return $this->container->get('logs_path');
+    }
+
     public function getSignature(): string
     {
         return $this->appSignature;
@@ -139,7 +172,7 @@ class App
 
     public function printSignature(): void
     {
-        $this->display($this->getSignature());
+        $this->display($this->appSignature);
     }
 
     public function setSignature(string $appSignature): void
@@ -148,14 +181,13 @@ class App
         $this->container->bind('appSignature', fn (): string => $appSignature);
     }
 
-    public function setTheme(string $theme): void
+    /**
+     * @param  class-string<ThemeInterface>  $theme
+     */
+    public function setTheme(?string $theme): void
     {
         $output = new OutputHandler();
-
-        $output->registerFilter(
-            new ThemeHelper($theme)
-                ->getOutputFilter()
-        );
+        $output->registerFilter(new ThemeHelper($theme)->getOutputFilter());
 
         $this->addService('printer', $output);
     }
@@ -231,12 +263,15 @@ class App
     /**
      * @throws CommandNotFoundException|Throwable
      */
-    protected function runSingle(CommandCall $input): bool
+    private function runSingle(CommandCall $input): bool
     {
+        /** @var AppConfig $config */
+        $config = $this->config('app');
+
         try {
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
-            if (! $this->config->debug) {
+            if (! $config->debug) {
                 $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
@@ -251,7 +286,7 @@ class App
             return true;
         }
 
-        if (! $this->config->debug) {
+        if (! $config->debug) {
             $this->error('The registered command is not a callable function.');
 
             return false;
@@ -260,7 +295,7 @@ class App
         throw new CommandNotFoundException('The registered command is not a callable function.');
     }
 
-    protected function bindPaths(?string $appRoot): void
+    private function bindPaths(?string $appRoot): void
     {
         $appRoot ??= $this->getAppRoot();
 
@@ -270,51 +305,139 @@ class App
     }
 
     /**
-     * @param  array<string,mixed>  $config
-     *
-     * @throws Exception\BindingResolutionException|ReflectionException
+     * @throws BindingResolutionException|ReflectionException
      */
-    protected function loadConfig(array $config, string $signature): void
+    private function loadConfig(): void
     {
-        $config = array_merge([
-            'app_path' => $this->base_path . '/Command',
-            'theme' => '',
-            'debug' => true,
-        ], $config);
+        $configPath = $this->configPath();
 
-        $this->addService('config', new Config(load_config($config, $this->config_path)));
-
-        $appSignature = $signature === self::DEFAULT_SIGNATURE && $this->config->app_name
-            ? $this->config->app_name
-            : $signature;
-
-        $this->setSignature($appSignature);
-    }
-
-    protected function loadServices(): void
-    {
-        $this->loadDefaultServices();
-
-        $services = $this->config->services ?? [];
-        if ($services === []) {
+        if (! is_dir($configPath)) {
             return;
         }
 
-        foreach ($services as $name => $service) {
-            $this->addService($name, new $service());
+        $configFiles = glob($configPath . '/*.php');
+
+        if ($configFiles === false || $configFiles === []) {
+            return;
+        }
+
+        foreach ($configFiles as $configFile) {
+            require_once $configFile;
+
+            $className = basename($configFile, '.php');
+
+            if (! class_exists($className)) {
+                continue;
+            }
+
+            $reflectionClass = new ReflectionClass($className);
+            $configAttributes = $reflectionClass->getAttributes(Config::class);
+
+            if ($configAttributes === []) {
+                throw new RuntimeException("Configuration class {$className} must have a Config attribute.");
+            }
+
+            $configAttribute = $configAttributes[0]->newInstance();
+            $configName = $configAttribute->name;
+
+            $configInstance = new $className();
+            $this->container->singleton($this->configKey($configName), fn (): object => $configInstance);
         }
     }
 
-    protected function loadDefaultServices(): void
+    private function loadServices(): void
+    {
+        $this->loadDefaultServices();
+
+        $basePath = $this->basePath();
+
+        if (! is_dir($basePath)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($basePath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        $processedClasses = [];
+
+        foreach ($iterator as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $filePath = $file->getRealPath();
+            // Skip vendor and config directories
+            if (str_contains((string) $filePath, '/vendor/')) {
+                continue;
+            }
+            if (str_contains((string) $filePath, '/config/')) {
+                continue;
+            }
+
+            // Track classes before requiring file
+            $classesBefore = get_declared_classes();
+
+            require_once $filePath;
+
+            // Get newly declared classes from this file
+            $classesAfter = get_declared_classes();
+            $newClasses = array_diff($classesAfter, $classesBefore);
+
+            foreach ($newClasses as $className) {
+                // Skip if already processed
+                if (isset($processedClasses[$className])) {
+                    continue;
+                }
+
+                $processedClasses[$className] = true;
+
+                if (! class_exists($className)) {
+                    continue;
+                }
+
+                $reflectionClass = new ReflectionClass($className);
+
+                // Check if class has Service attribute
+                $serviceAttributes = $reflectionClass->getAttributes(Service::class);
+
+                if ($serviceAttributes === []) {
+                    continue;
+                }
+
+                // Check if class implements ServiceInterface
+                if (! $reflectionClass->implementsInterface(ServiceInterface::class)) {
+                    continue;
+                }
+
+                $serviceAttribute = $serviceAttributes[0]->newInstance();
+                $serviceName = $serviceAttribute->name;
+
+                /** @var ServiceInterface $serviceInstance */
+                $serviceInstance = new $className();
+                $this->addService($serviceName, $serviceInstance);
+            }
+        }
+    }
+
+    private function loadDefaultServices(): void
     {
         $this->addService('logger', new Logger());
     }
 
-    protected function findBinFileName(): string
+    private function findBinFileName(): string
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         // Index 0 is current method, index 1 is the instantiation
         return basename($backtrace[1]['file'] ?? 'minicli');
+    }
+
+    private function configKey(string $name): string
+    {
+        return "config_{$name}";
     }
 }

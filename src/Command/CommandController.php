@@ -6,10 +6,9 @@ namespace Minicli\Command;
 
 use BadMethodCallException;
 use Minicli\App;
-use Minicli\Config;
-use Minicli\ControllerInterface;
+use Minicli\Contracts\ControllerInterface;
 use Minicli\Exception\MissingParametersException;
-use Minicli\Logging\Logger;
+use Minicli\Log\Logger;
 use Minicli\Output\OutputHandler;
 
 /**
@@ -23,13 +22,6 @@ abstract class CommandController implements ControllerInterface
      * @param  App  $app
      */
     protected App $app;
-
-    /**
-     * config instance.
-     *
-     * @param  Config  $config
-     */
-    protected Config $config;
 
     /**
      * logger instance.
@@ -82,7 +74,6 @@ abstract class CommandController implements ControllerInterface
     public function boot(App $app, CommandCall $input): void
     {
         $this->app = $app;
-        $this->config = $app->config;
         $this->logger = $app->logger;
         $this->printer = $app->printer;
 

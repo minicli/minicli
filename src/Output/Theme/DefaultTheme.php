@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Theme;
 
+use Minicli\Contracts\ThemeInterface;
 use Minicli\Output\CLIColors;
-use Minicli\Output\CLIThemeInterface;
 use Minicli\Output\ThemeConfig;
 use Minicli\Output\ThemeStyle;
 
-class DefaultTheme implements CLIThemeInterface
+class DefaultTheme implements ThemeInterface
 {
     public ThemeConfig $config;
 
@@ -18,7 +18,7 @@ class DefaultTheme implements CLIThemeInterface
      */
     public function __construct()
     {
-        $styles = array_merge($this->getDefaultColors(), $this->getThemeColors());
+        $styles = array_merge($this->getDefaultColors(), $this->themeColors());
 
         $formatted = [];
         foreach ($styles as $name => $style) {
@@ -31,7 +31,7 @@ class DefaultTheme implements CLIThemeInterface
     /**
      * Obtains the colors that compose a style for that theme, such as "error" or "success"
      */
-    public function getStyle(string $name): ThemeStyle
+    public function style(string $name): ThemeStyle
     {
         return $this->config->{$name} ?? $this->config->default;
     }
@@ -73,7 +73,7 @@ class DefaultTheme implements CLIThemeInterface
      *
      * @return array<string, array<int, string>>
      */
-    public function getThemeColors(): array
+    public function themeColors(): array
     {
         return [];
     }

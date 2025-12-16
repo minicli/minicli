@@ -6,10 +6,10 @@ namespace Minicli\Output;
 
 use InvalidArgumentException;
 use Minicli\App;
-use Minicli\Input;
+use Minicli\Contracts\ServiceInterface;
+use Minicli\Input\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\Helper\TableHelper;
-use Minicli\ServiceInterface;
 
 class OutputHandler implements ServiceInterface
 {

@@ -9,7 +9,7 @@ use Minicli\Output\Theme\DefaultTheme;
 
 class CustomTheme extends DefaultTheme
 {
-    public function getThemeColors(): array
+    public function themeColors(): array
     {
         return [
             'default' => [CLIColors::$FG_CYAN],

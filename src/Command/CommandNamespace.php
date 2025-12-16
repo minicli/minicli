@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Command;
 
-use Minicli\ControllerInterface;
+use Minicli\Contracts\ControllerInterface;
 
 class CommandNamespace
 {

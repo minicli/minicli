@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Logging;
+namespace Minicli\Log;
 
 use Minicli\App;
-use Minicli\ServiceInterface;
+use Minicli\Config\LogConfig;
+use Minicli\Contracts\ServiceInterface;
+use Minicli\Exception\BindingResolutionException;
+use ReflectionException;
 
 class Logger implements ServiceInterface
 {
@@ -19,14 +22,18 @@ class Logger implements ServiceInterface
 
     private string $timestampFormat;
 
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
     public function load(App $app): void
     {
-        $config = $app->config;
+        /** @var LogConfig $config */
+        $config = $app->config('log');
 
-        $this->logsPath = $app->logs_path;
-        $this->logType = LogType::from($config->logging['type'] ?? LogType::SINGLE->value);
-        $this->logLevel = LogLevel::from($config->logging['level'] ?? LogLevel::INFO->value);
-        $this->timestampFormat = $config->logging['timestamp_format'] ?? self::DEFAULT_TIMESTAMP_FORMAT;
+        $this->logsPath = $app->logsPath();
+        $this->logType = $config->type ?? LogType::SINGLE;
+        $this->logLevel = $config->level ?? LogLevel::INFO;
+        $this->timestampFormat = $config->timestampFormat ?? self::DEFAULT_TIMESTAMP_FORMAT;
     }
 
     /**

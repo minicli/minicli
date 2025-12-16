@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Minicli\Command;
 
 use Minicli\App;
-use Minicli\ControllerInterface;
+use Minicli\Contracts\ControllerInterface;
+use Minicli\Contracts\ServiceInterface;
 use Minicli\Exception\CommandNotFoundException;
-use Minicli\ServiceInterface;
 
 class CommandRegistry implements ServiceInterface
 {

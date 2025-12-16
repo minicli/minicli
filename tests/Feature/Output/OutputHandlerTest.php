@@ -20,12 +20,12 @@ it('asserts that OutputHandler outputs raw content', function (): void {
     $printer->rawOutput('testing minicli');
 })->expectOutputString('testing minicli');
 
-it('asserts that OutputHandler outputs newline', function (): void {
+it('SimpleOutput - asserts that OutputHandler outputs newline', function (): void {
     $printer = getSimpleOutputHandler();
     $printer->newline();
 })->expectOutputString("\n");
 
-it('asserts that OutputHandler displays content wrapped in newlines', function (): void {
+it('SimpleOutput - asserts that OutputHandler displays content wrapped in newlines', function (): void {
     $printer = getSimpleOutputHandler();
     $printer->display('testing minicli');
 })->expectOutputString("\ntesting minicli\n");

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Minicli\Logging\LogLevel;
-use Minicli\Logging\LogType;
+use Minicli\Log\LogLevel;
+use Minicli\Log\LogType;
 
 return [
     /****************************************************************************

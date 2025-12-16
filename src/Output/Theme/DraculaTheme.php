@@ -13,7 +13,7 @@ class DraculaTheme extends DefaultTheme
      *
      * @return array<string,array<int,string>>
      */
-    public function getThemeColors(): array
+    public function themeColors(): array
     {
         return [
             'default' => [CLIColors::$FG_MAGENTA],

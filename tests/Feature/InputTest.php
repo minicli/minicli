@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Input;
+use Minicli\Input\Input;
 
 it('asserts that Input sets a default prompt', function (): void {
     expect(new Input()->getPrompt())
