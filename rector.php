@@ -7,6 +7,7 @@ use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
 use Rector\Carbon\Rector\New_\DateTimeInstanceToCarbonRector;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 
 return RectorConfig::configure()
@@ -35,4 +36,5 @@ return RectorConfig::configure()
         PostIncDecToPreIncDecRector::class,
         DateTimeInstanceToCarbonRector::class,
         DateFuncCallToCarbonRector::class,
+        NewInInitializerRector::class,
     ]);
