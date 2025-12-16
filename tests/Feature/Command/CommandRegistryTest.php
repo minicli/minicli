@@ -6,42 +6,41 @@ use Minicli\Command\CommandNamespace;
 use Minicli\Exception\CommandNotFoundException;
 
 it('asserts Registry autoloads command namespaces')
-    ->expect(fn () => getRegistry()->getNamespace("test"))
+    ->expect(fn (): ?\Minicli\Command\CommandNamespace => getRegistry()->getNamespace('test'))
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class);
 
-
 it('asserts Registry autoloads command namespaces in multiple source paths')
-    ->expect(fn () => getRegistryWithMultiplePaths())
-    ->getNamespace("test")
+    ->expect(fn (): \Minicli\Command\CommandRegistry => getRegistryWithMultiplePaths())
+    ->getNamespace('test')
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class)
-    ->getNamespace("vendor")
+    ->getNamespace('vendor')
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class);
 
 it('asserts Registry returns null when a namespace is not found')
-    ->expect(fn () => getRegistry()->getNamespace("dasdsad"))
+    ->expect(fn (): ?\Minicli\Command\CommandNamespace => getRegistry()->getNamespace('dasdsad'))
     ->toBeNull();
 
 it('asserts Registry returns correct controller from namespace when no subcommand is passed')
-    ->expect(fn () => getRegistry()->getCallableController("test"))
+    ->expect(fn (): ?\Minicli\ControllerInterface => getRegistry()->getCallableController('test'))
     ->toBeInstanceOf(Assets\Command\Test\DefaultController::class);
 
 it('asserts Registry returns correct controller from namespace when a subcommand is passed')
-    ->expect(fn () => getRegistry()->getCallableController("test", "help"))
+    ->expect(fn (): ?\Minicli\ControllerInterface => getRegistry()->getCallableController('test', 'help'))
     ->toBeInstanceOf(Assets\Command\Test\HelpController::class);
 
 it('asserts Registry returns null when a namespace controller is not found')
-    ->expect(fn () => getRegistry()->getCallableController("dasdsad"))
+    ->expect(fn (): ?\Minicli\ControllerInterface => getRegistry()->getCallableController('dasdsad'))
     ->toBeNull();
 
 it('asserts Registry returns correct callable')
-    ->expect(fn () => getRegistry()->getCallable("minicli-test"))
+    ->expect(fn (): ?callable => getRegistry()->getCallable('minicli-test'))
     ->toBeCallable();
 
 it('asserts Registry throws CommandNotFoundException when a command is not found')
-    ->expect(fn () => getRegistry()->getCallable("dasdakjsdasd"))
+    ->expect(fn (): ?callable => getRegistry()->getCallable('dasdakjsdasd'))
     ->throws(CommandNotFoundException::class);
 
 it('assets Registry returns full command list', function (): void {

@@ -10,9 +10,6 @@ class DefaultPrinterAdapter implements PrinterAdapterInterface
 {
     /**
      * output
-     *
-     * @param string $message
-     * @return string
      */
     public function out(string $message): string
     {

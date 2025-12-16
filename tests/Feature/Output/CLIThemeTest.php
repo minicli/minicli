@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\CLIColors;
+use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\ThemeStyle;
 
 it('asserts that themes set all default styles', function (DefaultTheme $theme): void {
@@ -18,7 +18,7 @@ it('asserts that themes set all default styles', function (DefaultTheme $theme):
 })->with('themes');
 
 it('asserts that default theme returns expected colors for default text')
-    ->expect(fn () => (new DefaultTheme())->getStyle('default')->foreground)
+    ->expect(fn (): string => new DefaultTheme()->getStyle('default')->foreground)
     ->toBe(CLIColors::$FG_WHITE);
 
 it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme): void {

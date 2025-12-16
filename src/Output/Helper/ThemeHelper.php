@@ -18,8 +18,6 @@ class ThemeHelper
 
     /**
      * ThemeHelper constructor. Takes in the App theme config value
-     *
-     * @param string $themeConfig
      */
     public function __construct(string $themeConfig = '')
     {
@@ -28,8 +26,6 @@ class ThemeHelper
 
     /**
      * Initialize and return an OutputFilter based on our theme class
-     *
-     * @return ColorOutputFilter
      */
     public function getOutputFilter(): ColorOutputFilter
     {
@@ -38,6 +34,7 @@ class ThemeHelper
              * @var CLIThemeInterface $theme
              */
             $theme = new $this->theme();
+
             return new ColorOutputFilter($theme);
         }
 
@@ -46,20 +43,17 @@ class ThemeHelper
 
     /**
      * Parses the theme config setting and returns a namespaced class name.
-     *
-     * @param string $themeConfig
-     * @return string
      */
     protected function parseThemeSetting(string $themeConfig): string
     {
-        if ( ! $themeConfig) {
+        if ($themeConfig === '' || $themeConfig === '0') {
             return '';
         }
 
-        if ('\\' === $themeConfig[0]) {
-            return '\Minicli\Output\Theme'.$themeConfig.'Theme';  // Built-in theme.
+        if ($themeConfig[0] === '\\') {
+            return '\Minicli\Output\Theme' . $themeConfig . 'Theme';  // Built-in theme.
         }
 
-        return $themeConfig.'Theme'; // User-defined theme.
+        return $themeConfig . 'Theme'; // User-defined theme.
     }
 }

@@ -9,9 +9,7 @@ use Minicli\ServiceInterface;
 
 class TestService implements ServiceInterface
 {
-    public function load(App $app): void
-    {
-    }
+    public function load(App $app): void {}
 
     public function hello(): string
     {

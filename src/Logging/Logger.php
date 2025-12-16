@@ -9,7 +9,7 @@ use Minicli\ServiceInterface;
 
 class Logger implements ServiceInterface
 {
-    private const DEFAULT_TIMESTAMP_FORMAT = 'Y-m-d H:i:s';
+    private const string DEFAULT_TIMESTAMP_FORMAT = 'Y-m-d H:i:s';
 
     private string $logsPath;
 
@@ -30,10 +30,7 @@ class Logger implements ServiceInterface
     }
 
     /**
-     * @param string $message
-     * @param array<mixed> $context
-     * @param LogLevel|null $level
-     * @return void
+     * @param  array<mixed>  $context
      */
     public function log(string $message, array $context = [], ?LogLevel $level = null): void
     {
@@ -44,14 +41,12 @@ class Logger implements ServiceInterface
             date($this->timestampFormat),
             $level->value,
             $message,
-            [] === $context ? '' : ' - '.json_encode($context)
+            $context === [] ? '' : ' - ' . json_encode($context)
         ));
     }
 
     /**
-     * @param string $message
-     * @param array<mixed> $context
-     * @return void
+     * @param  array<mixed>  $context
      */
     public function info(string $message, array $context = []): void
     {
@@ -59,9 +54,7 @@ class Logger implements ServiceInterface
     }
 
     /**
-     * @param string $message
-     * @param array<mixed> $context
-     * @return void
+     * @param  array<mixed>  $context
      */
     public function warning(string $message, array $context = []): void
     {
@@ -69,9 +62,7 @@ class Logger implements ServiceInterface
     }
 
     /**
-     * @param string $message
-     * @param array<mixed> $context
-     * @return void
+     * @param  array<mixed>  $context
      */
     public function error(string $message, array $context = []): void
     {
@@ -79,9 +70,7 @@ class Logger implements ServiceInterface
     }
 
     /**
-     * @param string $message
-     * @param array<mixed> $context
-     * @return void
+     * @param  array<mixed>  $context
      */
     public function debug(string $message, array $context = []): void
     {
@@ -90,13 +79,13 @@ class Logger implements ServiceInterface
 
     private function writeLog(string $message): void
     {
-        if ( ! is_dir($this->logsPath)) {
+        if (! is_dir($this->logsPath)) {
             mkdir($this->logsPath, 0775, true);
         }
 
         $logFile = $this->getLogFilePath();
 
-        if ( ! file_exists($logFile)) {
+        if (! file_exists($logFile)) {
             touch($logFile);
         }
 
@@ -106,7 +95,7 @@ class Logger implements ServiceInterface
     private function getLogFilePath(): string
     {
         return match ($this->logType) {
-            LogType::DAILY => sprintf("{$this->logsPath}/minicli-%s.log", date('Y-m-d')),
+            LogType::DAILY => sprintf("{$this->logsPath}/minicli-%s.log", \Carbon\Carbon::now()->format('Y-m-d')),
             default => "{$this->logsPath}/minicli.log",
         };
     }

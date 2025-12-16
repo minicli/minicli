@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @param array<string, mixed> $defaultConfig
- * @param string $configPath
+ * @param  array<string, mixed>  $defaultConfig
  * @return array<string, mixed>
  */
 function load_config(array $defaultConfig, string $configPath): array
@@ -24,5 +23,6 @@ function load_config(array $defaultConfig, string $configPath): array
 function envconfig(string $key, ?string $default = null): ?string
 {
     $value = getenv($key);
-    return false === $value ? $default : $value;
+
+    return $value === false ? $default : $value;
 }

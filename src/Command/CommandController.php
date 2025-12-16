@@ -20,51 +20,63 @@ abstract class CommandController implements ControllerInterface
     /**
      * app instance.
      *
-     * @param App $app
+     * @param  App  $app
      */
     protected App $app;
 
     /**
      * config instance.
      *
-     * @param Config $config
+     * @param  Config  $config
      */
     protected Config $config;
 
     /**
      * logger instance.
      *
-     * @param Logger $logger
+     * @param  Logger  $logger
      */
     protected Logger $logger;
 
     /**
      * command call instance.
      *
-     * @param CommandCall $input
+     * @param  CommandCall  $input
      */
     protected CommandCall $input;
 
     /**
      * output handler instance.
      *
-     * @param OutputHandler $printer
+     * @param  OutputHandler  $printer
      */
     private OutputHandler $printer;
 
     /**
+     * @param  array<int,mixed>  $arguments
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (method_exists($this->printer, $name)) {
+            return $this->printer->{$name}(...$arguments);
+        }
+
+        throw new BadMethodCallException("Method {$name} does not exist.");
+    }
+
+    /**
+     * Called when `run` is successfully finished.
+     */
+    public function teardown(): void {}
+
+    /**
      * handle command.
-     *
-     * @return void
      */
     abstract public function handle(): void;
 
     /**
      * Called before `run`
      *
-     * @param App $app
-     * @param CommandCall $input
-     * @return void
      * @throws MissingParametersException
      */
     public function boot(App $app, CommandCall $input): void
@@ -76,15 +88,13 @@ abstract class CommandController implements ControllerInterface
 
         $missing = array_diff($this->required(), array_keys($input->params));
 
-        if ([] !== $missing) {
+        if ($missing !== []) {
             throw new MissingParametersException($missing);
         }
     }
 
     /**
      * run command
-     * @param CommandCall $input
-     * @return void
      */
     public function run(CommandCall $input): void
     {
@@ -100,15 +110,6 @@ abstract class CommandController implements ControllerInterface
     public function required(): array
     {
         return [];
-    }
-
-    /**
-     * Called when `run` is successfully finished.
-     *
-     * @return void
-     */
-    public function teardown(): void
-    {
     }
 
     /**
@@ -133,9 +134,6 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * check has parameter
-     *
-     * @param string $param
-     * @return bool
      */
     protected function hasParam(string $param): bool
     {
@@ -144,9 +142,6 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * check has flag
-     *
-     * @param string $flag
-     * @return bool
      */
     protected function hasFlag(string $flag): bool
     {
@@ -155,9 +150,6 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * get parameter
-     *
-     * @param string $param
-     * @return string|null
      */
     protected function getParam(string $param): ?string
     {
@@ -166,8 +158,6 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * get app instance
-     *
-     * @return App
      */
     protected function getApp(): App
     {
@@ -176,26 +166,10 @@ abstract class CommandController implements ControllerInterface
 
     /**
      * get output handler instance
-     *
-     * @return OutputHandler
-     * @deprecated
      */
+    #[\Deprecated]
     protected function getPrinter(): OutputHandler
     {
         return $this->printer;
-    }
-
-    /**
-     * @param string $name
-     * @param array<int,mixed> $arguments
-     * @return mixed
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        if (method_exists($this->printer, $name)) {
-            return $this->printer->$name(...$arguments);
-        }
-
-        throw new BadMethodCallException("Method {$name} does not exist.");
     }
 }

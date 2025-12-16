@@ -1,49 +1,71 @@
 {
-  "name": "minicli/minicli",
-  "type": "library",
-  "description": "Experimental micro CLI framework for PHP",
-  "license": "MIT",
-  "homepage": "https://github.com/minicli/minicli",
-  "keywords": ["cli","command-line"],
-  "autoload": {
-    "psr-4": {
-      "Minicli\\": "src/"
+    "name": "minicli/minicli",
+    "type": "library",
+    "description": "Minimalist, dependency-free framework for building CLI-centric PHP applications",
+    "license": "MIT",
+    "homepage": "https://github.com/minicli/minicli",
+    "keywords": [
+        "cli",
+        "command-line",
+        "minimalist",
+        "dependency free",
+        "minicli"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Minicli\\": "src/"
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
     },
-    "files": [
-      "src/helpers.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Assets\\": "tests/Assets"
+    "autoload-dev": {
+        "psr-4": {
+            "Assets\\": "tests/Assets"
+        }
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^8.4",
+        "ext-readline": "*"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.26",
+        "mockery/mockery": "^1.6",
+        "pestphp/pest": "^4.2",
+        "pestphp/pest-plugin-type-coverage": "^4.0",
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.2"
+    },
+    "scripts": {
+        "lint": [
+            "pint --parallel",
+            "rector"
+        ],
+        "test:lint": [
+            "pint --test --parallel",
+            "rector --dry-run"
+        ],
+        "test:types": [
+            "pest --type-coverage --min=100"
+        ],
+        "test:stan": [
+            "phpstan analyse"
+        ],
+        "test:unit": [
+            "pest --parallel"
+        ],
+        "test": [
+            "@test:lint",
+            "@test:types",
+            "@test:stan",
+            "@test:unit"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
-  },
-  "prefer-stable": true,
-  "minimum-stability": "dev",
-  "require": {
-    "php": ">=8.2",
-    "ext-readline": "*"
-  },
-  "require-dev": {
-    "pestphp/pest": "^3.2",
-    "mockery/mockery": "^1.6",
-    "phpstan/phpstan": "^1.12",
-    "laravel/pint": "^1.18"
-  },
-  "scripts": {
-    "lint": ["pint"],
-    "test:lint": ["pint --test"],
-    "test:stan": ["phpstan analyse"],
-    "test:unit": ["pest"],
-    "test": [
-      "@test:lint",
-      "@test:stan",
-      "@test:unit"
-    ]
-  },
-  "config": {
-    "allow-plugins": {
-      "pestphp/pest-plugin": true
-    }
-  }
 }

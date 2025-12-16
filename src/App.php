@@ -8,7 +8,7 @@ use BadMethodCallException;
 use Closure;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
-use Minicli\DI\Container;
+use Minicli\Container\Container;
 use Minicli\Exception\CommandNotFoundException;
 use Minicli\Exception\MissingParametersException;
 use Minicli\Logging\Logger;
@@ -31,11 +31,11 @@ use Throwable;
  */
 class App
 {
-    private const DEFAULT_SIGNATURE = './minicli help';
-
-    protected Container $container;
+    private const string DEFAULT_SIGNATURE = './minicli help';
 
     public readonly string $me;
+
+    protected Container $container;
 
     /**
      * @param  array<string, mixed>  $config
@@ -56,43 +56,6 @@ class App
     }
 
     /**
-     * @param  array<string, mixed>  $config
-     *
-     * @throws Exception\BindingResolutionException|ReflectionException
-     */
-    public function boot(array $config, string $signature): void
-    {
-        $this->loadConfig($config, $signature);
-        $this->loadServices();
-
-        $commandsPath = $this->config->app_path;
-        if ( ! is_array($commandsPath)) {
-            $commandsPath = [$commandsPath];
-        }
-
-        $commandSources = [];
-        foreach ($commandsPath as $path) {
-            if (str_starts_with($path, '@')) {
-                $path = str_replace('@', $this->base_path.'/vendor/', $path).'/Command';
-            }
-            $commandSources[] = $path;
-        }
-        $this->addService('commandRegistry', new CommandRegistry($commandSources));
-        $this->setTheme($this->config->theme);
-    }
-
-    public function getAppRoot(): string
-    {
-        $root_app = dirname(__DIR__);
-
-        if ( ! is_file($root_app.'/vendor/autoload.php')) {
-            $root_app = dirname(__DIR__, 4);
-        }
-
-        return $root_app;
-    }
-
-    /**
      * @throws Exception\BindingResolutionException|ReflectionException
      */
     public function __get(string $name): mixed
@@ -108,10 +71,47 @@ class App
     public function __call(string $name, array $arguments): mixed
     {
         if (method_exists($this->getPrinter(), $name)) {
-            return $this->getPrinter()->$name(...$arguments);
+            return $this->getPrinter()->{$name}(...$arguments);
         }
 
         throw new BadMethodCallException("Method {$name} does not exist.");
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     *
+     * @throws Exception\BindingResolutionException|ReflectionException
+     */
+    public function boot(array $config, string $signature): void
+    {
+        $this->loadConfig($config, $signature);
+        $this->loadServices();
+
+        $commandsPath = $this->config->app_path;
+        if (! is_array($commandsPath)) {
+            $commandsPath = [$commandsPath];
+        }
+
+        $commandSources = [];
+        foreach ($commandsPath as $path) {
+            if (str_starts_with((string) $path, '@')) {
+                $path = str_replace('@', $this->base_path . '/vendor/', $path) . '/Command';
+            }
+            $commandSources[] = $path;
+        }
+        $this->addService('commandRegistry', new CommandRegistry($commandSources));
+        $this->setTheme($this->config->theme);
+    }
+
+    public function getAppRoot(): string
+    {
+        $root_app = dirname(__DIR__);
+
+        if (! is_file($root_app . '/vendor/autoload.php')) {
+            return dirname(__DIR__, 4);
+        }
+
+        return $root_app;
     }
 
     public function addService(string $name, ServiceInterface|Closure $service): void
@@ -123,12 +123,10 @@ class App
         }
 
         $service->load($this);
-        $this->container->bind($name, fn () => $service);
+        $this->container->bind($name, fn (): \Minicli\ServiceInterface => $service);
     }
 
-    /**
-     * @deprecated
-     */
+    #[\Deprecated]
     public function getPrinter(): OutputHandler
     {
         return $this->printer;
@@ -153,7 +151,7 @@ class App
     public function setSignature(string $appSignature): void
     {
         $this->container->remove('appSignature');
-        $this->container->bind('appSignature', fn () => $appSignature);
+        $this->container->bind('appSignature', fn (): string => $appSignature);
     }
 
     public function setTheme(string $theme): void
@@ -161,7 +159,7 @@ class App
         $output = new OutputHandler();
 
         $output->registerFilter(
-            (new ThemeHelper($theme))
+            new ThemeHelper($theme)
                 ->getOutputFilter()
         );
 
@@ -219,6 +217,24 @@ class App
     }
 
     /**
+     * List all registered services.
+     *
+     * @return array<string, mixed>
+     */
+    public function listServices(): array
+    {
+        return $this->container->getBindings();
+    }
+
+    /**
+     * Check if a service is registered.
+     */
+    public function hasService(string $serviceName): bool
+    {
+        return $this->container->has($serviceName);
+    }
+
+    /**
      * @throws CommandNotFoundException|Throwable
      */
     protected function runSingle(CommandCall $input): bool
@@ -226,7 +242,7 @@ class App
         try {
             $callable = $this->commandRegistry->getCallable((string) $input->command);
         } catch (Throwable $exception) {
-            if ( ! $this->config->debug) {
+            if (! $this->config->debug) {
                 $this->logger->error($exception->getMessage());
                 $this->error($exception->getMessage());
 
@@ -241,7 +257,7 @@ class App
             return true;
         }
 
-        if ( ! $this->config->debug) {
+        if (! $this->config->debug) {
             $this->error('The registered command is not a callable function.');
 
             return false;
@@ -254,9 +270,9 @@ class App
     {
         $appRoot ??= $this->getAppRoot();
 
-        $this->container->bind('base_path', fn () => $appRoot);
-        $this->container->bind('config_path', fn () => "{$appRoot}/config");
-        $this->container->bind('logs_path', fn () => "{$appRoot}/logs");
+        $this->container->bind('base_path', fn (): string => $appRoot);
+        $this->container->bind('config_path', fn (): string => "{$appRoot}/config");
+        $this->container->bind('logs_path', fn (): string => "{$appRoot}/logs");
     }
 
     /**
@@ -267,14 +283,14 @@ class App
     protected function loadConfig(array $config, string $signature): void
     {
         $config = array_merge([
-            'app_path' => $this->base_path.'/Command',
+            'app_path' => $this->base_path . '/Command',
             'theme' => '',
             'debug' => true,
         ], $config);
 
         $this->addService('config', new Config(load_config($config, $this->config_path)));
 
-        $appSignature = self::DEFAULT_SIGNATURE === $signature && $this->config->app_name
+        $appSignature = $signature === self::DEFAULT_SIGNATURE && $this->config->app_name
             ? $this->config->app_name
             : $signature;
 
@@ -286,7 +302,7 @@ class App
         $this->loadDefaultServices();
 
         $services = $this->config->services ?? [];
-        if ([] === $services) {
+        if ($services === []) {
             return;
         }
 
@@ -298,23 +314,6 @@ class App
     protected function loadDefaultServices(): void
     {
         $this->addService('logger', new Logger());
-    }
-
-    /**
-     * List all registered services.
-     * @return array<string, mixed>
-     */
-    public function listServices(): array
-    {
-        return $this->container->getBindings();
-    }
-
-    /**
-     * Check if a service is registered.
-     */
-    public function hasService(string $serviceName): bool
-    {
-        return $this->container->has($serviceName);
     }
 
     protected function findBinFileName(): string

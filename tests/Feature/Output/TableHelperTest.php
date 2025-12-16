@@ -7,7 +7,7 @@ use Minicli\Output\Helper\TableHelper;
 it('asserts that TableHelper creates table from constructor', function (): void {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
-        ['value1', 'value2', 'value3']
+        ['value1', 'value2', 'value3'],
     ];
 
     $tableHelper = new TableHelper($table);
@@ -26,11 +26,11 @@ it('asserts that TableHelper sets and outputs table rows', function (): void {
         ['ID', 'NAME', 'FIELD3']
     );
 
-    for ($i = 1; $i <= 10; $i++) {
+    for ($i = 1; $i <= 10; ++$i) {
         $table->addRow([
             (string) $i,
             'test',
-            (string) rand(0, 200)
+            (string) random_int(0, 200),
         ]);
     }
 
@@ -46,9 +46,8 @@ it('asserts that all fields respect column sizes', function (): void {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
         ['value11234123', 'value2234', 'value3as2341234123'],
-        ['value1', 'value2', 'value3']
+        ['value1', 'value2', 'value3'],
     ];
-
 
     $tableHelper = new TableHelper($table);
     $tableContent = $tableHelper->getFormattedTable();

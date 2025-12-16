@@ -11,26 +11,16 @@ use Minicli\Output\Theme\DefaultTheme;
 class ColorOutputFilter implements OutputFilterInterface
 {
     /**
-     * theme
-     *
-     * @var CLIThemeInterface
-     */
-    protected CLIThemeInterface $theme;
-
-    /**
      * ColorOutputFilter constructor
      *
-     * @param CLIThemeInterface|null $theme If a theme is not set, the default CLITheme will be used.
+     * @param  CLIThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(null|CLIThemeInterface $theme = null)
+    public function __construct(protected ?CLIThemeInterface $theme = new DefaultTheme())
     {
-        $this->theme = $theme ?? new DefaultTheme();
     }
 
     /**
      * Gets the CLITheme
-     *
-     * @return CLIThemeInterface
      */
     public function getTheme(): CLIThemeInterface
     {
@@ -39,9 +29,6 @@ class ColorOutputFilter implements OutputFilterInterface
 
     /**
      * Sets the CLITheme
-     *
-     * @param CLIThemeInterface $theme
-     * @return void
      */
     public function setTheme(CLIThemeInterface $theme): void
     {
@@ -51,29 +38,23 @@ class ColorOutputFilter implements OutputFilterInterface
     /**
      * Filters a string according to the specified style.
      *
-     * @param string $message
-     * @param string|null $style
      * @return string the resulting string
      */
-    public function filter(string $message, null|string $style = "default"): string
+    public function filter(string $message, ?string $style = 'default'): string
     {
         return $this->format($message, $style ?? 'default');
     }
 
     /**
      * Formats a message with color codes based on a CLITheme
-     *
-     * @param string $message
-     * @param string $style
-     * @return string
      */
-    public function format(string $message, string $style = "default"): string
+    public function format(string $message, string $style = 'default'): string
     {
         $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if ( ! empty($styleColors->background)) {
-            $bg = ';'.$styleColors->background;
+        if (!in_array($styleColors->background, [null, '', '0'], true)) {
+            $bg = ';' . $styleColors->background;
         }
 
         return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground, $bg, $message);

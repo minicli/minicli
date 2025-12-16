@@ -20,8 +20,7 @@ final class ThemeConfig
         public ThemeStyle $italic,
         public ThemeStyle $underline,
         public ThemeStyle $invert
-    ) {
-    }
+    ) {}
 
     public static function make(
         ThemeStyle $default,

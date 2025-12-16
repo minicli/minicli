@@ -6,14 +6,14 @@ use Minicli\Output\Adapter\FilePrinterAdapter;
 use Minicli\Output\OutputHandler;
 
 it('asserts that FilePrinterAdapter saves content to file', function (): void {
-    $file_path = sys_get_temp_dir().'/minicli-output-test.log';
+    $file_path = sys_get_temp_dir() . '/minicli-output-test.log';
 
-    //makes sure we get a new empty file
+    // makes sure we get a new empty file
     if (file_exists($file_path)) {
         @unlink($file_path);
     }
 
-    (new OutputHandler(new FilePrinterAdapter($file_path)))
+    new OutputHandler(new FilePrinterAdapter($file_path))
         ->rawOutput('writing output to file');
 
     expect(file_exists($file_path))->toBeTrue()
@@ -22,8 +22,8 @@ it('asserts that FilePrinterAdapter saves content to file', function (): void {
 
 it('asserts that FilePrinterAdapter throws exception when a non-writable file is provided')
     ->expect(
-        fn () => (new OutputHandler(
+        fn () => new OutputHandler(
             new FilePrinterAdapter('/root/cant_write_here')
-        ))->rawOutput('writing output to file')
+        )->rawOutput('writing output to file')
     )
     ->throws(TypeError::class);

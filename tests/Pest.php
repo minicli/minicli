@@ -8,13 +8,13 @@ use Minicli\Command\CommandRegistry;
 
 function getCommandsPath(): string
 {
-    return __DIR__.'/Assets/Command';
+    return __DIR__ . '/Assets/Command';
 }
 
 function getBasicApp(): App
 {
     return new App([
-        'app_path' => getCommandsPath()
+        'app_path' => getCommandsPath(),
     ]);
 }
 
@@ -22,7 +22,7 @@ function getProdApp(): App
 {
     return new App([
         'app_path' => getCommandsPath(),
-        'debug' => false
+        'debug' => false,
     ]);
 }
 
@@ -36,10 +36,10 @@ function getThemedApp(): App
 
 function getConfiguredApp(): App
 {
-    return new App([], './minicli help', __DIR__.'/Assets');
+    return new App([], './minicli help', __DIR__ . '/Assets');
 }
 
-function getCommandCall(array $parameters = null): CommandCall
+function getCommandCall(?array $parameters = null): CommandCall
 {
     return new CommandCall(array_merge(['minicli'], $parameters));
 }
@@ -47,9 +47,9 @@ function getCommandCall(array $parameters = null): CommandCall
 function getRegistry(): CommandRegistry
 {
     $app = new App([
-        'app_path' => getCommandsPath()
+        'app_path' => getCommandsPath(),
     ]);
-    $app->registerCommand("minicli-test", fn () => true);
+    $app->registerCommand('minicli-test', fn (): true => true);
 
     /** @var CommandRegistry $registry */
     $registry = $app->commandRegistry;
@@ -62,8 +62,8 @@ function getRegistryWithMultiplePaths(): CommandRegistry
     $app = new App([
         'app_path' => [
             getCommandsPath(),
-            __DIR__.'/Assets/VendorCommand'
-        ]
+            __DIR__ . '/Assets/VendorCommand',
+        ],
     ]);
 
     /** @var CommandRegistry $registry */

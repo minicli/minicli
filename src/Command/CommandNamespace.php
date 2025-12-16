@@ -9,19 +9,15 @@ use Minicli\ControllerInterface;
 class CommandNamespace
 {
     /**
-     * @param string $name
-     * @param array<string, ControllerInterface> $controllers
+     * @param  array<string, ControllerInterface>  $controllers
      */
     public function __construct(
         protected string $name,
         protected array $controllers = []
-    ) {
-    }
+    ) {}
 
     /**
      * get name
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -31,12 +27,11 @@ class CommandNamespace
     /**
      * Load namespace controllers
      *
-     * @param string $commandsPath
      * @return array<string, ControllerInterface>
      */
     public function loadControllers(string $commandsPath): array
     {
-        $controllers = (array) glob($commandsPath.'/'.$this->getName().'/*Controller.php');
+        $controllers = (array) glob($commandsPath . '/' . $this->getName() . '/*Controller.php');
 
         /**
          * @var string $controllerFile
@@ -58,11 +53,6 @@ class CommandNamespace
         return $this->controllers;
     }
 
-    /**
-     * @param string $commandName
-     *
-     * @return ControllerInterface|null
-     */
     public function getController(string $commandName): ?ControllerInterface
     {
         return $this->controllers[$commandName] ?? null;
@@ -70,9 +60,6 @@ class CommandNamespace
 
     /**
      * load command map
-     *
-     * @param string $controllerFile
-     * @return void
      */
     protected function loadCommandMap(string $controllerFile): void
     {
@@ -80,7 +67,7 @@ class CommandNamespace
 
         $controllerClass = str_replace('.php', '', $filename);
         $commandName = mb_strtolower(str_replace('Controller', '', $controllerClass));
-        $fullClassName = sprintf("%s\\%s", $this->getNamespace($controllerFile), $controllerClass);
+        $fullClassName = sprintf('%s\\%s', $this->getNamespace($controllerFile), $controllerClass);
 
         /** @var ControllerInterface $controller */
         $controller = new $fullClassName();
@@ -89,15 +76,12 @@ class CommandNamespace
 
     /**
      * get namespace
-     *
-     * @param string $filename
-     * @return string
      */
     protected function getNamespace(string $filename): string
     {
         $file = (array) file($filename);
         $lines = (array) preg_grep('/^namespace /', $file);
-        $namespaceLine = trim(array_shift($lines));
+        $namespaceLine = trim((string) array_shift($lines));
         $match = [];
         preg_match('/^namespace (.*);$/', $namespaceLine, $match);
 

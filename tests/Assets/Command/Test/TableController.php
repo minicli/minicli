@@ -15,9 +15,9 @@ class TableController extends CommandController
 
         $table->addHeader(['ID', 'NAME', 'FIELD3']);
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 10; ++$i) {
             $table->addRow([
-                $i, 'test', rand(0, 200)
+                $i, 'test', random_int(0, 200),
             ]);
         }
 

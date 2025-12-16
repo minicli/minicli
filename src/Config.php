@@ -10,23 +10,19 @@ namespace Minicli;
  * @property string $theme
  * @property array<string, class-string<ServiceInterface>> $services
  * @property array<string, string> $logging
- * @property boolean $debug
+ * @property bool $debug
  */
 class Config implements ServiceInterface
 {
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public function __construct(
         protected array $config = [],
-    ) {
-    }
+    ) {}
 
     /**
      * get config
-     *
-     * @param string $name
-     * @return mixed
      */
     public function __get(string $name): mixed
     {
@@ -35,9 +31,6 @@ class Config implements ServiceInterface
 
     /**
      * set config
-     *
-     * @param string $name
-     * @param string $value
      */
     public function __set(string $name, string $value): void
     {
@@ -46,9 +39,6 @@ class Config implements ServiceInterface
 
     /**
      * check if has config
-     *
-     * @param  string $name
-     * @return boolean
      */
     public function has(string $name): bool
     {
@@ -57,11 +47,6 @@ class Config implements ServiceInterface
 
     /**
      * load application instance
-     *
-     * @param App $app
-     * @return void
      */
-    public function load(App $app): void
-    {
-    }
+    public function load(App $app): void {}
 }

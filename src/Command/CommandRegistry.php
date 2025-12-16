@@ -6,28 +6,24 @@ namespace Minicli\Command;
 
 use Minicli\App;
 use Minicli\ControllerInterface;
-use Minicli\ServiceInterface;
 use Minicli\Exception\CommandNotFoundException;
+use Minicli\ServiceInterface;
 
 class CommandRegistry implements ServiceInterface
 {
     /**
-     * @param array<int, string> $commandsPath
-     * @param array<string, CommandNamespace> $namespaces
-     * @param array<string, callable> $defaultRegistry
+     * @param  array<int, string>  $commandsPath
+     * @param  array<string, CommandNamespace>  $namespaces
+     * @param  array<string, callable>  $defaultRegistry
      */
     public function __construct(
         protected array $commandsPath,
         protected array $namespaces = [],
         protected array $defaultRegistry = [],
-    ) {
-    }
+    ) {}
 
     /**
      * load app
-     *
-     * @param App $app
-     * @return void
      */
     public function load(App $app): void
     {
@@ -38,20 +34,17 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * autoload namespaces
-     *
-     * @param string $commandSource
-     * @return void
      */
     public function autoloadNamespaces(string $commandSource): void
     {
-        $paths = (array) glob($commandSource.'/*', GLOB_ONLYDIR);
+        $paths = (array) glob($commandSource . '/*', GLOB_ONLYDIR);
 
         /**
          * @var string $namespacePath
          */
         foreach ($paths as $namespacePath) {
-            if (file_exists($namespacePath.'/composer.json')) {
-                //this looks like a 3rd party package, so lets run a sec check
+            if (file_exists($namespacePath . '/composer.json')) {
+                // this looks like a 3rd party package, so lets run a sec check
             }
             $this->registerNamespace(basename($namespacePath), $commandSource);
         }
@@ -59,10 +52,6 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * register namespace
-     *
-     * @param string $commandNamespace
-     * @param string $commandSource
-     * @return void
      */
     public function registerNamespace(string $commandNamespace, string $commandSource): void
     {
@@ -73,9 +62,6 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * get namespace
-     *
-     * @param string $command
-     * @return ?CommandNamespace
      */
     public function getNamespace(string $command): ?CommandNamespace
     {
@@ -94,10 +80,6 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * Registers an anonymous function as single command
-     *
-     * @param string $name
-     * @param callable $callable
-     * @return void
      */
     public function registerCommand(string $name, callable $callable): void
     {
@@ -106,9 +88,6 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * get command
-     *
-     * @param string $command
-     * @return callable|null
      */
     public function getCommand(string $command): ?callable
     {
@@ -117,12 +96,8 @@ class CommandRegistry implements ServiceInterface
 
     /**
      * get callable controller
-     *
-     * @param string $command
-     * @param string $subcommand
-     * @return ControllerInterface|null
      */
-    public function getCallableController(string $command, string $subcommand = "default"): ?ControllerInterface
+    public function getCallableController(string $command, string $subcommand = 'default'): ?ControllerInterface
     {
         $namespace = $this->getNamespace($command);
 
@@ -132,16 +107,14 @@ class CommandRegistry implements ServiceInterface
     /**
      * get callable
      *
-     * @param string $command
-     * @return callable|null
      *
      * @throws CommandNotFoundException
      */
     public function getCallable(string $command): ?callable
     {
         $singleCommand = $this->getCommand($command);
-        if (null === $singleCommand) {
-            throw new CommandNotFoundException(sprintf("Command \"%s\" not found.", $command));
+        if ($singleCommand === null) {
+            throw new CommandNotFoundException(sprintf('Command "%s" not found.', $command));
         }
 
         return $singleCommand;

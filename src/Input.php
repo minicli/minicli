@@ -7,19 +7,15 @@ namespace Minicli;
 class Input
 {
     /**
-     * @param string $prompt
-     * @param array<int, string> $inputHistory
+     * @param  array<int, string>  $inputHistory
      */
     public function __construct(
         protected string $prompt = 'minicli$> ',
         protected array $inputHistory = [],
-    ) {
-    }
+    ) {}
 
     /**
      * read input
-     *
-     * @return string
      */
     public function read(): string
     {
@@ -42,8 +38,6 @@ class Input
 
     /**
      * get prompt
-     *
-     * @return string
      */
     public function getPrompt(): string
     {
@@ -52,9 +46,6 @@ class Input
 
     /**
      * set prompt
-     *
-     * @param string $prompt
-     * @return void
      */
     public function setPrompt(string $prompt): void
     {

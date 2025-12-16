@@ -16,7 +16,7 @@
         <img src="https://readthedocs.org/projects/minicliphp/badge/?version=latest" alt="Documentation Status" title="Documentation Status">
     </a>
     <h1 align="center">
-        Minicli
+        miniCLI 5.x
     </h1>
     <h4 align="center">
         Minimalist, dependency-free framework for building CLI-centric PHP applications

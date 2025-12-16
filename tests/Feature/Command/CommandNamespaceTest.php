@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-use Minicli\Command\CommandNamespace;
 use Minicli\Command\CommandController;
+use Minicli\Command\CommandNamespace;
 
-function getCommandNamespace()
+function getCommandNamespace(): \Minicli\Command\CommandNamespace
 {
-    return new CommandNamespace("Test");
+    return new CommandNamespace('Test');
 }
 
 it('asserts that a name is set as expected')
     ->expect(fn () => getCommandNamespace()->getName())
-    ->toBe("Test");
+    ->toBe('Test');
 
 it('asserts that controllers are loaded successfully')
     ->expect(fn () => getCommandNamespace()->loadControllers(getCommandsPath()))
@@ -21,6 +21,6 @@ it('asserts that controllers are loaded successfully')
     ->toContainOnlyInstancesOf(CommandController::class);
 
 it('asserts that no controllers are returned if the namespace is empty')
-    ->expect(fn () => (new CommandNamespace("Empty"))->loadControllers(getCommandsPath()))
+    ->expect(fn (): array => new CommandNamespace('Empty')->loadControllers(getCommandsPath()))
     ->toBeArray()
     ->toBeEmpty();

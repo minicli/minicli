@@ -14,20 +14,15 @@ use Minicli\ServiceInterface;
 class OutputHandler implements ServiceInterface
 {
     /**
-     * @param PrinterAdapterInterface $printerAdapter
-     * @param array<int, OutputFilterInterface> $outputFilters
+     * @param  array<int, OutputFilterInterface>  $outputFilters
      */
     public function __construct(
         protected PrinterAdapterInterface $printerAdapter = new DefaultPrinterAdapter(),
         protected array $outputFilters = [],
-    ) {
-    }
+    ) {}
 
     /**
      * register filter
-     *
-     * @param OutputFilterInterface $filter
-     * @return void
      */
     public function registerFilter(OutputFilterInterface $filter): void
     {
@@ -36,8 +31,6 @@ class OutputHandler implements ServiceInterface
 
     /**
      * clear registered filters
-     *
-     * @return void
      */
     public function clearFilters(): void
     {
@@ -46,20 +39,11 @@ class OutputHandler implements ServiceInterface
 
     /**
      * load application instance
-     *
-     * @param App $app
-     * @return void
      */
-    public function load(App $app): void
-    {
-    }
+    public function load(App $app): void {}
 
     /**
      * Pass content through current configured filter(s)
-     *
-     * @param  string $content
-     * @param  string|null $style
-     * @return string
      */
     public function filterOutput(string $content, ?string $style = null): string
     {
@@ -72,30 +56,22 @@ class OutputHandler implements ServiceInterface
 
     /**
      * Prints a content using configured filters
-     *
-     * @param string $content
-     * @param string $style
      */
-    public function out(string $content, string $style = "default"): void
+    public function out(string $content, string $style = 'default'): void
     {
-        print $this->printerAdapter->out($this->filterOutput($content, $style));
+        echo $this->printerAdapter->out($this->filterOutput($content, $style));
     }
 
     /**
      * Prints content without formatting or styling
-     *
-     * @param string $content
-     * @return void
      */
     public function rawOutput(string $content): void
     {
-        print $this->printerAdapter->out($content);
+        echo $this->printerAdapter->out($content);
     }
 
     /**
      * prints a new line
-     *
-     * @return void
      */
     public function newline(): void
     {
@@ -104,10 +80,6 @@ class OutputHandler implements ServiceInterface
 
     /**
      * Print the output with a newline either side.
-     *
-     * @param string $content
-     * @param string $style
-     * @return void
      */
     public function breathe(string $content, string $style): void
     {
@@ -119,9 +91,7 @@ class OutputHandler implements ServiceInterface
     /**
      * Displays content using the "default" style
      *
-     * @param string $content
-     * @param bool $alt  Use the inverted style ("alt")
-     * @return void
+     * @param  bool  $alt  Use the inverted style ("alt")
      */
     public function display(string $content, bool $alt = false): void
     {
@@ -131,9 +101,7 @@ class OutputHandler implements ServiceInterface
     /**
      * Prints content using the "error" style
      *
-     * @param string $content
-     * @param bool $alt Use the inverted style ("error_alt")
-     * @return void
+     * @param  bool  $alt  Use the inverted style ("error_alt")
      */
     public function error(string $content, bool $alt = false): void
     {
@@ -143,9 +111,7 @@ class OutputHandler implements ServiceInterface
     /**
      * Prints content using the "info" style
      *
-     * @param string $content
-     * @param bool $alt Use the inverted style ("info_alt")
-     * @return void
+     * @param  bool  $alt  Use the inverted style ("info_alt")
      */
     public function info(string $content, bool $alt = false): void
     {
@@ -155,9 +121,8 @@ class OutputHandler implements ServiceInterface
     /**
      * Prints content using the "success" style
      *
-     * @param string $content The string to print
-     * @param bool $alt Use the inverted style ("success_alt")
-     * @return void
+     * @param  string  $content  The string to print
+     * @param  bool  $alt  Use the inverted style ("success_alt")
      */
     public function success(string $content, bool $alt = false): void
     {
@@ -167,7 +132,7 @@ class OutputHandler implements ServiceInterface
     /**
      * Shortcut method to print tables using the TableHelper
      *
-     * @param array<int, array<string>> $table An array containing all table rows. Each row must be an array with the individual cells.
+     * @param  array<int, array<string>>  $table  An array containing all table rows. Each row must be an array with the individual cells.
      */
     public function printTable(array $table): void
     {
@@ -181,14 +146,10 @@ class OutputHandler implements ServiceInterface
 
     /**
      * Ask the users input
-     *
-     * @param string $content
-     * @param string $method
-     * @return string
      */
     public function ask(string $content, string $method = 'display'): string
     {
-        if ( ! method_exists($this, $method)) {
+        if (! method_exists($this, $method)) {
             throw new InvalidArgumentException(
                 message: "No output for [{$method}]",
             );
@@ -198,6 +159,6 @@ class OutputHandler implements ServiceInterface
             $content,
         );
 
-        return (new Input())->read();
+        return new Input()->read();
     }
 }

@@ -9,7 +9,7 @@ use Exception;
 final class MissingParametersException extends Exception
 {
     /**
-     * @param array<int,string> $missing
+     * @param  array<int,string>  $missing
      */
     public function __construct(array $missing)
     {

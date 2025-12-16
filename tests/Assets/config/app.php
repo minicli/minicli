@@ -12,7 +12,7 @@ return [
 
     'app_name' => 'Configured App',
 
-    'app_path' => __DIR__.'/../Command',
+    'app_path' => __DIR__ . '/../Command',
 
     'theme' => 'unicorn',
 

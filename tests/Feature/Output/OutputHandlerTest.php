@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\OutputHandler;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Output\OutputHandler;
 
-function getSimpleOutputHandler()
+function getSimpleOutputHandler(): \Minicli\Output\OutputHandler
 {
     return new OutputHandler(new DefaultPrinterAdapter());
 }
 
 it('asserts that OutputHandler outputs expected text', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->out("testing minicli");
-})->expectOutputString("testing minicli");
+    $printer->out('testing minicli');
+})->expectOutputString('testing minicli');
 
 it('asserts that OutputHandler outputs raw content', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->rawOutput("testing minicli");
-})->expectOutputString("testing minicli");
+    $printer->rawOutput('testing minicli');
+})->expectOutputString('testing minicli');
 
 it('asserts that OutputHandler outputs newline', function (): void {
     $printer = getSimpleOutputHandler();
@@ -27,28 +27,28 @@ it('asserts that OutputHandler outputs newline', function (): void {
 
 it('asserts that OutputHandler displays content wrapped in newlines', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->display("testing minicli");
+    $printer->display('testing minicli');
 })->expectOutputString("\ntesting minicli\n");
 
 it('asserts that OutputHandler displays error', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->error("error minicli");
+    $printer->error('error minicli');
 })->expectOutputString("\nerror minicli\n");
 
 it('asserts that OutputHandler displays info', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->info("info minicli");
+    $printer->info('info minicli');
 })->expectOutputString("\ninfo minicli\n");
 
 it('asserts that OutputHandler displays success', function (): void {
     $printer = getSimpleOutputHandler();
-    $printer->success("success minicli");
+    $printer->success('success minicli');
 })->expectOutputString("\nsuccess minicli\n");
 
 it('asserts that OutputHandler prints table', function (): void {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
-        ['value1', 'value2', 'value3']
+        ['value1', 'value2', 'value3'],
     ];
 
     $printer = getSimpleOutputHandler();

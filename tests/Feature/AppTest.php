@@ -5,21 +5,21 @@ declare(strict_types=1);
 use Minicli\App;
 use Minicli\Command\CommandRegistry;
 use Minicli\Config;
-use Minicli\Output\OutputHandler;
-use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Exception\CommandNotFoundException;
+use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Output\OutputHandler;
 
 it('assert App is created')
-    ->expect(fn () => getBasicApp())
+    ->expect(fn (): \Minicli\App => getBasicApp())
     ->toBeInstanceOf(App::class);
 
 it('asserts App sets, gets and prints signature', function (): void {
     $app = getBasicApp();
     $app->setOutputHandler(new OutputHandler(new DefaultPrinterAdapter()));
-    expect($app->getSignature())->toContain("minicli");
+    expect($app->getSignature())->toContain('minicli');
 
-    $app->setSignature("Testing minicli");
-    expect($app->getSignature())->toBe("Testing minicli");
+    $app->setSignature('Testing minicli');
+    expect($app->getSignature())->toBe('Testing minicli');
 
     $app->printSignature();
 })->expectOutputString("\nTesting minicli\n");
@@ -28,7 +28,7 @@ it('asserts App reads configuration from config folder', function (): void {
     $app = getConfiguredApp();
 
     expect($app->getSignature())->toBe('Configured App')
-        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__.'/../Assets/Command'))
+        ->and(realpath($app->config->app_path))->toBe(realpath(__DIR__ . '/../Assets/Command'))
         ->and($app->config->theme)->toBe('unicorn')
         ->and($app->config->debug)->toBe(true);
 });
@@ -51,7 +51,7 @@ it('asserts App returns null when a service is not found')
 
 it('asserts App parses command path with @vendor tag', function (): void {
     $app = new App([
-        'app_path' => '@namespace/command'
+        'app_path' => '@namespace/command',
     ]);
 
     $registry = $app->commandRegistry;
@@ -59,12 +59,12 @@ it('asserts App parses command path with @vendor tag', function (): void {
 
     expect($paths)->toBeArray()
         ->toHaveCount(1)
-        ->and($paths[0])->toEndWith("namespace/command/Command");
+        ->and($paths[0])->toEndWith('namespace/command/Command');
 });
 
 it('asserts App can handle a closure as a service', function (): void {
     $app = getBasicApp();
-    $app->addService('closure', fn () => 'closure');
+    $app->addService('closure', fn (): string => 'closure');
 
     expect($app->closure)->toBe('closure');
 });
@@ -85,20 +85,20 @@ it('asserts App registers and executes single command', function (): void {
     $app = getBasicApp();
 
     $app->registerCommand('minicli-test', function () use ($app): void {
-        $app->rawOutput("testing minicli");
+        $app->rawOutput('testing minicli');
     });
 
     $command = $app->commandRegistry->getCallable('minicli-test');
     expect($command)->toBeCallable();
 
     $app->runCommand(['minicli', 'minicli-test']);
-})->expectOutputString("testing minicli");
+})->expectOutputString('testing minicli');
 
 it('asserts App executes command from namespace', function (): void {
     $app = getBasicApp();
 
     $app->runCommand(['minicli', 'test']);
-})->expectOutputString("test default");
+})->expectOutputString('test default');
 it('registers multiple commands', function (): void {
     // Create a new instance of the App
     $app = getBasicApp();
@@ -140,12 +140,12 @@ it('asserts App throws exception when single command is not found', function ():
 
 it('asserts App throws exception when command is not callable', function (): void {
     $app = getBasicApp();
-    $app->registerCommand('minicli-test-error', "not a callable");
+    $app->registerCommand('minicli-test-error', 'not a callable');
 })->expectException(TypeError::class);
 
 $app = new App();
-$errorNotFound = $app->filterOutput("Command \"inexistent-command\" not found.", 'error');
-$errorMissingParams = $app->filterOutput("Missing required parameter(s): name", 'error');
+$errorNotFound = $app->filterOutput('Command "inexistent-command" not found.', 'error');
+$errorMissingParams = $app->filterOutput('Missing required parameter(s): name', 'error');
 
 it('asserts App shows error when debug is set to false and command is not found', function (): void {
     $app = getProdApp();
@@ -165,10 +165,9 @@ it('asserts App shows error when required parameters are not provided', function
     $app->runCommand(['minicli', 'test', 'required']);
 })->expectOutputString("\n{$errorMissingParams}\n");
 
-
 it('asserts App can check if a service is registered', function (): void {
     $app = getBasicApp();
-    $app->addService('test_service', fn () => 'test');
+    $app->addService('test_service', fn (): string => 'test');
 
     expect($app->hasService('test_service'))->toBeTrue();
     expect($app->hasService('non_existent_service'))->toBeFalse();
@@ -176,8 +175,8 @@ it('asserts App can check if a service is registered', function (): void {
 
 it('asserts App can list all registered services', function (): void {
     $app = getBasicApp();
-    $app->addService('service1', fn () => 'service1');
-    $app->addService('service2', fn () => 'service2');
+    $app->addService('service1', fn (): string => 'service1');
+    $app->addService('service2', fn (): string => 'service2');
 
     $services = $app->listServices();
 

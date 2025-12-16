@@ -10,10 +10,6 @@ class SimpleOutputFilter implements OutputFilterInterface
 {
     /**
      * simple filter
-     *
-     * @param string $message
-     * @param string|null $style
-     * @return string
      */
     public function filter(string $message, ?string $style = null): string
     {

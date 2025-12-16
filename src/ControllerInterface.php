@@ -10,20 +10,19 @@ use Minicli\Exception\MissingParametersException;
 interface ControllerInterface
 {
     /**
+     * Called when `run` is successfully finished
+     */
+    public function teardown(): void;
+
+    /**
      * Called before `run`
      *
-     * @param App $app
-     * @param CommandCall $input
-     * @return void
      * @throws MissingParametersException
      */
     public function boot(App $app, CommandCall $input): void;
 
     /**
      * Main execution
-     *
-     * @param CommandCall $input
-     * @return void
      */
     public function run(CommandCall $input): void;
 
@@ -33,11 +32,4 @@ interface ControllerInterface
      * @return array<int,string>
      */
     public function required(): array;
-
-    /**
-     * Called when `run` is successfully finished
-     *
-     * @return void
-     */
-    public function teardown(): void;
 }

@@ -25,15 +25,13 @@ class TableHelper
 
     /**
      * formatted table
-     *
-     * @var string
      */
     protected string $formattedTable = '';
 
     /**
      * TableHelper constructor. Optionally sets the table rows with an array containing all rows
      *
-     * @param array<int, array<string>>|null $table
+     * @param  array<int, array<string>>|null  $table
      */
     public function __construct(?array $table = null)
     {
@@ -44,8 +42,6 @@ class TableHelper
 
     /**
      * Returns the total number of rows in the table
-     *
-     * @return int
      */
     public function totalRows(): int
     {
@@ -55,11 +51,9 @@ class TableHelper
     /**
      * Adds a table header
      *
-     * @param array<int, string> $header
-     * @param string $style
-     * @return void
+     * @param  array<int, string>  $header
      */
-    public function addHeader(array $header, $style = 'alt'): void
+    public function addHeader(array $header, string $style = 'alt'): void
     {
         $this->insertTableRow($header, $style);
     }
@@ -67,8 +61,7 @@ class TableHelper
     /**
      * Sets the table rows at once
      *
-     * @param array<int, array<string>> $full_table An array containing each table row. Rows must be arrays containing the individual cell contents.
-     * @return void
+     * @param  array<int, array<string>>  $full_table  An array containing each table row. Rows must be arrays containing the individual cell contents.
      */
     public function setTable(array $full_table): void
     {
@@ -78,6 +71,7 @@ class TableHelper
             if ($first) {
                 $this->addHeader($row);
                 $first = false;
+
                 continue;
             }
 
@@ -88,9 +82,7 @@ class TableHelper
     /**
      * Adds a table row
      *
-     * @param array<int, string> $row
-     * @param string $style
-     * @return void
+     * @param  array<int, string>  $row
      */
     public function addRow(array $row, string $style = 'default'): void
     {
@@ -100,12 +92,11 @@ class TableHelper
     /**
      * Returns the formatted table for printing
      *
-     * @param OutputFilterInterface|null $filter In case no filter is provided, a SimpleOutputFilter is used by default.
-     * @return string
+     * @param  OutputFilterInterface|null  $filter  In case no filter is provided, a SimpleOutputFilter is used by default.
      */
     public function getFormattedTable(?OutputFilterInterface $filter = null): string
     {
-        $filter = $filter ?? new SimpleOutputFilter();
+        $filter ??= new SimpleOutputFilter();
 
         foreach ($this->styledRows as $item) {
             $style = $item['style'];
@@ -113,8 +104,8 @@ class TableHelper
                 ? $this->getRowAsString($item['row'])
                 : '';
 
-            if ( ! is_array($style)) {
-                $this->formattedTable .= "\n".$filter->filter($row, $style);
+            if (! is_array($style)) {
+                $this->formattedTable .= "\n" . $filter->filter($row, $style);
             }
         }
 
@@ -124,9 +115,7 @@ class TableHelper
     /**
      * Inserts a new row in the table and sets the style for that row
      *
-     * @param array<int, string> $row
-     * @param string $style
-     * @return void
+     * @param  array<int, string>  $row
      */
     protected function insertTableRow(array $row, string $style = 'default'): void
     {
@@ -137,7 +126,6 @@ class TableHelper
     /**
      * Calculates ideal column sizes for the current table rows
      *
-     * @param int $minColSize
      * @return array<int, int>
      */
     protected function calculateColumnSizes(int $minColSize = 5): array
@@ -148,11 +136,11 @@ class TableHelper
             $columnCount = 0;
 
             foreach ($rowContent as $cell) {
-                $columnSizes[$columnCount] = $columnSizes[$columnCount] ?? $minColSize;
+                $columnSizes[$columnCount] ??= $minColSize;
                 if (mb_strlen($cell) >= $columnSizes[$columnCount]) {
                     $columnSizes[$columnCount] = mb_strlen($cell) + 2;
                 }
-                $columnCount++;
+                ++$columnCount;
             }
         }
 
@@ -162,14 +150,13 @@ class TableHelper
     /**
      * Transforms a row into a formatted string, with adequate column sizing
      *
-     * @param array<int, string> $row
-     * @return string
+     * @param  array<int, string>  $row
      */
     protected function getRowAsString(array $row): string
     {
-        //first, determine the size of each column
-        $columnSizes  = $this->calculateColumnSizes();
-        $formattedRow = "";
+        // first, determine the size of each column
+        $columnSizes = $this->calculateColumnSizes();
+        $formattedRow = '';
 
         foreach ($row as $column => $tableCell) {
             $formattedRow .= $this->getPaddedString($tableCell, $columnSizes[$column]);
@@ -180,10 +167,6 @@ class TableHelper
 
     /**
      * Pads a string as table cell
-     *
-     * @param string $tableCell
-     * @param int $colSize
-     * @return string
      */
     protected function getPaddedString(string $tableCell, int $colSize = 5): string
     {

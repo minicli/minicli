@@ -6,6 +6,4 @@ namespace Minicli\Exception;
 
 use Exception;
 
-final class BindingResolutionException extends Exception
-{
-}
+final class BindingResolutionException extends Exception {}
