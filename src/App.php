@@ -6,6 +6,7 @@ namespace Minicli;
 
 use BadMethodCallException;
 use Closure;
+use Deprecated;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Container\Container;
@@ -123,10 +124,10 @@ class App
         }
 
         $service->load($this);
-        $this->container->bind($name, fn (): \Minicli\ServiceInterface => $service);
+        $this->container->bind($name, fn (): ServiceInterface => $service);
     }
 
-    #[\Deprecated]
+    #[Deprecated]
     public function getPrinter(): OutputHandler
     {
         return $this->printer;

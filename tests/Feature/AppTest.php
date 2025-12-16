@@ -10,7 +10,7 @@ use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\OutputHandler;
 
 it('assert App is created')
-    ->expect(fn (): \Minicli\App => getBasicApp())
+    ->expect(fn (): App => getBasicApp())
     ->toBeInstanceOf(App::class);
 
 it('asserts App sets, gets and prints signature', function (): void {

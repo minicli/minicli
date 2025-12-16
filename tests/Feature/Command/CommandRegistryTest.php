@@ -11,7 +11,7 @@ it('asserts Registry autoloads command namespaces')
     ->toBeInstanceOf(CommandNamespace::class);
 
 it('asserts Registry autoloads command namespaces in multiple source paths')
-    ->expect(fn (): \Minicli\Command\CommandRegistry => getRegistryWithMultiplePaths())
+    ->expect(fn (): Minicli\Command\CommandRegistry => getRegistryWithMultiplePaths())
     ->getNamespace('test')
     ->not()->toBeNull()
     ->toBeInstanceOf(CommandNamespace::class)

@@ -10,7 +10,7 @@ use Minicli\Output\Theme\UnicornTheme;
 use Minicli\Output\ThemeStyle;
 
 /** Color Output Helpers */
-function getColorOutputHandler(): \Minicli\Output\OutputHandler
+function getColorOutputHandler(): OutputHandler
 {
     $handler = new OutputHandler();
     $handler->registerFilter(new ColorOutputFilter());

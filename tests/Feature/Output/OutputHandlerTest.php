@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\OutputHandler;
 
-function getSimpleOutputHandler(): \Minicli\Output\OutputHandler
+function getSimpleOutputHandler(): OutputHandler
 {
     return new OutputHandler(new DefaultPrinterAdapter());
 }
@@ -64,7 +64,7 @@ it('asserts a question can be asked', function (): void {
 });
 
 it('throws an exception if asking a question and display method does not exist')
-    ->expect(fn () => getSimpleOutputHandler()->ask(
+    ->expect(fn (): string => getSimpleOutputHandler()->ask(
         content: 'test',
         method: 'awesome',
     ))

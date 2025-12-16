@@ -36,7 +36,7 @@ final class Container implements ArrayAccess
 
     public static function getInstance(): static
     {
-        if (!self::$instance instanceof \Minicli\Container\Container) {
+        if (! self::$instance instanceof Container) {
             self::$instance = new self();
         }
 
@@ -213,7 +213,7 @@ final class Container implements ArrayAccess
             $type = $dependency->getType(); // ReflectionType|null
 
             if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                $declaringClass = $dependency->getDeclaringClass() instanceof \ReflectionClass ? $dependency->getDeclaringClass()->getName() : '';
+                $declaringClass = $dependency->getDeclaringClass() instanceof ReflectionClass ? $dependency->getDeclaringClass()->getName() : '';
                 throw new BindingResolutionException("Unresolvable dependency resolving [{$dependency}] in class {$declaringClass}");
             }
 

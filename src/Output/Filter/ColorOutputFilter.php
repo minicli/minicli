@@ -15,9 +15,7 @@ class ColorOutputFilter implements OutputFilterInterface
      *
      * @param  CLIThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(protected ?CLIThemeInterface $theme = new DefaultTheme())
-    {
-    }
+    public function __construct(protected ?CLIThemeInterface $theme = new DefaultTheme()) {}
 
     /**
      * Gets the CLITheme
@@ -53,7 +51,7 @@ class ColorOutputFilter implements OutputFilterInterface
         $styleColors = $this->theme->getStyle($style);
 
         $bg = '';
-        if (!in_array($styleColors->background, [null, '', '0'], true)) {
+        if (! in_array($styleColors->background, [null, '', '0'], true)) {
             $bg = ';' . $styleColors->background;
         }
 

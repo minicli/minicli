@@ -40,13 +40,13 @@ class CommandCall
     /**
      * CommandCall constructor.
      *
-     * @param array<int, string> $rawArgs
+     * @param  array<int, string>  $rawArgs
      */
     public function __construct(/**
      * raw arguments
      */
-    public array $rawArgs)
-    {
+        public array $rawArgs
+    ) {
         $this->parseCommand($this->rawArgs);
 
         $this->command = $this->args[1] ?? null;

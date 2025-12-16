@@ -140,7 +140,7 @@ class TableHelper
                 if (mb_strlen($cell) >= $columnSizes[$columnCount]) {
                     $columnSizes[$columnCount] = mb_strlen($cell) + 2;
                 }
-                ++$columnCount;
+                $columnCount++;
             }
         }
 

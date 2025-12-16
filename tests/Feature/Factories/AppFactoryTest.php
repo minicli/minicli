@@ -6,7 +6,7 @@ use Minicli\App;
 use Minicli\Factories\AppFactory;
 
 it('assert it can create a new app')
-    ->expect(fn (): \Minicli\App => AppFactory::make(
+    ->expect(fn (): App => AppFactory::make(
         config: [
             'app_path' => __DIR__ . '/../app/Command',
             'theme' => '',

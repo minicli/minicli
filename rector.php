@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 
@@ -29,4 +30,5 @@ return RectorConfig::configure()
     )
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        PostIncDecToPreIncDecRector::class,
     ]);

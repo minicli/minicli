@@ -6,7 +6,7 @@ use Minicli\Container\Container;
 use Minicli\Exception\BindingResolutionException;
 
 test('the container is a singleton')
-    ->expect(fn (): \Minicli\Container\Container => Container::getInstance())
+    ->expect(fn (): Container => Container::getInstance())
     ->toEqual(Container::getInstance());
 
 it('can be resolve a class from instructions', function (): void {
@@ -15,7 +15,7 @@ it('can be resolve a class from instructions', function (): void {
 
     $container->bind(
         abstract: SmtpMailer::class,
-        concrete: fn (): \SmtpMailer => new SmtpMailer('mail.example.com'),
+        concrete: fn (): SmtpMailer => new SmtpMailer('mail.example.com'),
     );
 
     expect(
@@ -29,7 +29,7 @@ it('can resolve a class from an alias', function (): void {
 
     $container->bind(
         abstract: 'mailer',
-        concrete: fn (): \SmtpMailer => new SmtpMailer('mail.example.com'),
+        concrete: fn (): SmtpMailer => new SmtpMailer('mail.example.com'),
     );
 
     expect(
@@ -65,7 +65,7 @@ it('can resolve recursive dependencies', function (): void {
     $container->flush();
 
     $container->bind(MailerInterface::class, SmtpMailer::class);
-    $container->bind(SmtpMailer::class, fn (): \SmtpMailer => new SmtpMailer('smtp.example.com'));
+    $container->bind(SmtpMailer::class, fn (): SmtpMailer => new SmtpMailer('smtp.example.com'));
 
     expect(
         $container->make(MailerInterface::class),
@@ -76,7 +76,7 @@ it('can bind a singleton', function (): void {
     $container = Container::getInstance();
     $container->flush();
 
-    $container->singleton(SmtpMailer::class, fn (): \SmtpMailer => new SmtpMailer('mail.example.com'));
+    $container->singleton(SmtpMailer::class, fn (): SmtpMailer => new SmtpMailer('mail.example.com'));
 
     $smtpMailer1 = $container->make(SmtpMailer::class);
     $smtpMailer2 = $container->make(SmtpMailer::class);

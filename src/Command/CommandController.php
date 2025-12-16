@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Command;
 
 use BadMethodCallException;
+use Deprecated;
 use Minicli\App;
 use Minicli\Config;
 use Minicli\ControllerInterface;
@@ -167,7 +168,7 @@ abstract class CommandController implements ControllerInterface
     /**
      * get output handler instance
      */
-    #[\Deprecated]
+    #[Deprecated]
     protected function getPrinter(): OutputHandler
     {
         return $this->printer;

@@ -5,17 +5,17 @@ declare(strict_types=1);
 use Minicli\Command\CommandController;
 use Minicli\Command\CommandNamespace;
 
-function getCommandNamespace(): \Minicli\Command\CommandNamespace
+function getCommandNamespace(): CommandNamespace
 {
     return new CommandNamespace('Test');
 }
 
 it('asserts that a name is set as expected')
-    ->expect(fn () => getCommandNamespace()->getName())
+    ->expect(fn (): string => getCommandNamespace()->getName())
     ->toBe('Test');
 
 it('asserts that controllers are loaded successfully')
-    ->expect(fn () => getCommandNamespace()->loadControllers(getCommandsPath()))
+    ->expect(fn (): array => getCommandNamespace()->loadControllers(getCommandsPath()))
     ->toBeArray()
     ->not()->toBeEmpty()
     ->toContainOnlyInstancesOf(CommandController::class);

@@ -10,21 +10,21 @@ use Minicli\Output\Theme\DraculaTheme;
 use Minicli\Output\Theme\UnicornTheme;
 
 it('asserts that ThemeHelper instantiates the Default theme')
-    ->expect(fn (): \Minicli\Output\CLIThemeInterface => new ThemeHelper()->getOutputFilter()->getTheme())
+    ->expect(fn (): Minicli\Output\CLIThemeInterface => new ThemeHelper()->getOutputFilter()->getTheme())
     ->toBeInstanceOf(DefaultTheme::class);
 
 it('asserts that ThemeHelper instantiates the Unicorn theme')
-    ->expect(fn (): \Minicli\Output\CLIThemeInterface => new ThemeHelper('\Unicorn')->getOutputFilter()->getTheme())
+    ->expect(fn (): Minicli\Output\CLIThemeInterface => new ThemeHelper('\Unicorn')->getOutputFilter()->getTheme())
     ->toBeInstanceOf(UnicornTheme::class);
 
 it('asserts that ThemeHelper instantiates the Dalton theme')
-    ->expect(fn (): \Minicli\Output\CLIThemeInterface => new ThemeHelper('\Dalton')->getOutputFilter()->getTheme())
+    ->expect(fn (): Minicli\Output\CLIThemeInterface => new ThemeHelper('\Dalton')->getOutputFilter()->getTheme())
     ->toBeInstanceOf(DaltonTheme::class);
 
 it('asserts that ThemeHelper instantiates the Dracula theme')
-    ->expect(fn (): \Minicli\Output\CLIThemeInterface => new ThemeHelper('\Dracula')->getOutputFilter()->getTheme())
+    ->expect(fn (): Minicli\Output\CLIThemeInterface => new ThemeHelper('\Dracula')->getOutputFilter()->getTheme())
     ->toBeInstanceOf(DraculaTheme::class);
 
 it('asserts that ThemeHelper instantiates a custom theme')
-    ->expect(fn (): \Minicli\Output\CLIThemeInterface => new ThemeHelper('Assets\Theme\Custom')->getOutputFilter()->getTheme())
+    ->expect(fn (): Minicli\Output\CLIThemeInterface => new ThemeHelper('Assets\Theme\Custom')->getOutputFilter()->getTheme())
     ->toBeInstanceOf(CustomTheme::class);

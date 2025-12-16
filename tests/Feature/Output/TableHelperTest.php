@@ -26,7 +26,7 @@ it('asserts that TableHelper sets and outputs table rows', function (): void {
         ['ID', 'NAME', 'FIELD3']
     );
 
-    for ($i = 1; $i <= 10; ++$i) {
+    for ($i = 1; $i <= 10; $i++) {
         $table->addRow([
             (string) $i,
             'test',
