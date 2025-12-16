@@ -23,6 +23,12 @@ class FilePrinterAdapter implements PrinterAdapterInterface
      */
     public function out(string $message, ?string $style = null): string
     {
+        $directory = dirname($this->outputFile);
+
+        if (! is_writable($directory)) {
+            throw new TypeError("Could not open file {$this->outputFile} for writing.");
+        }
+
         $fp = fopen($this->outputFile, 'a+');
 
         if ($fp === false) {

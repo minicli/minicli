@@ -6,6 +6,11 @@ namespace Minicli\Output;
 
 final class ThemeConfig
 {
+    /**
+     * @var array<string, ThemeStyle>
+     */
+    private array $customStyles = [];
+
     public function __construct(
         public ThemeStyle $default,
         public ThemeStyle $alt,
@@ -21,6 +26,16 @@ final class ThemeConfig
         public ThemeStyle $underline,
         public ThemeStyle $invert
     ) {}
+
+    public function __get(string $name): ?ThemeStyle
+    {
+        return $this->customStyles[$name] ?? null;
+    }
+
+    public function __set(string $name, ThemeStyle $value): void
+    {
+        $this->customStyles[$name] = $value;
+    }
 
     public static function make(
         ThemeStyle $default,

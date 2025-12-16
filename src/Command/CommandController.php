@@ -85,7 +85,7 @@ abstract class CommandController implements ControllerInterface
         $this->app = $app;
         $this->config = $app->config;
         $this->logger = $app->logger;
-        $this->printer = $app->getPrinter();
+        $this->printer = $app->printer;
 
         $missing = array_diff($this->required(), array_keys($input->params));
 

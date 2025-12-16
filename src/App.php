@@ -71,8 +71,8 @@ class App
      */
     public function __call(string $name, array $arguments): mixed
     {
-        if (method_exists($this->getPrinter(), $name)) {
-            return $this->getPrinter()->{$name}(...$arguments);
+        if ($this->printer !== null && method_exists($this->printer, $name)) {
+            return $this->printer->{$name}(...$arguments);
         }
 
         throw new BadMethodCallException("Method {$name} does not exist.");
