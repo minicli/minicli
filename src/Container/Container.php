@@ -132,7 +132,7 @@ final class Container implements ArrayAccess
     /**
      * @param  string  $offset
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->contains(
             abstract: $offset,
@@ -144,7 +144,7 @@ final class Container implements ArrayAccess
      *
      * @throws BindingResolutionException|ReflectionException
      */
-    public function offsetGet($offset): mixed
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->make(
             abstract: $offset,
@@ -155,7 +155,7 @@ final class Container implements ArrayAccess
      * @param  string  $offset
      * @param  Closure|null|string  $value
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->bind(
             abstract: $offset,
@@ -166,7 +166,7 @@ final class Container implements ArrayAccess
     /**
      * @param  string  $offset
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         $this->remove(
             abstract: $offset,
