@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 5.x ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 5.x ]
 
 jobs:
   build:
@@ -15,23 +15,26 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'
         extensions: mbstring, dom, curl
 
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Check code style
+    - name: Code Style
       run: composer test:lint
 
-    - name: Run PHPStan
+    - name: Type Coverage
+      run: composer test:types
+
+    - name: Static Analysis
       run: composer test:stan
 
-    - name: Run test suite
+    - name: Unit Tests
       run: composer test:unit

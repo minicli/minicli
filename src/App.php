@@ -6,7 +6,6 @@ namespace Minicli;
 
 use BadMethodCallException;
 use Closure;
-use Deprecated;
 use Minicli\Command\CommandCall;
 use Minicli\Command\CommandRegistry;
 use Minicli\Container\Container;
@@ -71,7 +70,7 @@ class App
      */
     public function __call(string $name, array $arguments): mixed
     {
-        if ($this->printer !== null && method_exists($this->printer, $name)) {
+        if (method_exists($this->printer, $name)) {
             return $this->printer->{$name}(...$arguments);
         }
 
@@ -125,12 +124,6 @@ class App
 
         $service->load($this);
         $this->container->bind($name, fn (): ServiceInterface => $service);
-    }
-
-    #[Deprecated]
-    public function getPrinter(): OutputHandler
-    {
-        return $this->printer;
     }
 
     public function setOutputHandler(OutputHandler $outputPrinter): void
