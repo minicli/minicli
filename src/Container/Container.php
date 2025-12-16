@@ -74,7 +74,7 @@ final class Container implements ArrayAccess
 
         $object = $concrete instanceof Closure || $concrete === $abstract ? $this->build($concrete) : $this->make($concrete);
 
-        if (isset($this->bindings[$abstract]) && $this->bindings[$abstract]['shared']) {
+        if (array_key_exists($abstract, $this->bindings) && $this->bindings[$abstract]['shared']) {
             $this->instances[$abstract] = $object;
         }
 

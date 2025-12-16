@@ -10,12 +10,17 @@ use Minicli\Output\Theme\DefaultTheme;
 
 class ColorOutputFilter implements OutputFilterInterface
 {
+    protected CLIThemeInterface $theme;
+
     /**
      * ColorOutputFilter constructor
      *
      * @param  CLIThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
      */
-    public function __construct(protected ?CLIThemeInterface $theme = new DefaultTheme()) {}
+    public function __construct(?CLIThemeInterface $theme = null)
+    {
+        $this->theme = $theme ?? new DefaultTheme();
+    }
 
     /**
      * Gets the CLITheme

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Carbon\Rector\FuncCall\DateFuncCallToCarbonRector;
+use Rector\Carbon\Rector\New_\DateTimeInstanceToCarbonRector;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
@@ -31,4 +33,6 @@ return RectorConfig::configure()
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
         PostIncDecToPreIncDecRector::class,
+        DateTimeInstanceToCarbonRector::class,
+        DateFuncCallToCarbonRector::class,
     ]);

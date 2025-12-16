@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
+use DateTimeImmutable;
 use Minicli\Output\OutputFilterInterface;
 
 class TimestampOutputFilter implements OutputFilterInterface
@@ -13,7 +14,7 @@ class TimestampOutputFilter implements OutputFilterInterface
      */
     public function filter(string $message, ?string $style = null): string
     {
-        $datetime = new \DateTimeImmutable();
+        $datetime = new DateTimeImmutable();
         $style ??= 'Y-m-d H:i:s';
 
         return $datetime->format("[{$style}]") . $message;

@@ -138,7 +138,7 @@ class OutputHandler implements ServiceInterface
     {
         $helper = new TableHelper($table);
 
-        $filter = (isset($this->outputFilters[0]) && $this->outputFilters[0] instanceof OutputFilterInterface) ? $this->outputFilters[0] : null;
+        $filter = $this->outputFilters[0] ?? null;
         $this->newline();
         $this->rawOutput($helper->getFormattedTable($filter));
         $this->newline();
