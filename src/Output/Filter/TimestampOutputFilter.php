@@ -13,8 +13,8 @@ class TimestampOutputFilter implements OutputFilterInterface
      */
     public function filter(string $message, ?string $style = null): string
     {
-        $datetime = \Carbon\CarbonImmutable::now();
-        $style ??= 'Y-m-d H:i:S';
+        $datetime = new \DateTimeImmutable();
+        $style ??= 'Y-m-d H:i:s';
 
         return $datetime->format("[{$style}]") . $message;
     }

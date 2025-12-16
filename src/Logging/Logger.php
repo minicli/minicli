@@ -95,7 +95,7 @@ class Logger implements ServiceInterface
     private function getLogFilePath(): string
     {
         return match ($this->logType) {
-            LogType::DAILY => sprintf("{$this->logsPath}/minicli-%s.log", \Carbon\Carbon::now()->format('Y-m-d')),
+            LogType::DAILY => sprintf("{$this->logsPath}/minicli-%s.log", date('Y-m-d')),
             default => "{$this->logsPath}/minicli.log",
         };
     }

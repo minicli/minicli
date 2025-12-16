@@ -30,10 +30,10 @@ it('asserts that ColorOutputFilter sets theme correctly and formats with style',
 
 it('asserts that TimestampOutputFilter adds timestamp to messages')
     ->expect(new TimestampOutputFilter()->filter('test timestamp'))
-    ->toContain(Carbon\CarbonImmutable::now())->format('Y-m-d')
+    ->toContain((new DateTimeImmutable())->format('Y-m-d'))
     ->toContain('test timestamp');
 
 it('asserts that TimestampOutputFilter adds formatted timestamp to messages')
     ->expect(new TimestampOutputFilter()->filter('test timestamp', 'm/d/Y'))
-    ->toContain(Carbon\CarbonImmutable::now())->format('m/d/Y')
+    ->toContain((new DateTimeImmutable())->format('m/d/Y'))
     ->toContain('test timestamp');
