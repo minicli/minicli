@@ -16,7 +16,7 @@ final class Help extends CommandController
     {
         /** @var AppConfig $config */
         $config = $this->config('app');
-        $this->out($config->name);
+        $this->success($config->name);
 
         $commands = $this->app->commandRegistry->getCommandMap();
         ksort($commands);
@@ -33,7 +33,7 @@ final class Help extends CommandController
                 ? " - {$commandInfo->description}"
                 : '';
 
-            $this->info("{$padding}{$name}{$description}");
+            $this->out("{$padding}{$name}{$description}");
         }
 
         $this->newline();
