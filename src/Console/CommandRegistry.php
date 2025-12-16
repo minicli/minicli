@@ -183,6 +183,9 @@ final class CommandRegistry implements ServiceInterface
         }
 
         // Check for methods with Command attributes (sub-commands)
+        $subcommands = [];
+        $hasDefault = false;
+
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodAttributes = $method->getAttributes(Command::class);
 
@@ -213,6 +216,10 @@ final class CommandRegistry implements ServiceInterface
             );
 
             $this->registerCommand($fullCommandName, $commandInfo);
+            $subcommands[] = [
+                'name' => $methodCommand->name,
+                'description' => $methodCommand->description,
+            ];
 
             // If this method is marked as default, also register it with just the class command name
             if ($methodCommand->default) {
@@ -223,7 +230,36 @@ final class CommandRegistry implements ServiceInterface
                 );
 
                 $this->registerCommand($classCommand->name, $defaultCommandInfo);
+                $hasDefault = true;
             }
+        }
+
+        // If there are subcommands but no default, register parent to show available subcommands
+        if ($subcommands !== [] && ! $hasDefault) {
+            $parentClosure = function (CommandCall $input, App $app) use ($classCommand, $subcommands): ExitCode {
+                $app->error("Command '{$classCommand->name}' requires a subcommand.");
+                $app->newline();
+                $app->info('Available subcommands:');
+                $app->newline();
+
+                foreach ($subcommands as $subcommand) {
+                    $description = $subcommand['description'] !== ''
+                        ? " - {$subcommand['description']}"
+                        : '';
+                    $app->out("{$subcommand['name']}{$description}");
+                    $app->newline();
+                }
+
+                return ExitCode::Invalid;
+            };
+
+            $parentCommandInfo = new CommandInfo(
+                callable: $parentClosure,
+                name: $classCommand->name,
+                description: $classCommand->description
+            );
+
+            $this->registerCommand($classCommand->name, $parentCommandInfo);
         }
     }
 }
