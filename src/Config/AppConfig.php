@@ -13,7 +13,7 @@ final readonly class AppConfig
 {
     public function __construct(
         public string $name = <<< 'APPNAME'
-'
+
 ███╗   ███╗██╗███╗   ██╗██╗ ██████╗██╗     ██╗
 ████╗ ████║██║████╗  ██║██║██╔════╝██║     ██║
 ██╔████╔██║██║██╔██╗ ██║██║██║     ██║     ██║
@@ -21,7 +21,7 @@ final readonly class AppConfig
 ██║ ╚═╝ ██║██║██║ ╚████║██║╚██████╗███████╗██║
 ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝╚══════╝╚═╝
 
-Minimalist, dependency-free framework for building CLI-centric PHP applications'
+Minimalist, dependency-free framework for building CLI-centric PHP applications
 APPNAME,
         /** @var array<string> $commandPaths */
         public array $commandPaths = [

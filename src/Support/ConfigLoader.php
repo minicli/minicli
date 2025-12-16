@@ -35,11 +35,14 @@ final readonly class ConfigLoader
 
             $className = basename($configFile, '.php');
 
-            if (! class_exists($className)) {
+            if (! class_exists($className) && ! class_exists("\\{$className}")) {
                 continue;
             }
 
-            $reflectionClass = new ReflectionClass($className);
+            // Prefer global namespace if class exists there
+            $fullyQualifiedClassName = class_exists("\\{$className}") ? "\\{$className}" : $className;
+            /** @var class-string $fullyQualifiedClassName */
+            $reflectionClass = new ReflectionClass($fullyQualifiedClassName);
             $configAttributes = $reflectionClass->getAttributes(Config::class);
 
             if ($configAttributes === []) {
@@ -49,7 +52,7 @@ final readonly class ConfigLoader
             $configAttribute = $configAttributes[0]->newInstance();
             $configName = $configAttribute->name;
 
-            $configInstance = new $className();
+            $configInstance = new $fullyQualifiedClassName();
             $app->addConfig($configName, $configInstance);
         }
     }

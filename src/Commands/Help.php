@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
+use Minicli\Config\AppConfig;
 use Minicli\Console\CommandController;
 use Minicli\Console\ExitCode;
 
@@ -13,6 +14,10 @@ final class Help extends CommandController
 {
     public function __invoke(): ExitCode
     {
-        return ExitCode::Invalid;
+        /** @var AppConfig $config */
+        $config = $this->app->config('app');
+        $this->info($config->name);
+
+        return ExitCode::Success;
     }
 }

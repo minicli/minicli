@@ -11,13 +11,12 @@ use Minicli\Config\AppConfig;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandInfo;
 use Minicli\Console\CommandRegistry;
+use Minicli\Console\ExitCode;
 use Minicli\Container\Container;
-use Minicli\Contracts\ControllerInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Contracts\ThemeInterface;
 use Minicli\Exceptions\BindingResolutionException;
 use Minicli\Exceptions\CommandNotFoundException;
-use Minicli\Exceptions\MissingParametersException;
 use Minicli\Log\Logger;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
@@ -30,7 +29,6 @@ use Throwable;
  * @property Logger $logger
  * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
- * @property string $appSignature
  *
  * @mixin OutputHandler
  */
@@ -85,7 +83,6 @@ final readonly class App
 
         /** @var AppConfig $config */
         $config = $this->config('app');
-
         $this->addService('commandRegistry', new CommandRegistry());
         $this->setTheme($config->theme);
     }
@@ -93,7 +90,6 @@ final readonly class App
     public function appRoot(): string
     {
         $root = dirname(__DIR__);
-
         if (! is_file("{$root}/vendor/autoload.php")) {
             return dirname(__DIR__, 4);
         }
@@ -160,22 +156,6 @@ final readonly class App
         return $this->container->get('logs_path');
     }
 
-    public function getSignature(): string
-    {
-        return $this->appSignature;
-    }
-
-    public function printSignature(): void
-    {
-        $this->display($this->appSignature);
-    }
-
-    public function setSignature(string $appSignature): void
-    {
-        $this->container->remove('appSignature');
-        $this->container->bind('appSignature', fn (): string => $appSignature);
-    }
-
     /**
      * @param  class-string<ThemeInterface>  $theme
      */
@@ -207,36 +187,35 @@ final readonly class App
      *
      * @throws CommandNotFoundException|Throwable
      */
-    public function runCommand(array $argv = []): void
+    public function runCommand(array $argv = []): int
     {
         $input = new CommandCall($argv);
 
         if (count($input->args) < 2) {
-            $this->printSignature();
+            // Run help command by default
+            $helpCommand = $this->commandRegistry->getCommand('help');
+            if ($helpCommand !== null) {
+                /** @var ExitCode $result */
+                $result = ($helpCommand->callable)($input, $this);
+            }
 
-            return;
+            return $result->value ?? ExitCode::Failure->value;
         }
 
-        // TODO: Update how to get and call commands from registry
+        $commandName = $input->command;
+        if ($input->subcommand !== null) {
+            $commandName .= " {$input->subcommand}";
+        }
 
-        //        $controller = $this->commandRegistry->getCallableController((string) $input->command, $input->subcommand);
-        //
-        //        if ($controller instanceof ControllerInterface) {
-        //            try {
-        //                $controller->boot($this, $input);
-        //                $controller->run($input);
-        //                $controller->teardown();
-        //
-        //                return;
-        //            } catch (MissingParametersException $exception) {
-        //                $this->logger->error($exception->getMessage());
-        //                $this->error($exception->getMessage());
-        //
-        //                return;
-        //            }
-        //        }
-        //
-        //        $this->runSingle($input);
+        $command = $this->commandRegistry->getCommand($commandName);
+        if ($command === null) {
+            throw new CommandNotFoundException("Command '{$commandName}' not found.");
+        }
+
+        /** @var ExitCode $result */
+        $result = ($command->callable)($input, $this);
+
+        return $result->value;
     }
 
     /**

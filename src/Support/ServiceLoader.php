@@ -22,8 +22,7 @@ final readonly class ServiceLoader
     public function load(App $app): void
     {
         $this->loadDefaultServices($app);
-
-        $basePath = $app->basePath();
+        $basePath = $app->basePath() . '/app';
 
         if (! is_dir($basePath)) {
             return;
