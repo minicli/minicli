@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Minicli\Container\Container;
-use Minicli\Exception\BindingResolutionException;
+use Minicli\Exceptions\BindingResolutionException;
 
 test('the container is a singleton')
     ->expect(fn (): Container => Container::getInstance())

@@ -7,7 +7,7 @@ namespace Minicli\Command;
 use BadMethodCallException;
 use Minicli\App;
 use Minicli\Contracts\ControllerInterface;
-use Minicli\Exception\MissingParametersException;
+use Minicli\Exceptions\MissingParametersException;
 use Minicli\Log\Logger;
 use Minicli\Output\OutputHandler;
 

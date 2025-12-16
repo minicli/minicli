@@ -15,9 +15,9 @@ use Minicli\Container\Container;
 use Minicli\Contracts\ControllerInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Contracts\ThemeInterface;
-use Minicli\Exception\BindingResolutionException;
-use Minicli\Exception\CommandNotFoundException;
-use Minicli\Exception\MissingParametersException;
+use Minicli\Exceptions\BindingResolutionException;
+use Minicli\Exceptions\CommandNotFoundException;
+use Minicli\Exceptions\MissingParametersException;
 use Minicli\Log\Logger;
 use Minicli\Output\Helper\ThemeHelper;
 use Minicli\Output\OutputHandler;
@@ -92,7 +92,7 @@ final readonly class App
         $commandSources = [];
         foreach ($commandsPath as $path) {
             if (str_starts_with((string) $path, '@')) {
-                $path = str_replace('@', $this->basePath() . '/vendor/', $path) . '/Command';
+                $path = str_replace('@', $this->basePath() . '/vendor/', $path) . '/Commands';
             }
             $commandSources[] = $path;
         }

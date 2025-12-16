@@ -7,7 +7,7 @@ namespace Minicli\Command;
 use Minicli\App;
 use Minicli\Contracts\ControllerInterface;
 use Minicli\Contracts\ServiceInterface;
-use Minicli\Exception\CommandNotFoundException;
+use Minicli\Exceptions\CommandNotFoundException;
 
 class CommandRegistry implements ServiceInterface
 {

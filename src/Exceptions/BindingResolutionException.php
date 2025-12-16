@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Exception;
+namespace Minicli\Exceptions;
 
 use Exception;
 

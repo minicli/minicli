@@ -6,7 +6,7 @@ namespace Minicli\Container;
 
 use ArrayAccess;
 use Closure;
-use Minicli\Exception\BindingResolutionException;
+use Minicli\Exceptions\BindingResolutionException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;

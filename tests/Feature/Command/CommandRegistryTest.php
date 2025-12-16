@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Minicli\Command\CommandNamespace;
-use Minicli\Exception\CommandNotFoundException;
+use Minicli\Exceptions\CommandNotFoundException;
 
 it('asserts Registry autoloads command namespaces')
     ->expect(fn (): ?\Minicli\Command\CommandNamespace => getRegistry()->getNamespace('test'))

@@ -7,7 +7,7 @@ namespace Minicli\Log;
 use Minicli\App;
 use Minicli\Config\LogConfig;
 use Minicli\Contracts\ServiceInterface;
-use Minicli\Exception\BindingResolutionException;
+use Minicli\Exceptions\BindingResolutionException;
 use ReflectionException;
 
 class Logger implements ServiceInterface

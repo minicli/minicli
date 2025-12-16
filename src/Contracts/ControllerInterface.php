@@ -6,7 +6,7 @@ namespace Minicli\Contracts;
 
 use Minicli\App;
 use Minicli\Command\CommandCall;
-use Minicli\Exception\MissingParametersException;
+use Minicli\Exceptions\MissingParametersException;
 
 interface ControllerInterface
 {

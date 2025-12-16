@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Minicli\App;
 use Minicli\Command\CommandRegistry;
-use Minicli\Exception\CommandNotFoundException;
+use Minicli\Exceptions\CommandNotFoundException;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
 use Minicli\Output\OutputHandler;
 
