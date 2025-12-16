@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Console;
 
 use BadMethodCallException;
+use Exception;
 use Minicli\App;
 use Minicli\Contracts\ControllerInterface;
 use Minicli\Log\Logger;
@@ -48,6 +49,16 @@ abstract class CommandController implements ControllerInterface
         $this->app = $app;
         $this->logger = $app->logger;
         $this->printer = $app->printer;
+    }
+
+    protected function config(string $name): mixed
+    {
+        try {
+            return $this->app->config($name);
+        } catch (Exception) {
+            return null;
+        }
+
     }
 
     /**

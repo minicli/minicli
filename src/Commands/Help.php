@@ -15,7 +15,7 @@ final class Help extends CommandController
     public function __invoke(): ExitCode
     {
         /** @var AppConfig $config */
-        $config = $this->app->config('app');
+        $config = $this->config('app');
         $this->info($config->name);
 
         return ExitCode::Success;
