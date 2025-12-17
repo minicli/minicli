@@ -18,6 +18,8 @@ class DaltonTheme extends DefaultTheme
             alt: ThemeStyle::make(Foreground::BLACK, Background::YELLOW),
             error: ThemeStyle::make(Foreground::RED),
             error_alt: ThemeStyle::make(Foreground::WHITE, Background::RED),
+            warning: ThemeStyle::make(Foreground::MAGENTA),
+            warning_alt: ThemeStyle::make(Foreground::BLACK, Background::MAGENTA),
             success: ThemeStyle::make(Foreground::CYAN),
             success_alt: ThemeStyle::make(Foreground::BLACK, Background::CYAN),
             info: ThemeStyle::make(Foreground::MAGENTA),

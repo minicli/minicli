@@ -18,6 +18,8 @@ class DraculaTheme extends DefaultTheme
             alt: ThemeStyle::make(Foreground::WHITE, Background::MAGENTA),
             error: ThemeStyle::make(Foreground::RED),
             error_alt: ThemeStyle::make(Foreground::WHITE, Background::RED),
+            warning: ThemeStyle::make(Foreground::YELLOW),
+            warning_alt: ThemeStyle::make(Foreground::BLACK, Background::YELLOW),
             success: ThemeStyle::make(Foreground::GREEN),
             success_alt: ThemeStyle::make(Foreground::WHITE, Background::GREEN),
             info: ThemeStyle::make(Foreground::CYAN),

@@ -18,6 +18,8 @@ class UnicornTheme extends DefaultTheme
             alt: ThemeStyle::make(Foreground::BLACK, Background::CYAN),
             error: ThemeStyle::make(Foreground::RED),
             error_alt: ThemeStyle::make(Foreground::CYAN, Background::RED),
+            warning: ThemeStyle::make(Foreground::YELLOW),
+            warning_alt: ThemeStyle::make(Foreground::BLACK, Background::YELLOW),
             success: ThemeStyle::make(Foreground::GREEN),
             success_alt: ThemeStyle::make(Foreground::BLACK, Background::GREEN),
             info: ThemeStyle::make(Foreground::MAGENTA),

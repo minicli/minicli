@@ -10,6 +10,8 @@ enum StyleType: string
     case ALT = 'alt';
     case ERROR = 'error';
     case ERROR_ALT = 'error_alt';
+    case WARNING = 'warning';
+    case WARNING_ALT = 'warning_alt';
     case SUCCESS = 'success';
     case SUCCESS_ALT = 'success_alt';
     case INFO = 'info';

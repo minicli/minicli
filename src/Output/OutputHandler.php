@@ -82,6 +82,11 @@ final class OutputHandler implements ServiceInterface
         $this->breathe($content, $alt ? StyleType::ERROR_ALT : StyleType::ERROR);
     }
 
+    public function warning(string $content, bool $alt = false): void
+    {
+        $this->breathe($content, $alt ? StyleType::WARNING_ALT : StyleType::WARNING);
+    }
+
     public function info(string $content, bool $alt = false): void
     {
         $this->breathe($content, $alt ? StyleType::INFO_ALT : StyleType::INFO);
