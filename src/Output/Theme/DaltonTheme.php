@@ -6,25 +6,22 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLI\Background;
 use Minicli\Output\CLI\Foreground;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class DaltonTheme extends DefaultTheme
 {
-    /**
-     * get the colors
-     *
-     * @return array<string, array<int, string>>
-     */
-    public function themeColors(): array
+    public function themeConfig(): ThemeConfig
     {
-        return [
-            'default' => [Foreground::YELLOW->value],
-            'alt' => [Foreground::BLACK->value, Background::YELLOW->value],
-            'error' => [Foreground::RED->value],
-            'error_alt' => [Foreground::WHITE->value, Background::RED->value],
-            'success' => [Foreground::CYAN->value],
-            'success_alt' => [Foreground::BLACK->value, Background::CYAN->value],
-            'info' => [Foreground::MAGENTA->value],
-            'info_alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
-        ];
+        return ThemeConfig::make(
+            default: ThemeStyle::make(Foreground::YELLOW),
+            alt: ThemeStyle::make(Foreground::BLACK, Background::YELLOW),
+            error: ThemeStyle::make(Foreground::RED),
+            error_alt: ThemeStyle::make(Foreground::WHITE, Background::RED),
+            success: ThemeStyle::make(Foreground::CYAN),
+            success_alt: ThemeStyle::make(Foreground::BLACK, Background::CYAN),
+            info: ThemeStyle::make(Foreground::MAGENTA),
+            info_alt: ThemeStyle::make(Foreground::WHITE, Background::MAGENTA),
+        );
     }
 }

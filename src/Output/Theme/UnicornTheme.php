@@ -6,25 +6,22 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLI\Background;
 use Minicli\Output\CLI\Foreground;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class UnicornTheme extends DefaultTheme
 {
-    /**
-     * get theme colors
-     *
-     * @return array<string,array<int,string>>
-     */
-    public function themeColors(): array
+    public function themeConfig(): ThemeConfig
     {
-        return [
-            'default' => [Foreground::CYAN->value],
-            'alt' => [Foreground::BLACK->value, Background::CYAN->value],
-            'error' => [Foreground::RED->value],
-            'error_alt' => [Foreground::CYAN->value, Background::RED->value],
-            'success' => [Foreground::GREEN->value],
-            'success_alt' => [Foreground::BLACK->value, Background::GREEN->value],
-            'info' => [Foreground::MAGENTA->value],
-            'info_alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
-        ];
+        return ThemeConfig::make(
+            default: ThemeStyle::make(Foreground::CYAN),
+            alt: ThemeStyle::make(Foreground::BLACK, Background::CYAN),
+            error: ThemeStyle::make(Foreground::RED),
+            error_alt: ThemeStyle::make(Foreground::CYAN, Background::RED),
+            success: ThemeStyle::make(Foreground::GREEN),
+            success_alt: ThemeStyle::make(Foreground::BLACK, Background::GREEN),
+            info: ThemeStyle::make(Foreground::MAGENTA),
+            info_alt: ThemeStyle::make(Foreground::WHITE, Background::MAGENTA),
+        );
     }
 }

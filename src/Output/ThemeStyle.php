@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Minicli\Output;
 
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\FontWeight;
+use Minicli\Output\CLI\Foreground;
+
 final readonly class ThemeStyle
 {
     public function __construct(
-        public string $foreground,
-        public ?string $background = null
+        public Foreground|FontWeight $foreground,
+        public ?Background $background = null
     ) {}
 
-    public static function make(string $foreground, ?string $background = null): self
+    public static function make(Foreground|FontWeight $foreground, ?Background $background = null): self
     {
         return new self($foreground, $background);
     }

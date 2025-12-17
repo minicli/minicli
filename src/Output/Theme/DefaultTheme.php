@@ -15,19 +15,26 @@ class DefaultTheme implements ThemeInterface
 {
     public ThemeConfig $config;
 
-    /**
-     * DefaultTheme constructor.
-     */
     public function __construct()
     {
-        $styles = array_merge($this->getDefaultColors(), $this->themeColors());
+        $defaultTheme = $this->defaultConfig();
+        $customTheme = $this->themeConfig();
 
-        $formatted = [];
-        foreach ($styles as $name => $style) {
-            $formatted[$name] = ThemeStyle::make(...$style);
-        }
-
-        $this->config = ThemeConfig::make(...$formatted);
+        $this->config = ThemeConfig::make(
+            default: $customTheme->default ?? $defaultTheme->default,
+            alt: $customTheme->alt ?? $defaultTheme->alt,
+            error: $customTheme->error ?? $defaultTheme->error,
+            error_alt: $customTheme->error_alt ?? $defaultTheme->error_alt,
+            success: $customTheme->success ?? $defaultTheme->success,
+            success_alt: $customTheme->success_alt ?? $defaultTheme->success_alt,
+            info: $customTheme->info ?? $defaultTheme->info,
+            info_alt: $customTheme->info_alt ?? $defaultTheme->info_alt,
+            bold: $customTheme->bold ?? $defaultTheme->bold,
+            dim: $customTheme->dim ?? $defaultTheme->dim,
+            italic: $customTheme->italic ?? $defaultTheme->italic,
+            underline: $customTheme->underline ?? $defaultTheme->underline,
+            invert: $customTheme->invert ?? $defaultTheme->invert,
+        );
     }
 
     /**
@@ -38,45 +45,35 @@ class DefaultTheme implements ThemeInterface
         return $this->config->{$name} ?? $this->config->default;
     }
 
-    /**
-     * Sets a style
-     */
     public function setStyle(string $name, ThemeStyle $style): void
     {
         $this->config->{$name} = $style;
     }
 
-    /**
-     * get default style colors
-     *
-     * @return array<string,array<int,string>>
-     */
-    public function getDefaultColors(): array
+    public function defaultConfig(): ThemeConfig
     {
-        return [
-            'default' => [Foreground::WHITE->value],
-            'alt' => [Foreground::BLACK->value, Background::WHITE->value],
-            'error' => [Foreground::RED->value],
-            'error_alt' => [Foreground::WHITE->value, Background::RED->value],
-            'success' => [Foreground::GREEN->value],
-            'success_alt' => [Foreground::WHITE->value, Background::GREEN->value],
-            'info' => [Foreground::CYAN->value],
-            'info_alt' => [Foreground::WHITE->value, Background::CYAN->value],
-            'bold' => [FontWeight::BOLD->value],
-            'dim' => [FontWeight::DIM->value],
-            'italic' => [FontWeight::ITALIC->value],
-            'underline' => [FontWeight::UNDERLINE->value],
-            'invert' => [FontWeight::INVERT->value],
-        ];
+        return ThemeConfig::make(
+            default: ThemeStyle::make(Foreground::WHITE),
+            alt: ThemeStyle::make(Foreground::BLACK, Background::WHITE),
+            error: ThemeStyle::make(Foreground::RED),
+            error_alt: ThemeStyle::make(Foreground::WHITE, Background::RED),
+            success: ThemeStyle::make(Foreground::GREEN),
+            success_alt: ThemeStyle::make(Foreground::WHITE, Background::GREEN),
+            info: ThemeStyle::make(Foreground::CYAN),
+            info_alt: ThemeStyle::make(Foreground::WHITE, Background::CYAN),
+            bold: ThemeStyle::make(FontWeight::BOLD),
+            dim: ThemeStyle::make(FontWeight::DIM),
+            italic: ThemeStyle::make(FontWeight::ITALIC),
+            underline: ThemeStyle::make(FontWeight::UNDERLINE),
+            invert: ThemeStyle::make(FontWeight::INVERT),
+        );
     }
 
     /**
      * This method should be implemented by children themes to overwrite and set custom styles/colors
-     *
-     * @return array<string, array<int, string>>
      */
-    public function themeColors(): array
+    public function themeConfig(): ThemeConfig
     {
-        return [];
+        return ThemeConfig::make();
     }
 }

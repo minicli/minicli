@@ -167,17 +167,19 @@ namespace App\Theme;
 use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\CLI\Background;
 use Minicli\Output\CLI\Foreground;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class BlueTheme extends DefaultTheme
 {
-    public function themeColors(): array
+    public function themeConfig(): ThemeConfig
     {
-        return [
-            'default'     => [ Foreground::BLUE->value ],
-            'alt'         => [ Foreground::BLACK->value, Background::BLUE->value ],
-            'info'        => [ Foreground::WHITE->value],
-            'info_alt'    => [ Foreground::WHITE->value, Background::BLUE->value ]
-        ];
+        return ThemeConfig::make(
+            default: ThemeStyle::make(Foreground::BLUE),
+            alt: ThemeStyle::make(Foreground::BLACK, Background::BLUE),
+            info: ThemeStyle::make(Foreground::WHITE),
+            info_alt: ThemeStyle::make(Foreground::WHITE, Background::BLUE)
+        );
     }
 }
 ```

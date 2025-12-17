@@ -12,19 +12,19 @@ final class ThemeConfig
     private array $customStyles = [];
 
     public function __construct(
-        public ThemeStyle $default,
-        public ThemeStyle $alt,
-        public ThemeStyle $error,
-        public ThemeStyle $error_alt,
-        public ThemeStyle $success,
-        public ThemeStyle $success_alt,
-        public ThemeStyle $info,
-        public ThemeStyle $info_alt,
-        public ThemeStyle $bold,
-        public ThemeStyle $dim,
-        public ThemeStyle $italic,
-        public ThemeStyle $underline,
-        public ThemeStyle $invert
+        public ?ThemeStyle $default = null,
+        public ?ThemeStyle $alt = null,
+        public ?ThemeStyle $error = null,
+        public ?ThemeStyle $error_alt = null,
+        public ?ThemeStyle $success = null,
+        public ?ThemeStyle $success_alt = null,
+        public ?ThemeStyle $info = null,
+        public ?ThemeStyle $info_alt = null,
+        public ?ThemeStyle $bold = null,
+        public ?ThemeStyle $dim = null,
+        public ?ThemeStyle $italic = null,
+        public ?ThemeStyle $underline = null,
+        public ?ThemeStyle $invert = null,
     ) {}
 
     public function __get(string $name): ?ThemeStyle
@@ -38,19 +38,19 @@ final class ThemeConfig
     }
 
     public static function make(
-        ThemeStyle $default,
-        ThemeStyle $alt,
-        ThemeStyle $error,
-        ThemeStyle $error_alt,
-        ThemeStyle $success,
-        ThemeStyle $success_alt,
-        ThemeStyle $info,
-        ThemeStyle $info_alt,
-        ThemeStyle $bold,
-        ThemeStyle $dim,
-        ThemeStyle $italic,
-        ThemeStyle $underline,
-        ThemeStyle $invert
+        ?ThemeStyle $default = null,
+        ?ThemeStyle $alt = null,
+        ?ThemeStyle $error = null,
+        ?ThemeStyle $error_alt = null,
+        ?ThemeStyle $success = null,
+        ?ThemeStyle $success_alt = null,
+        ?ThemeStyle $info = null,
+        ?ThemeStyle $info_alt = null,
+        ?ThemeStyle $bold = null,
+        ?ThemeStyle $dim = null,
+        ?ThemeStyle $italic = null,
+        ?ThemeStyle $underline = null,
+        ?ThemeStyle $invert = null,
     ): self {
         return new self(
             $default,

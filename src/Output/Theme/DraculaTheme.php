@@ -6,25 +6,22 @@ namespace Minicli\Output\Theme;
 
 use Minicli\Output\CLI\Background;
 use Minicli\Output\CLI\Foreground;
+use Minicli\Output\ThemeConfig;
+use Minicli\Output\ThemeStyle;
 
 class DraculaTheme extends DefaultTheme
 {
-    /**
-     * get the colors
-     *
-     * @return array<string,array<int,string>>
-     */
-    public function themeColors(): array
+    public function themeConfig(): ThemeConfig
     {
-        return [
-            'default' => [Foreground::MAGENTA->value],
-            'alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
-            'error' => [Foreground::RED->value],
-            'error_alt' => [Foreground::WHITE->value, Background::RED->value],
-            'success' => [Foreground::GREEN->value],
-            'success_alt' => [Foreground::WHITE->value, Background::GREEN->value],
-            'info' => [Foreground::CYAN->value],
-            'info_alt' => [Foreground::WHITE->value, Background::CYAN->value],
-        ];
+        return ThemeConfig::make(
+            default: ThemeStyle::make(Foreground::MAGENTA),
+            alt: ThemeStyle::make(Foreground::WHITE, Background::MAGENTA),
+            error: ThemeStyle::make(Foreground::RED),
+            error_alt: ThemeStyle::make(Foreground::WHITE, Background::RED),
+            success: ThemeStyle::make(Foreground::GREEN),
+            success_alt: ThemeStyle::make(Foreground::WHITE, Background::GREEN),
+            info: ThemeStyle::make(Foreground::CYAN),
+            info_alt: ThemeStyle::make(Foreground::WHITE, Background::CYAN),
+        );
     }
 }
