@@ -6,11 +6,11 @@ namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
 use Minicli\Config\AppConfig;
-use Minicli\Console\CommandController;
+use Minicli\Console\ConsoleCommand;
 use Minicli\Console\ExitCode;
 
 #[Command(description: 'List the available commands in your application')]
-final class Help extends CommandController
+final class Help extends ConsoleCommand
 {
     public function __invoke(): ExitCode
     {

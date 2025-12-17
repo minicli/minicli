@@ -7,14 +7,14 @@ namespace Minicli\Console;
 use BadMethodCallException;
 use Exception;
 use Minicli\App;
-use Minicli\Contracts\ControllerInterface;
+use Minicli\Contracts\CommandInterface;
 use Minicli\Log\Logger;
 use Minicli\Output\OutputHandler;
 
 /**
  * @mixin OutputHandler
  */
-abstract class CommandController implements ControllerInterface
+abstract class ConsoleCommand implements CommandInterface
 {
     protected App $app;
 

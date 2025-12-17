@@ -6,7 +6,7 @@ namespace Minicli\Contracts;
 
 use Minicli\App;
 
-interface ControllerInterface
+interface CommandInterface
 {
     /**
      * Called after the command execution

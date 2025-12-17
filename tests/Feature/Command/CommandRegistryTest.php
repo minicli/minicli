@@ -24,15 +24,15 @@ it('asserts Registry returns null when a namespace is not found')
     ->toBeNull();
 
 it('asserts Registry returns correct controller from namespace when no subcommand is passed')
-    ->expect(fn (): ?\Minicli\Contracts\ControllerInterface => getRegistry()->getCallableController('test'))
+    ->expect(fn (): ?\Minicli\Contracts\CommandInterface => getRegistry()->getCallableController('test'))
     ->toBeInstanceOf(Assets\Command\Test\DefaultController::class);
 
 it('asserts Registry returns correct controller from namespace when a subcommand is passed')
-    ->expect(fn (): ?\Minicli\Contracts\ControllerInterface => getRegistry()->getCallableController('test', 'help'))
+    ->expect(fn (): ?\Minicli\Contracts\CommandInterface => getRegistry()->getCallableController('test', 'help'))
     ->toBeInstanceOf(Assets\Command\Test\HelpController::class);
 
 it('asserts Registry returns null when a namespace controller is not found')
-    ->expect(fn (): ?\Minicli\Contracts\ControllerInterface => getRegistry()->getCallableController('dasdsad'))
+    ->expect(fn (): ?\Minicli\Contracts\CommandInterface => getRegistry()->getCallableController('dasdsad'))
     ->toBeNull();
 
 it('asserts Registry returns correct callable')

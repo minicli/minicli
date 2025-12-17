@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Assets\Command\Test;
 
-use Minicli\Console\CommandController;
+use Minicli\Console\ConsoleCommand;
 
-class HelpController extends CommandController
+class HelpController extends ConsoleCommand
 {
     public function handle(): void
     {

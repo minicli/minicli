@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Assets\Command\Test;
 
-use Minicli\Console\CommandController;
+use Minicli\Console\ConsoleCommand;
 use Minicli\Output\Helper\TableHelper;
 
-class TableController extends CommandController
+class TableController extends ConsoleCommand
 {
     public function handle(): void
     {

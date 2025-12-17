@@ -140,7 +140,7 @@ final class CommandRegistry implements ServiceInterface
             }
 
             $reflection = new ReflectionClass($fullName);
-            if (! $reflection->isSubclassOf(CommandController::class)) {
+            if (! $reflection->isSubclassOf(ConsoleCommand::class)) {
                 return;
             }
 
@@ -151,7 +151,7 @@ final class CommandRegistry implements ServiceInterface
     }
 
     /**
-     * @param  ReflectionClass<CommandController>  $reflection
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
      *
      * @throws ReflectionException
      */
@@ -179,7 +179,7 @@ final class CommandRegistry implements ServiceInterface
         if ($reflection->hasMethod('__invoke')) {
             $invokeMethod = $reflection->getMethod('__invoke');
             $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod): mixed {
-                /** @var CommandController $instance */
+                /** @var ConsoleCommand $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
 
@@ -220,7 +220,7 @@ final class CommandRegistry implements ServiceInterface
             }
 
             $closure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
-                /** @var CommandController $instance */
+                /** @var ConsoleCommand $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
 
@@ -250,7 +250,7 @@ final class CommandRegistry implements ServiceInterface
             if ($methodCommand->default) {
                 // Create a separate closure for the default command to ensure proper binding
                 $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
-                    /** @var CommandController $instance */
+                    /** @var ConsoleCommand $instance */
                     $instance = $app->make($reflection->getName());
                     $instance->boot($app);
 
