@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace Minicli\Console;
 
+use BackedEnum;
+use Exception;
 use Minicli\App;
 use Minicli\Attributes\Command;
 use Minicli\Config\AppConfig;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
+use Minicli\Exceptions\CastException;
+use Minicli\Exceptions\MissingParametersException;
+use Minicli\Input\InputCaster;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionParameter;
+use UnitEnum;
 
 final class CommandRegistry implements ServiceInterface
 {
@@ -169,12 +177,14 @@ final class CommandRegistry implements ServiceInterface
 
         // Check if it has an __invoke method (single command)
         if ($reflection->hasMethod('__invoke')) {
-            $closure = function (CommandCall $input, App $app) use ($reflection): mixed {
+            $invokeMethod = $reflection->getMethod('__invoke');
+            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod): mixed {
                 /** @var CommandController $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app, $input);
-                assert(is_callable($instance));
-                $result = $instance();
+
+                $arguments = $this->prepareArguments($invokeMethod->getParameters(), $input);
+                $result = $invokeMethod->invokeArgs($instance, $arguments);
                 $instance->teardown();
 
                 return $result;
@@ -213,7 +223,9 @@ final class CommandRegistry implements ServiceInterface
                 /** @var CommandController $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app, $input);
-                $result = $method->invoke($instance);
+
+                $arguments = $this->prepareArguments($method->getParameters(), $input);
+                $result = $method->invokeArgs($instance, $arguments);
                 $instance->teardown();
 
                 return $result;
@@ -236,8 +248,21 @@ final class CommandRegistry implements ServiceInterface
 
             // If this method is marked as default, also register it with just the class command name
             if ($methodCommand->default) {
+                // Create a separate closure for the default command to ensure proper binding
+                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
+                    /** @var CommandController $instance */
+                    $instance = $app->make($reflection->getName());
+                    $instance->boot($app, $input);
+
+                    $arguments = $this->prepareArguments($method->getParameters(), $input);
+                    $result = $method->invokeArgs($instance, $arguments);
+                    $instance->teardown();
+
+                    return $result;
+                };
+
                 $defaultCommandInfo = new CommandInfo(
-                    callable: $closure,
+                    callable: $defaultClosure,
                     name: $commandName,
                     description: $classCommand->description
                 );
@@ -274,5 +299,100 @@ final class CommandRegistry implements ServiceInterface
 
             $this->registerCommand($commandName, $parentCommandInfo);
         }
+    }
+
+    /**
+     * Prepare arguments from CommandCall based on method parameters
+     *
+     * @param  array<ReflectionParameter>  $parameters
+     * @return array<mixed>
+     *
+     * @throws MissingParametersException|CastException|ReflectionException
+     */
+    private function prepareArguments(array $parameters, CommandCall $input): array
+    {
+        $arguments = [];
+        $missing = [];
+
+        foreach ($parameters as $parameter) {
+            $paramName = $parameter->getName();
+            $kebabName = toKebabCase($paramName);
+            $type = $parameter->getType();
+
+            if (! $type instanceof ReflectionNamedType) {
+                continue;
+            }
+
+            $typeName = $type->getName();
+            $isNullable = $type->allowsNull();
+            $hasDefault = $parameter->isDefaultValueAvailable();
+
+            // Handle boolean parameters as flags
+            if ($typeName === 'bool') {
+                $arguments[] = $input->hasFlag($kebabName);
+
+                continue;
+            }
+
+            $hasValue = $input->hasParam($kebabName);
+            if (! $hasValue && ! $isNullable && ! $hasDefault) {
+                $missing[] = $kebabName;
+
+                continue;
+            }
+
+            // If parameter is missing but optional, use default or null
+            if (! $hasValue) {
+                $arguments[] = $hasDefault
+                    ? $parameter->getDefaultValue()
+                    : null;
+
+                continue;
+            }
+
+            $value = $input->getParam($kebabName);
+            try {
+                $arguments[] = $this->castValue($value, $typeName);
+            } catch (Exception) {
+                throw new CastException($kebabName);
+            }
+        }
+
+        if ($missing !== []) {
+            throw new MissingParametersException($missing);
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * @throws CastException
+     */
+    private function castValue(?string $value, string $typeName): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return match ($typeName) {
+            'string' => $value,
+            'int' => InputCaster::castToInteger($value),
+            'float' => InputCaster::castToFloat($value),
+            'array' => InputCaster::castToArray($value),
+            default => $this->castToEnumOrDefault($value, $typeName),
+        };
+    }
+
+    /**
+     * @throws CastException
+     */
+    private function castToEnumOrDefault(string $value, string $typeName): mixed
+    {
+        if (is_subclass_of($typeName, UnitEnum::class) || is_subclass_of($typeName, BackedEnum::class)) {
+            return InputCaster::castToEnum($value, $typeName);
+        }
+
+        // For other types, return as-is (string)
+        return $value;
     }
 }
