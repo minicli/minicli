@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\Theme\DaltonTheme;
-use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\Theme\DraculaTheme;
-use Minicli\Output\Theme\UnicornTheme;
+use Minicli\Output\Theming\Themes\DaltonTheme;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+use Minicli\Output\Theming\Themes\DraculaTheme;
+use Minicli\Output\Theming\Themes\UnicornTheme;
 
 dataset('themes', [
     'default' => new DefaultTheme(),

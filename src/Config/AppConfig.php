@@ -6,7 +6,7 @@ namespace Minicli\Config;
 
 use Minicli\Attributes\Config;
 use Minicli\Contracts\ThemeInterface;
-use Minicli\Output\Theme\DefaultTheme;
+use Minicli\Output\Theming\Themes\DefaultTheme;
 
 #[Config('app')]
 final readonly class AppConfig

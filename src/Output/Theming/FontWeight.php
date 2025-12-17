@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\CLI;
+namespace Minicli\Output\Theming;
 
 enum FontWeight: string
 {

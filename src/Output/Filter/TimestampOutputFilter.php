@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Output\Filter;
 
 use DateTimeImmutable;
-use Minicli\Output\OutputFilterInterface;
+use Minicli\Contracts\OutputFilterInterface;
 
 class TimestampOutputFilter implements OutputFilterInterface
 {

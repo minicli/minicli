@@ -6,6 +6,8 @@ namespace Minicli\Output;
 
 use InvalidArgumentException;
 use Minicli\App;
+use Minicli\Contracts\OutputFilterInterface;
+use Minicli\Contracts\PrinterAdapterInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Input\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;

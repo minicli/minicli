@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Helper;
 
+use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Output\Filter\SimpleOutputFilter;
-use Minicli\Output\OutputFilterInterface;
 
 class TableHelper
 {

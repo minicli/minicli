@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\Filter\SimpleOutputFilter;
 use Minicli\Output\Filter\TimestampOutputFilter;
-use Minicli\Output\Theme\UnicornTheme;
+use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\Themes\UnicornTheme;
 
 it('asserts that SimpleOutputFilter returns unstyled content')
     ->expect(new SimpleOutputFilter()->filter('My content'))

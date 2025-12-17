@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Assets\Theme;
 
-use Minicli\Output\CLI\Background;
-use Minicli\Output\CLI\Foreground;
-use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\ThemeConfig;
-use Minicli\Output\ThemeStyle;
+use Minicli\Output\Theming\Background;
+use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\ThemeConfig;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+use Minicli\Output\Theming\ThemeStyle;
 
 class CustomTheme extends DefaultTheme
 {

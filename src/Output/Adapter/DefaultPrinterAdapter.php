@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Adapter;
 
-use Minicli\Output\PrinterAdapterInterface;
+use Minicli\Contracts\PrinterAdapterInterface;
 
 class DefaultPrinterAdapter implements PrinterAdapterInterface
 {

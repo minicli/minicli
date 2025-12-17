@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLI\Background;
-use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\OutputHandler;
-use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\Theme\UnicornTheme;
-use Minicli\Output\ThemeStyle;
+use Minicli\Output\Theming\Background;
+use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+use Minicli\Output\Theming\Themes\UnicornTheme;
+use Minicli\Output\Theming\ThemeStyle;
 
 /** Color Output Helpers */
 function getColorOutputHandler(): OutputHandler

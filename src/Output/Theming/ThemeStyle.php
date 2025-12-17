@@ -2,11 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output;
-
-use Minicli\Output\CLI\Background;
-use Minicli\Output\CLI\FontWeight;
-use Minicli\Output\CLI\Foreground;
+namespace Minicli\Output\Theming;
 
 final readonly class ThemeStyle
 {

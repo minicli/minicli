@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
-use Minicli\Output\OutputFilterInterface;
+use Minicli\Contracts\OutputFilterInterface;
 
 class SimpleOutputFilter implements OutputFilterInterface
 {

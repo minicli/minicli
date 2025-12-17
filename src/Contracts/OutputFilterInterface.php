@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output;
+namespace Minicli\Contracts;
 
 interface OutputFilterInterface
 {
-    /**
-     * output filter
-     */
     public function filter(string $message, ?string $style = null): string;
 }

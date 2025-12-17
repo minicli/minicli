@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Theme;
+namespace Minicli\Output\Theming\Themes;
 
-use Minicli\Output\CLI\Background;
-use Minicli\Output\CLI\Foreground;
-use Minicli\Output\ThemeConfig;
-use Minicli\Output\ThemeStyle;
+use Minicli\Output\Theming\Background;
+use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\ThemeConfig;
+use Minicli\Output\Theming\ThemeStyle;
 
 class DraculaTheme extends DefaultTheme
 {

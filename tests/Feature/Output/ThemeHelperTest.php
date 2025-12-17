@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Assets\Theme\CustomTheme;
 use Minicli\Output\Helper\ThemeHelper;
-use Minicli\Output\Theme\DaltonTheme;
-use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\Theme\DraculaTheme;
-use Minicli\Output\Theme\UnicornTheme;
+use Minicli\Output\Theming\Themes\DaltonTheme;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+use Minicli\Output\Theming\Themes\DraculaTheme;
+use Minicli\Output\Theming\Themes\UnicornTheme;
 
 it('asserts that ThemeHelper instantiates the Default theme')
     ->expect(fn (): Minicli\Contracts\ThemeInterface => new ThemeHelper()->getOutputFilter()->theme())

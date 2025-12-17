@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLI\Foreground;
-use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\ThemeStyle;
+use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+use Minicli\Output\Theming\ThemeStyle;
 
 it('asserts that themes set all default styles', function (DefaultTheme $theme): void {
     expect($theme->style('default'))->toBeInstanceOf(ThemeStyle::class)

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output;
+namespace Minicli\Output\Theming;
 
 final class ThemeConfig
 {

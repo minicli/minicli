@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output;
+namespace Minicli\Contracts;
 
 interface PrinterAdapterInterface
 {
-    /**
-     * output method
-     */
     public function out(string $message): string;
 }

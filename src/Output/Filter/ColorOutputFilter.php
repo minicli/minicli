@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Filter;
 
+use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Contracts\ThemeInterface;
-use Minicli\Output\OutputFilterInterface;
-use Minicli\Output\Theme\DefaultTheme;
+use Minicli\Output\Theming\Themes\DefaultTheme;
 
 final class ColorOutputFilter implements OutputFilterInterface
 {
