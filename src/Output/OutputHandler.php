@@ -11,7 +11,8 @@ use Minicli\Contracts\PrinterAdapterInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Input\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
-use Minicli\Output\Helper\TableHelper;
+use Minicli\Output\Theming\StyleType;
+use Minicli\Support\Table\TableBuilder;
 
 final class OutputHandler implements ServiceInterface
 {
@@ -35,7 +36,7 @@ final class OutputHandler implements ServiceInterface
 
     public function load(App $app): void {}
 
-    public function filterOutput(string $content, ?string $style = null): string
+    public function filterOutput(string $content, ?StyleType $style = null): string
     {
         foreach ($this->outputFilters as $filter) {
             $content = $filter->filter($content, $style);
@@ -44,7 +45,7 @@ final class OutputHandler implements ServiceInterface
         return $content;
     }
 
-    public function out(string $content, string $style = 'default'): void
+    public function out(string $content, StyleType $style = StyleType::DEFAULT): void
     {
         echo $this->printerAdapter->out($this->filterOutput($content, $style));
     }
@@ -64,7 +65,7 @@ final class OutputHandler implements ServiceInterface
         $this->rawOutput(str_repeat('-', $length));
     }
 
-    public function breathe(string $content, string $style): void
+    public function breathe(string $content, StyleType $style): void
     {
         $this->newline();
         $this->out($content, $style);
@@ -73,22 +74,22 @@ final class OutputHandler implements ServiceInterface
 
     public function display(string $content, bool $alt = false): void
     {
-        $this->breathe($content, $alt ? 'alt' : 'default');
+        $this->breathe($content, $alt ? StyleType::ALT : StyleType::DEFAULT);
     }
 
     public function error(string $content, bool $alt = false): void
     {
-        $this->breathe($content, $alt ? 'error_alt' : 'error');
+        $this->breathe($content, $alt ? StyleType::ERROR_ALT : StyleType::ERROR);
     }
 
     public function info(string $content, bool $alt = false): void
     {
-        $this->breathe($content, $alt ? 'info_alt' : 'info');
+        $this->breathe($content, $alt ? StyleType::INFO_ALT : StyleType::INFO);
     }
 
     public function success(string $content, bool $alt = false): void
     {
-        $this->breathe($content, $alt ? 'success_alt' : 'success');
+        $this->breathe($content, $alt ? StyleType::SUCCESS_ALT : StyleType::SUCCESS);
     }
 
     /**
@@ -96,7 +97,7 @@ final class OutputHandler implements ServiceInterface
      */
     public function printTable(array $table): void
     {
-        $helper = new TableHelper($table);
+        $helper = new TableBuilder($table);
 
         $filter = $this->outputFilters[0] ?? null;
         $this->newline();

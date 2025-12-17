@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Assets\Command\Test;
 
 use Minicli\Console\ConsoleCommand;
-use Minicli\Output\Helper\TableHelper;
+use Minicli\Support\Table\TableBuilder;
 
 class TableController extends ConsoleCommand
 {
     public function handle(): void
     {
-        $table = new TableHelper();
+        $table = new TableBuilder();
 
         $table->addHeader(['ID', 'NAME', 'FIELD3']);
 

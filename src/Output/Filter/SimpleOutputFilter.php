@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Minicli\Output\Filter;
 
 use Minicli\Contracts\OutputFilterInterface;
+use Minicli\Output\Theming\StyleType;
 
 class SimpleOutputFilter implements OutputFilterInterface
 {
-    /**
-     * simple filter
-     */
-    public function filter(string $message, ?string $style = null): string
+    public function filter(string $message, ?StyleType $style = null): string
     {
         return $message;
     }

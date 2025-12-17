@@ -6,11 +6,12 @@ namespace Minicli\Output\Filter;
 
 use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Contracts\ThemeInterface;
+use Minicli\Output\Theming\StyleType;
 use Minicli\Output\Theming\Themes\DefaultTheme;
 
-final class ColorOutputFilter implements OutputFilterInterface
+class ColorOutputFilter implements OutputFilterInterface
 {
-    private ThemeInterface $theme;
+    protected ThemeInterface $theme;
 
     public function __construct(?ThemeInterface $theme = null)
     {
@@ -30,15 +31,15 @@ final class ColorOutputFilter implements OutputFilterInterface
     /**
      * Filters a string according to the specified style.
      */
-    public function filter(string $message, ?string $style = 'default'): string
+    public function filter(string $message, ?StyleType $style = null): string
     {
-        return $this->format($message, $style ?? 'default');
+        return $this->format($message, $style ?? StyleType::DEFAULT);
     }
 
     /**
      * Formats a message with color codes based on a theme
      */
-    public function format(string $message, string $style = 'default'): string
+    public function format(string $message, StyleType $style = StyleType::DEFAULT): string
     {
         $styleColors = $this->theme->style($style);
 

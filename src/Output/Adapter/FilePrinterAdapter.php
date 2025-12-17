@@ -9,16 +9,9 @@ use TypeError;
 
 class FilePrinterAdapter implements PrinterAdapterInterface
 {
-    /**
-     * setup file printer adapter
-     */
-    public function __construct(
-        protected string $outputFile,
-    ) {}
+    public function __construct(protected string $outputFile) {}
 
     /**
-     * writes output to file
-     *
      * @throws TypeError
      */
     public function out(string $message, ?string $style = null): string

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Helper;
+namespace Minicli\Output\Theming;
 
 use Minicli\Contracts\ThemeInterface;
 use Minicli\Output\Filter\ColorOutputFilter;

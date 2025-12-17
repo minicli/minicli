@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\Helper\TableHelper;
+use Minicli\Support\Table\TableBuilder;
 
-it('asserts that TableHelper creates table from constructor', function (): void {
+it('asserts that TableBuilder creates table from constructor', function (): void {
     $table = [
         ['ID', 'NAME', 'FIELD3'],
         ['value1', 'value2', 'value3'],
     ];
 
-    $tableHelper = new TableHelper($table);
+    $tableHelper = new TableBuilder($table);
     $tableContent = $tableHelper->getFormattedTable();
 
     expect($tableHelper->totalRows())->toBe(2)
@@ -19,8 +19,8 @@ it('asserts that TableHelper creates table from constructor', function (): void 
         ->and($tableContent)->toContain('value3');
 });
 
-it('asserts that TableHelper sets and outputs table rows', function (): void {
-    $table = new TableHelper();
+it('asserts that TableBuilder sets and outputs table rows', function (): void {
+    $table = new TableBuilder();
 
     $table->addHeader(
         ['ID', 'NAME', 'FIELD3']
@@ -49,7 +49,7 @@ it('asserts that all fields respect column sizes', function (): void {
         ['value1', 'value2', 'value3'],
     ];
 
-    $tableHelper = new TableHelper($table);
+    $tableHelper = new TableBuilder($table);
     $tableContent = $tableHelper->getFormattedTable();
 
     $rows = explode("\n", $tableContent);

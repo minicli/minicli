@@ -6,6 +6,7 @@ use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Theming\Background;
 use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\StyleType;
 use Minicli\Output\Theming\Themes\DefaultTheme;
 use Minicli\Output\Theming\Themes\UnicornTheme;
 use Minicli\Output\Theming\ThemeStyle;
@@ -52,7 +53,7 @@ function getThemedOutput($text): string
 /** TESTS */
 it('asserts that OutputHandler outputs correct style', function (): void {
     $printer = getColorOutputHandler();
-    $printer->out('testing minicli', 'alt');
+    $printer->out('testing minicli', StyleType::ALT);
 })->expectOutputString(getAltOutput('testing minicli'));
 
 it('ColorOutput - asserts that OutputHandler outputs newline', function (): void {
@@ -93,7 +94,7 @@ it('asserts that its possible to overwrite default styles', function (): void {
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('default', ThemeStyle::make(Foreground::MAGENTA->value));
+    $myCustomTheme->setStyle(StyleType::DEFAULT, ThemeStyle::make(Foreground::MAGENTA));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->display('custom theme');
@@ -104,10 +105,10 @@ it('asserts that custom styles can be used with the out method', function (): vo
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('custom', ThemeStyle::make(Foreground::MAGENTA->value));
+    $myCustomTheme->setStyle(StyleType::DEFAULT, ThemeStyle::make(Foreground::MAGENTA));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
-    $printer->out('custom theme', 'custom');
+    $printer->out('custom theme', StyleType::DEFAULT);
 })->expectOutputString(getThemedOutput('custom theme'));
 
 it('asserts that out method sets style to default when style is not passed', function (): void {

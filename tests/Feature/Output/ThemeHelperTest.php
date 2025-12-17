@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Assets\Theme\CustomTheme;
-use Minicli\Output\Helper\ThemeHelper;
+use Minicli\Output\Theming\ThemeHelper;
 use Minicli\Output\Theming\Themes\DaltonTheme;
 use Minicli\Output\Theming\Themes\DefaultTheme;
 use Minicli\Output\Theming\Themes\DraculaTheme;

@@ -6,6 +6,7 @@ use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\Filter\SimpleOutputFilter;
 use Minicli\Output\Filter\TimestampOutputFilter;
 use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\StyleType;
 use Minicli\Output\Theming\Themes\UnicornTheme;
 
 it('asserts that SimpleOutputFilter returns unstyled content')
@@ -21,7 +22,7 @@ it('asserts that ColorOutputFilter sets theme correctly and formats with style',
     $color->setTheme(new UnicornTheme());
 
     $text = 'My content';
-    $styled = $color->filter($text, 'info');
+    $styled = $color->filter($text, StyleType::INFO);
     $expected = sprintf("\e[%sm%s\e[0m", Foreground::MAGENTA->value, $text);
 
     expect($color->theme())->toBeInstanceOf(UnicornTheme::class)
@@ -34,6 +35,6 @@ it('asserts that TimestampOutputFilter adds timestamp to messages')
     ->toContain('test timestamp');
 
 it('asserts that TimestampOutputFilter adds formatted timestamp to messages')
-    ->expect(new TimestampOutputFilter()->filter('test timestamp', 'm/d/Y'))
+    ->expect(new TimestampOutputFilter('m/d/Y')->filter('test timestamp'))
     ->toContain(new DateTimeImmutable()->format('m/d/Y'))
     ->toContain('test timestamp');

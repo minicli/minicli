@@ -8,6 +8,7 @@ use Minicli\Contracts\ThemeInterface;
 use Minicli\Output\Theming\Background;
 use Minicli\Output\Theming\FontWeight;
 use Minicli\Output\Theming\Foreground;
+use Minicli\Output\Theming\StyleType;
 use Minicli\Output\Theming\ThemeConfig;
 use Minicli\Output\Theming\ThemeStyle;
 
@@ -38,16 +39,19 @@ class DefaultTheme implements ThemeInterface
     }
 
     /**
-     * Obtains the colors that compose a style for that theme, such as "error" or "success"
+     * Obtains the colors that compose a style for that theme
      */
-    public function style(string $name): ThemeStyle
+    public function style(StyleType $name): ThemeStyle
     {
-        return $this->config->{$name} ?? $this->config->default;
+        /** @var ThemeStyle $default */
+        $default = $this->config->default;
+
+        return $this->config->{$name->value} ?? $default;
     }
 
-    public function setStyle(string $name, ThemeStyle $style): void
+    public function setStyle(StyleType $name, ThemeStyle $style): void
     {
-        $this->config->{$name} = $style;
+        $this->config->{$name->value} = $style;
     }
 
     public function defaultConfig(): ThemeConfig

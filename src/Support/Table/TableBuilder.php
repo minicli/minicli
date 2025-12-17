@@ -2,35 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Helper;
+namespace Minicli\Support\Table;
 
 use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Output\Filter\SimpleOutputFilter;
+use Minicli\Output\Theming\StyleType;
 
-class TableHelper
+class TableBuilder
 {
     /**
-     * table rows
-     *
      * @var array<int, array<string>>
      */
     protected array $tableRows;
 
     /**
-     * style rows
-     *
-     * @var array<int, array<string, array<int, string>|string>>
+     * @var array<int, array<string, array<int, string>|string|StyleType>>
      */
     protected array $styledRows;
 
-    /**
-     * formatted table
-     */
     protected string $formattedTable = '';
 
     /**
-     * TableHelper constructor. Optionally sets the table rows with an array containing all rows
-     *
      * @param  array<int, array<string>>|null  $table
      */
     public function __construct(?array $table = null)
@@ -40,27 +32,20 @@ class TableHelper
         }
     }
 
-    /**
-     * Returns the total number of rows in the table
-     */
     public function totalRows(): int
     {
         return count($this->tableRows);
     }
 
     /**
-     * Adds a table header
-     *
      * @param  array<int, string>  $header
      */
-    public function addHeader(array $header, string $style = 'alt'): void
+    public function addHeader(array $header, StyleType $style = StyleType::ALT): void
     {
         $this->insertTableRow($header, $style);
     }
 
     /**
-     * Sets the table rows at once
-     *
      * @param  array<int, array<string>>  $full_table  An array containing each table row. Rows must be arrays containing the individual cell contents.
      */
     public function setTable(array $full_table): void
@@ -80,18 +65,14 @@ class TableHelper
     }
 
     /**
-     * Adds a table row
-     *
      * @param  array<int, string>  $row
      */
-    public function addRow(array $row, string $style = 'default'): void
+    public function addRow(array $row, StyleType $style = StyleType::DEFAULT): void
     {
         $this->insertTableRow($row, $style);
     }
 
     /**
-     * Returns the formatted table for printing
-     *
      * @param  OutputFilterInterface|null  $filter  In case no filter is provided, a SimpleOutputFilter is used by default.
      */
     public function getFormattedTable(?OutputFilterInterface $filter = null): string
@@ -99,33 +80,28 @@ class TableHelper
         $filter ??= new SimpleOutputFilter();
 
         foreach ($this->styledRows as $item) {
+            /** @var StyleType $style */
             $style = $item['style'];
             $row = is_array($item['row'])
                 ? $this->getRowAsString($item['row'])
                 : '';
 
-            if (! is_array($style)) {
-                $this->formattedTable .= "\n" . $filter->filter($row, $style);
-            }
+            $this->formattedTable .= "\n" . $filter->filter($row, $style);
         }
 
         return $this->formattedTable;
     }
 
     /**
-     * Inserts a new row in the table and sets the style for that row
-     *
      * @param  array<int, string>  $row
      */
-    protected function insertTableRow(array $row, string $style = 'default'): void
+    protected function insertTableRow(array $row, StyleType $style = StyleType::DEFAULT): void
     {
         $this->tableRows[] = $row;
         $this->styledRows[] = ['row' => $row, 'style' => $style];
     }
 
     /**
-     * Calculates ideal column sizes for the current table rows
-     *
      * @return array<int, int>
      */
     protected function calculateColumnSizes(int $minColSize = 5): array
@@ -148,8 +124,6 @@ class TableHelper
     }
 
     /**
-     * Transforms a row into a formatted string, with adequate column sizing
-     *
      * @param  array<int, string>  $row
      */
     protected function getRowAsString(array $row): string
@@ -165,9 +139,6 @@ class TableHelper
         return $formattedRow;
     }
 
-    /**
-     * Pads a string as table cell
-     */
     protected function getPaddedString(string $tableCell, int $colSize = 5): string
     {
         return mb_str_pad($tableCell, $colSize);
