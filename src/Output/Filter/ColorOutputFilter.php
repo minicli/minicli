@@ -8,31 +8,20 @@ use Minicli\Contracts\ThemeInterface;
 use Minicli\Output\OutputFilterInterface;
 use Minicli\Output\Theme\DefaultTheme;
 
-class ColorOutputFilter implements OutputFilterInterface
+final class ColorOutputFilter implements OutputFilterInterface
 {
-    protected ThemeInterface $theme;
+    private ThemeInterface $theme;
 
-    /**
-     * ColorOutputFilter constructor
-     *
-     * @param  ThemeInterface|null  $theme  If a theme is not set, the default CLITheme will be used.
-     */
     public function __construct(?ThemeInterface $theme = null)
     {
         $this->theme = $theme ?? new DefaultTheme();
     }
 
-    /**
-     * Gets the CLITheme
-     */
-    public function getTheme(): ThemeInterface
+    public function theme(): ThemeInterface
     {
         return $this->theme;
     }
 
-    /**
-     * Sets the CLITheme
-     */
     public function setTheme(ThemeInterface $theme): void
     {
         $this->theme = $theme;
@@ -40,8 +29,6 @@ class ColorOutputFilter implements OutputFilterInterface
 
     /**
      * Filters a string according to the specified style.
-     *
-     * @return string the resulting string
      */
     public function filter(string $message, ?string $style = 'default'): string
     {
@@ -49,17 +36,17 @@ class ColorOutputFilter implements OutputFilterInterface
     }
 
     /**
-     * Formats a message with color codes based on a CLITheme
+     * Formats a message with color codes based on a theme
      */
     public function format(string $message, string $style = 'default'): string
     {
         $styleColors = $this->theme->style($style);
 
         $bg = '';
-        if (! in_array($styleColors->background, [null, '', '0'], true)) {
-            $bg = ';' . $styleColors->background;
+        if (! in_array($styleColors->background?->value, [null, '', '0'], true)) {
+            $bg = ';' . $styleColors->background->value;
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground, $bg, $message);
+        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground->value, $bg, $message);
     }
 }
