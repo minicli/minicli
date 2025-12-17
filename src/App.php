@@ -61,7 +61,7 @@ final readonly class App
     }
 
     /**
-     * @param  array<int,mixed>  $arguments
+     * @param  array<mixed>  $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {
@@ -182,7 +182,7 @@ final readonly class App
     }
 
     /**
-     * @param  array<int,string>  $argv
+     * @param  array<string>  $argv
      *
      * @throws CommandNotFoundException|Throwable
      */

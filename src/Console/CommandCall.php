@@ -11,7 +11,7 @@ final class CommandCall
     public ?string $subcommand;
 
     /**
-     * @var array<int, string>
+     * @var array<string>
      */
     public array $args = [];
 
@@ -26,7 +26,7 @@ final class CommandCall
     public array $flags = [];
 
     /**
-     * @param  array<int, string>  $rawArgs
+     * @param  array<string>  $rawArgs
      */
     public function __construct(public array $rawArgs)
     {
@@ -51,7 +51,7 @@ final class CommandCall
     }
 
     /**
-     * @return array<int, string>
+     * @return array<string>
      */
     public function getRawArgs(): array
     {
@@ -67,7 +67,7 @@ final class CommandCall
     }
 
     /**
-     * @param  array<int, string>  $argv
+     * @param  array<string>  $argv
      */
     private function parseCommand(array $argv): void
     {

@@ -49,10 +49,7 @@ class TableBuilder
         $table = '';
 
         foreach ($this->rows as $row) {
-            $style = $row->style;
-            $row = $this->rowToString($row->cells);
-
-            $table .= "\n{$filter->filter($row, $style)}";
+            $table .= "\n{$this->rowToString($row->cells, $filter)}";
         }
 
         return $table;
@@ -69,7 +66,7 @@ class TableBuilder
     }
 
     /**
-     * @return array<int, int>
+     * @return array<int>
      */
     protected function calculateColumnSizes(int $minColSize = 5): array
     {
@@ -80,8 +77,8 @@ class TableBuilder
 
             foreach ($rowContent->cells as $cell) {
                 $columnSizes[$columnCount] ??= $minColSize;
-                if (mb_strlen($cell) >= $columnSizes[$columnCount]) {
-                    $columnSizes[$columnCount] = mb_strlen($cell) + 2;
+                if (mb_strlen($cell->content) >= $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = mb_strlen($cell->content) + 2;
                 }
                 $columnCount++;
             }
@@ -91,16 +88,17 @@ class TableBuilder
     }
 
     /**
-     * @param  array<int, string>  $row
+     * @param  array<Cell>  $row
      */
-    protected function rowToString(array $row): string
+    protected function rowToString(array $row, OutputFilterInterface $filter): string
     {
         // first, determine the size of each column
         $columnSizes = $this->calculateColumnSizes();
         $formattedRow = '';
 
-        foreach ($row as $column => $tableCell) {
-            $formattedRow .= $this->getPaddedString($tableCell, $columnSizes[$column]);
+        foreach ($row as $column => $cell) {
+            $paddedContent = $this->getPaddedString($cell->content, $columnSizes[$column]);
+            $formattedRow .= $filter->filter($paddedContent, $cell->style);
         }
 
         return $formattedRow;

@@ -200,7 +200,7 @@ final class Container implements ArrayAccess
 
     /**
      * @param  array<ReflectionParameter>  $dependencies
-     * @return array<int,mixed>
+     * @return array<mixed>
      *
      * @throws BindingResolutionException|ReflectionException
      */

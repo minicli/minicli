@@ -7,7 +7,7 @@ namespace Minicli\Input;
 final class Input
 {
     /**
-     * @param  array<int, string>  $inputHistory
+     * @param  array<string>  $inputHistory
      */
     public function __construct(
         private string $prompt = 'minicli$> ',

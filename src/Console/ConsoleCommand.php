@@ -23,7 +23,7 @@ abstract class ConsoleCommand implements CommandInterface
     private OutputHandler $printer;
 
     /**
-     * @param  array<int,mixed>  $arguments
+     * @param  array<mixed>  $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {

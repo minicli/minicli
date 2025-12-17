@@ -17,7 +17,7 @@ use Minicli\Output\Theming\StyleType;
 final class OutputHandler implements ServiceInterface
 {
     /**
-     * @param  array<int, OutputFilterInterface>  $outputFilters
+     * @param  array<OutputFilterInterface>  $outputFilters
      */
     public function __construct(
         private readonly PrinterAdapterInterface $printerAdapter = new DefaultPrinterAdapter(),
