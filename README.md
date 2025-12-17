@@ -165,17 +165,18 @@ The above setting would use the following example theme:
 namespace App\Theme;
 
 use Minicli\Output\Theme\DefaultTheme;
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\Foreground;
 
 class BlueTheme extends DefaultTheme
 {
-    public function getThemeColors(): array
+    public function themeColors(): array
     {
         return [
-            'default'     => [ CLIColors::$FG_BLUE ],
-            'alt'         => [ CLIColors::$FG_BLACK, CLIColors::$BG_BLUE ],
-            'info'        => [ CLIColors::$FG_WHITE],
-            'info_alt'    => [ CLIColors::$FG_WHITE, CLIColors::$BG_BLUE ]
+            'default'     => [ Foreground::BLUE->value ],
+            'alt'         => [ Foreground::BLACK->value, Background::BLUE->value ],
+            'info'        => [ Foreground::WHITE->value],
+            'info_alt'    => [ Foreground::WHITE->value, Background::BLUE->value ]
         ];
     }
 }

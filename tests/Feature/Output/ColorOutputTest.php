@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\OutputHandler;
 use Minicli\Output\Theme\DefaultTheme;
@@ -20,32 +21,32 @@ function getColorOutputHandler(): OutputHandler
 
 function getDefaultOutput($text): string
 {
-    return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_WHITE, $text);
+    return sprintf("\e[%sm%s\e[0m", Foreground::WHITE->value, $text);
 }
 
 function getAltOutput($text): string
 {
-    return sprintf("\e[%s;%sm%s\e[0m", CLIColors::$FG_BLACK, CLIColors::$BG_WHITE, $text);
+    return sprintf("\e[%s;%sm%s\e[0m", Foreground::BLACK->value, Background::WHITE->value, $text);
 }
 
 function getErrorOutput($text): string
 {
-    return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_RED, $text);
+    return sprintf("\e[%sm%s\e[0m", Foreground::RED->value, $text);
 }
 
 function getInfoOutput($text): string
 {
-    return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_CYAN, $text);
+    return sprintf("\e[%sm%s\e[0m", Foreground::CYAN->value, $text);
 }
 
 function getSuccessOutput($text): string
 {
-    return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_GREEN, $text);
+    return sprintf("\e[%sm%s\e[0m", Foreground::GREEN->value, $text);
 }
 
 function getThemedOutput($text): string
 {
-    return sprintf("\e[%sm%s\e[0m", CLIColors::$FG_MAGENTA, $text);
+    return sprintf("\e[%sm%s\e[0m", Foreground::MAGENTA->value, $text);
 }
 
 /** TESTS */
@@ -92,7 +93,7 @@ it('asserts that its possible to overwrite default styles', function (): void {
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('default', ThemeStyle::make(CLIColors::$FG_MAGENTA));
+    $myCustomTheme->setStyle('default', ThemeStyle::make(Foreground::MAGENTA->value));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->display('custom theme');
@@ -103,7 +104,7 @@ it('asserts that custom styles can be used with the out method', function (): vo
     $printer->clearFilters();
 
     $myCustomTheme = new DefaultTheme();
-    $myCustomTheme->setStyle('custom', ThemeStyle::make(CLIColors::$FG_MAGENTA));
+    $myCustomTheme->setStyle('custom', ThemeStyle::make(Foreground::MAGENTA->value));
 
     $printer->registerFilter(new ColorOutputFilter($myCustomTheme));
     $printer->out('custom theme', 'custom');

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Assets\Theme;
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Theme\DefaultTheme;
 
 class CustomTheme extends DefaultTheme
@@ -12,10 +13,10 @@ class CustomTheme extends DefaultTheme
     public function themeColors(): array
     {
         return [
-            'default' => [CLIColors::$FG_CYAN],
-            'alt' => [CLIColors::$FG_BLACK, CLIColors::$BG_CYAN],
-            'info' => [CLIColors::$FG_MAGENTA],
-            'info_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_MAGENTA],
+            'default' => [Foreground::CYAN->value],
+            'alt' => [Foreground::BLACK->value, Background::CYAN->value],
+            'info' => [Foreground::MAGENTA->value],
+            'info_alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
         ];
     }
 }

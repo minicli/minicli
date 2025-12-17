@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Theme\DefaultTheme;
 use Minicli\Output\ThemeStyle;
 
@@ -19,7 +19,7 @@ it('asserts that themes set all default styles', function (DefaultTheme $theme):
 
 it('asserts that default theme returns expected colors for default text')
     ->expect(fn (): string => new DefaultTheme()->style('default')->foreground)
-    ->toBe(CLIColors::$FG_WHITE);
+    ->toBe(Foreground::WHITE->value);
 
 it('asserts that missing styles in built-in themes are included from default theme', function (DefaultTheme $theme): void {
     expect($theme->config->italic)->toBeInstanceOf(ThemeStyle::class)

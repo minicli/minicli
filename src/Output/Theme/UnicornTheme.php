@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Theme;
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\Foreground;
 
 class UnicornTheme extends DefaultTheme
 {
@@ -16,14 +17,14 @@ class UnicornTheme extends DefaultTheme
     public function themeColors(): array
     {
         return [
-            'default' => [CLIColors::$FG_CYAN],
-            'alt' => [CLIColors::$FG_BLACK, CLIColors::$BG_CYAN],
-            'error' => [CLIColors::$FG_RED],
-            'error_alt' => [CLIColors::$FG_CYAN, CLIColors::$BG_RED],
-            'success' => [CLIColors::$FG_GREEN],
-            'success_alt' => [CLIColors::$FG_BLACK, CLIColors::$BG_GREEN],
-            'info' => [CLIColors::$FG_MAGENTA],
-            'info_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_MAGENTA],
+            'default' => [Foreground::CYAN->value],
+            'alt' => [Foreground::BLACK->value, Background::CYAN->value],
+            'error' => [Foreground::RED->value],
+            'error_alt' => [Foreground::CYAN->value, Background::RED->value],
+            'success' => [Foreground::GREEN->value],
+            'success_alt' => [Foreground::BLACK->value, Background::GREEN->value],
+            'info' => [Foreground::MAGENTA->value],
+            'info_alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
         ];
     }
 }

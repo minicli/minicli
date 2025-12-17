@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Minicli\Output\Theme;
 
 use Minicli\Contracts\ThemeInterface;
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\FontWeight;
+use Minicli\Output\CLI\Foreground;
 use Minicli\Output\ThemeConfig;
 use Minicli\Output\ThemeStyle;
 
@@ -52,19 +54,19 @@ class DefaultTheme implements ThemeInterface
     public function getDefaultColors(): array
     {
         return [
-            'default' => [CLIColors::$FG_WHITE],
-            'alt' => [CLIColors::$FG_BLACK, CLIColors::$BG_WHITE],
-            'error' => [CLIColors::$FG_RED],
-            'error_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_RED],
-            'success' => [CLIColors::$FG_GREEN],
-            'success_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_GREEN],
-            'info' => [CLIColors::$FG_CYAN],
-            'info_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_CYAN],
-            'bold' => [CLIColors::$BOLD],
-            'dim' => [CLIColors::$DIM],
-            'italic' => [CLIColors::$ITALIC],
-            'underline' => [CLIColors::$UNDERLINE],
-            'invert' => [CLIColors::$INVERT],
+            'default' => [Foreground::WHITE->value],
+            'alt' => [Foreground::BLACK->value, Background::WHITE->value],
+            'error' => [Foreground::RED->value],
+            'error_alt' => [Foreground::WHITE->value, Background::RED->value],
+            'success' => [Foreground::GREEN->value],
+            'success_alt' => [Foreground::WHITE->value, Background::GREEN->value],
+            'info' => [Foreground::CYAN->value],
+            'info_alt' => [Foreground::WHITE->value, Background::CYAN->value],
+            'bold' => [FontWeight::BOLD->value],
+            'dim' => [FontWeight::DIM->value],
+            'italic' => [FontWeight::ITALIC->value],
+            'underline' => [FontWeight::UNDERLINE->value],
+            'invert' => [FontWeight::INVERT->value],
         ];
     }
 

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli\Output\Theme;
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Background;
+use Minicli\Output\CLI\Foreground;
 
 class DraculaTheme extends DefaultTheme
 {
@@ -16,14 +17,14 @@ class DraculaTheme extends DefaultTheme
     public function themeColors(): array
     {
         return [
-            'default' => [CLIColors::$FG_MAGENTA],
-            'alt' => [CLIColors::$FG_WHITE, CLIColors::$FG_MAGENTA],
-            'error' => [CLIColors::$FG_RED],
-            'error_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_RED],
-            'success' => [CLIColors::$FG_GREEN],
-            'success_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_GREEN],
-            'info' => [CLIColors::$FG_CYAN],
-            'info_alt' => [CLIColors::$FG_WHITE, CLIColors::$BG_CYAN],
+            'default' => [Foreground::MAGENTA->value],
+            'alt' => [Foreground::WHITE->value, Background::MAGENTA->value],
+            'error' => [Foreground::RED->value],
+            'error_alt' => [Foreground::WHITE->value, Background::RED->value],
+            'success' => [Foreground::GREEN->value],
+            'success_alt' => [Foreground::WHITE->value, Background::GREEN->value],
+            'info' => [Foreground::CYAN->value],
+            'info_alt' => [Foreground::WHITE->value, Background::CYAN->value],
         ];
     }
 }

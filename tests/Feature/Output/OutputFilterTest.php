@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\CLIColors;
+use Minicli\Output\CLI\Foreground;
 use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\Filter\SimpleOutputFilter;
 use Minicli\Output\Filter\TimestampOutputFilter;
@@ -14,7 +14,7 @@ it('asserts that SimpleOutputFilter returns unstyled content')
 
 it('asserts that ColorOutputFilter returns styled content with default theme')
     ->expect(new ColorOutputFilter()->filter('My content'))
-    ->toBe(sprintf("\e[%sm%s\e[0m", CLIColors::$FG_WHITE, 'My content'));
+    ->toBe(sprintf("\e[%sm%s\e[0m", Foreground::WHITE->value, 'My content'));
 
 it('asserts that ColorOutputFilter sets theme correctly and formats with style', function (): void {
     $color = new ColorOutputFilter();
@@ -22,7 +22,7 @@ it('asserts that ColorOutputFilter sets theme correctly and formats with style',
 
     $text = 'My content';
     $styled = $color->filter($text, 'info');
-    $expected = sprintf("\e[%sm%s\e[0m", CLIColors::$FG_MAGENTA, $text);
+    $expected = sprintf("\e[%sm%s\e[0m", Foreground::MAGENTA->value, $text);
 
     expect($color->getTheme())->toBeInstanceOf(UnicornTheme::class)
         ->and($styled)->toBe($expected);
