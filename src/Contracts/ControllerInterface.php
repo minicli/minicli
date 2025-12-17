@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Minicli\Contracts;
 
 use Minicli\App;
-use Minicli\Console\CommandCall;
 
 interface ControllerInterface
 {
@@ -17,5 +16,5 @@ interface ControllerInterface
     /**
      * Called before the command execution
      */
-    public function boot(App $app, CommandCall $input): void;
+    public function boot(App $app): void;
 }

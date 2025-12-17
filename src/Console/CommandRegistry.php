@@ -181,7 +181,7 @@ final class CommandRegistry implements ServiceInterface
             $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod): mixed {
                 /** @var CommandController $instance */
                 $instance = $app->make($reflection->getName());
-                $instance->boot($app, $input);
+                $instance->boot($app);
 
                 $arguments = $this->prepareArguments($invokeMethod->getParameters(), $input);
                 $result = $invokeMethod->invokeArgs($instance, $arguments);
@@ -222,7 +222,7 @@ final class CommandRegistry implements ServiceInterface
             $closure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
                 /** @var CommandController $instance */
                 $instance = $app->make($reflection->getName());
-                $instance->boot($app, $input);
+                $instance->boot($app);
 
                 $arguments = $this->prepareArguments($method->getParameters(), $input);
                 $result = $method->invokeArgs($instance, $arguments);
@@ -252,7 +252,7 @@ final class CommandRegistry implements ServiceInterface
                 $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
                     /** @var CommandController $instance */
                     $instance = $app->make($reflection->getName());
-                    $instance->boot($app, $input);
+                    $instance->boot($app);
 
                     $arguments = $this->prepareArguments($method->getParameters(), $input);
                     $result = $method->invokeArgs($instance, $arguments);

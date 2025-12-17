@@ -6,7 +6,6 @@ namespace Minicli;
 
 use BadMethodCallException;
 use Closure;
-use Minicli\Attributes\Service;
 use Minicli\Config\AppConfig;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandInfo;

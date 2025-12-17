@@ -20,8 +20,6 @@ abstract class CommandController implements ControllerInterface
 
     protected Logger $logger;
 
-    protected CommandCall $input;
-
     private OutputHandler $printer;
 
     /**
@@ -44,7 +42,7 @@ abstract class CommandController implements ControllerInterface
     /**
      * Called before the command execution
      */
-    public function boot(App $app, CommandCall $input): void
+    public function boot(App $app): void
     {
         $this->app = $app;
         $this->logger = $app->logger;
@@ -58,37 +56,5 @@ abstract class CommandController implements ControllerInterface
         } catch (Exception) {
             return null;
         }
-
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function getArgs(): array
-    {
-        return $this->input->args;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function getParams(): array
-    {
-        return $this->input->params;
-    }
-
-    protected function hasParam(string $param): bool
-    {
-        return $this->input->hasParam($param);
-    }
-
-    protected function hasFlag(string $flag): bool
-    {
-        return $this->input->hasFlag($flag);
-    }
-
-    protected function getParam(string $param): ?string
-    {
-        return $this->input->getParam($param);
     }
 }
