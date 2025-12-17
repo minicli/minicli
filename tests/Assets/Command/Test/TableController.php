@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Assets\Command\Test;
 
 use Minicli\Console\ConsoleCommand;
-use Minicli\Support\Table\TableBuilder;
+use Minicli\Output\Table\TableBuilder;
 
 class TableController extends ConsoleCommand
 {
@@ -21,6 +21,6 @@ class TableController extends ConsoleCommand
             ]);
         }
 
-        $table->getFormattedTable();
+        $table->table();
     }
 }

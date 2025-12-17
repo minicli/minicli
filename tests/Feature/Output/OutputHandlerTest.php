@@ -52,7 +52,7 @@ it('asserts that OutputHandler prints table', function (): void {
     ];
 
     $printer = getSimpleOutputHandler();
-    $printer->printTable($table);
+    $printer->table($table);
 })->expectOutputRegex('/(\s*ID\s*)/');
 
 it('asserts a question can be asked', function (): void {

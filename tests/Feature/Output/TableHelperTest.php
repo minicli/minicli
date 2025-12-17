@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Support\Table\TableBuilder;
+use Minicli\Output\Table\TableBuilder;
 
 it('asserts that TableBuilder creates table from constructor', function (): void {
     $table = [
@@ -11,7 +11,7 @@ it('asserts that TableBuilder creates table from constructor', function (): void
     ];
 
     $tableHelper = new TableBuilder($table);
-    $tableContent = $tableHelper->getFormattedTable();
+    $tableContent = $tableHelper->table();
 
     expect($tableHelper->totalRows())->toBe(2)
         ->and($tableContent)->toContain('value1')
@@ -34,7 +34,7 @@ it('asserts that TableBuilder sets and outputs table rows', function (): void {
         ]);
     }
 
-    $tableContent = $table->getFormattedTable();
+    $tableContent = $table->table();
 
     expect($table->totalRows())->toBe(11)
         ->and($tableContent)->toContain('ID')
@@ -50,7 +50,7 @@ it('asserts that all fields respect column sizes', function (): void {
     ];
 
     $tableHelper = new TableBuilder($table);
-    $tableContent = $tableHelper->getFormattedTable();
+    $tableContent = $tableHelper->table();
 
     $rows = explode("\n", $tableContent);
     $sizeAtFirst = mb_strlen($rows[1]);

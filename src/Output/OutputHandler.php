@@ -11,8 +11,8 @@ use Minicli\Contracts\PrinterAdapterInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Input\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Output\Table\TableBuilder;
 use Minicli\Output\Theming\StyleType;
-use Minicli\Support\Table\TableBuilder;
 
 final class OutputHandler implements ServiceInterface
 {
@@ -92,16 +92,11 @@ final class OutputHandler implements ServiceInterface
         $this->breathe($content, $alt ? StyleType::SUCCESS_ALT : StyleType::SUCCESS);
     }
 
-    /**
-     * @param  array<int, array<string>>  $table
-     */
-    public function printTable(array $table): void
+    public function table(TableBuilder $builder): void
     {
-        $helper = new TableBuilder($table);
-
         $filter = $this->outputFilters[0] ?? null;
         $this->newline();
-        $this->rawOutput($helper->getFormattedTable($filter));
+        $this->rawOutput($builder->table($filter));
         $this->newline();
     }
 
