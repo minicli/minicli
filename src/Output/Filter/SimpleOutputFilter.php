@@ -9,7 +9,10 @@ use Minicli\Output\Theming\StyleType;
 
 class SimpleOutputFilter implements OutputFilterInterface
 {
-    public function filter(string $message, ?StyleType $style = null): string
+    /**
+     * @param  array<StyleType>  $formats
+     */
+    public function filter(string $message, ?StyleType $style = null, array $formats = []): string
     {
         return $message;
     }

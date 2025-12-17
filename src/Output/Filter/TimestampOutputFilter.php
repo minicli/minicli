@@ -14,7 +14,10 @@ class TimestampOutputFilter implements OutputFilterInterface
         private readonly string $format = 'Y-m-d H:i:s'
     ) {}
 
-    public function filter(string $message, ?StyleType $style = null): string
+    /**
+     * @param  array<StyleType>  $formats
+     */
+    public function filter(string $message, ?StyleType $style = null, array $formats = []): string
     {
         $datetime = new DateTimeImmutable();
 

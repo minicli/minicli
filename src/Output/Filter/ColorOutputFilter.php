@@ -30,24 +30,34 @@ class ColorOutputFilter implements OutputFilterInterface
 
     /**
      * Filters a string according to the specified style.
+     *
+     * @param  array<StyleType>  $formats
      */
-    public function filter(string $message, ?StyleType $style = null): string
+    public function filter(string $message, ?StyleType $style = null, array $formats = []): string
     {
-        return $this->format($message, $style ?? StyleType::DEFAULT);
+        return $this->format($message, $style ?? StyleType::DEFAULT, $formats);
     }
 
     /**
      * Formats a message with color codes based on a theme
+     *
+     * @param  array<StyleType>  $formats
      */
-    public function format(string $message, StyleType $style = StyleType::DEFAULT): string
+    public function format(string $message, StyleType $style = StyleType::DEFAULT, array $formats = []): string
     {
         $styleColors = $this->theme->style($style);
 
-        $bg = '';
+        $codes = [$styleColors->foreground->value];
+
         if (! in_array($styleColors->background?->value, [null, '', '0'], true)) {
-            $bg = ';' . $styleColors->background->value;
+            $codes[] = $styleColors->background->value;
         }
 
-        return sprintf("\e[%s%sm%s\e[0m", $styleColors->foreground->value, $bg, $message);
+        foreach ($formats as $format) {
+            $formatStyle = $this->theme->style($format);
+            $codes[] = $formatStyle->foreground->value;
+        }
+
+        return sprintf("\e[%sm%s\e[0m", implode(';', $codes), $message);
     }
 }
