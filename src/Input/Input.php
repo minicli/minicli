@@ -10,7 +10,7 @@ final class Input
      * @param  array<string>  $inputHistory
      */
     public function __construct(
-        private string $prompt = 'minicli$> ',
+        private string $prompt = '> ',
         private array $inputHistory = [],
     ) {}
 

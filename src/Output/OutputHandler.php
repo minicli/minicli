@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Minicli\Output;
 
-use InvalidArgumentException;
 use Minicli\App;
 use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Contracts\PrinterAdapterInterface;
@@ -129,18 +128,19 @@ final class OutputHandler implements ServiceInterface
         $this->newline();
     }
 
-    public function ask(string $content, string $method = 'display'): string
+    public function ask(string $content = '', bool $required = true): string
     {
-        if (! method_exists($this, $method)) {
-            throw new InvalidArgumentException(
-                message: "No output for [{$method}]",
-            );
+        if ($content !== '') {
+            $this->display($content);
         }
 
-        $this->{$method}(
-            $content,
-        );
+        $input = new Input()->read();
+        if ($input === '' && $required) {
+            $this->warning('Input cannot be empty. Please provide a value.');
 
-        return new Input()->read();
+            return $this->ask($content, $required);
+        }
+
+        return $input;
     }
 }
