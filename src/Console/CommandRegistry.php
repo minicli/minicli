@@ -114,18 +114,16 @@ final class CommandRegistry implements ServiceInterface
             return;
         }
 
-        // Extract namespace
         if (! preg_match('/namespace\s+([^;]+);/', $content, $namespaceMatches)) {
             return;
         }
         $namespace = $namespaceMatches[1];
 
-        // Extract class name
         if (! preg_match('/class\s+(\w+)/', $content, $classMatches)) {
             return;
         }
-        $className = $classMatches[1];
 
+        $className = $classMatches[1];
         $fullName = $namespace . '\\' . $className;
 
         try {
@@ -160,6 +158,15 @@ final class CommandRegistry implements ServiceInterface
         /** @var Command $classCommand */
         $classCommand = $classAttributes[0]->newInstance();
 
+        // Auto-generate command name if not provided
+        $commandName = $classCommand->name;
+        if ($commandName === '') {
+            $className = $reflection->getShortName();
+            /** @var string $className */
+            $className = preg_replace('/Command$/', '', $className);
+            $commandName = toKebabCase($className);
+        }
+
         // Check if it has an __invoke method (single command)
         if ($reflection->hasMethod('__invoke')) {
             $closure = function (CommandCall $input, App $app) use ($reflection): mixed {
@@ -175,11 +182,11 @@ final class CommandRegistry implements ServiceInterface
 
             $commandInfo = new CommandInfo(
                 callable: $closure,
-                name: $classCommand->name,
+                name: $commandName,
                 description: $classCommand->description
             );
 
-            $this->registerCommand($classCommand->name, $commandInfo);
+            $this->registerCommand($commandName, $commandInfo);
         }
 
         // Check for methods with Command attributes (sub-commands)
@@ -196,6 +203,12 @@ final class CommandRegistry implements ServiceInterface
             /** @var Command $methodCommand */
             $methodCommand = $methodAttributes[0]->newInstance();
 
+            // Auto-generate subcommand name if not provided
+            $subcommandName = $methodCommand->name;
+            if ($subcommandName === '') {
+                $subcommandName = toKebabCase($method->getName());
+            }
+
             $closure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
                 /** @var CommandController $instance */
                 $instance = $app->make($reflection->getName());
@@ -207,7 +220,7 @@ final class CommandRegistry implements ServiceInterface
             };
 
             // Register the full command name
-            $fullCommandName = "{$classCommand->name} {$methodCommand->name}";
+            $fullCommandName = "{$commandName} {$subcommandName}";
 
             $commandInfo = new CommandInfo(
                 callable: $closure,
@@ -217,7 +230,7 @@ final class CommandRegistry implements ServiceInterface
 
             $this->registerCommand($fullCommandName, $commandInfo);
             $subcommands[] = [
-                'name' => $methodCommand->name,
+                'name' => $subcommandName,
                 'description' => $methodCommand->description,
             ];
 
@@ -225,19 +238,19 @@ final class CommandRegistry implements ServiceInterface
             if ($methodCommand->default) {
                 $defaultCommandInfo = new CommandInfo(
                     callable: $closure,
-                    name: $classCommand->name,
+                    name: $commandName,
                     description: $classCommand->description
                 );
 
-                $this->registerCommand($classCommand->name, $defaultCommandInfo);
+                $this->registerCommand($commandName, $defaultCommandInfo);
                 $hasDefault = true;
             }
         }
 
         // If there are subcommands but no default, register parent to show available subcommands
         if ($subcommands !== [] && ! $hasDefault) {
-            $parentClosure = function (CommandCall $input, App $app) use ($classCommand, $subcommands): ExitCode {
-                $app->error("Command '{$classCommand->name}' requires a subcommand.");
+            $parentClosure = function (CommandCall $input, App $app) use ($commandName, $subcommands): ExitCode {
+                $app->error("Command '{$commandName}' requires a subcommand.");
                 $app->newline();
                 $app->info('Available subcommands:');
                 $app->newline();
@@ -255,11 +268,11 @@ final class CommandRegistry implements ServiceInterface
 
             $parentCommandInfo = new CommandInfo(
                 callable: $parentClosure,
-                name: $classCommand->name,
+                name: $commandName,
                 description: $classCommand->description
             );
 
-            $this->registerCommand($classCommand->name, $parentCommandInfo);
+            $this->registerCommand($commandName, $parentCommandInfo);
         }
     }
 }

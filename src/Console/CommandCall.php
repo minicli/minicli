@@ -42,9 +42,7 @@ final class CommandCall
 
     public function hasFlag(string $flag): bool
     {
-        return in_array($flag, $this->flags)
-            ? true
-            : in_array('--' . $flag, $this->flags);
+        return in_array($flag, $this->flags) || in_array("--{$flag}", $this->flags);
     }
 
     public function getParam(string $param): ?string

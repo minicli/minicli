@@ -9,7 +9,7 @@ use Minicli\Config\AppConfig;
 use Minicli\Console\CommandController;
 use Minicli\Console\ExitCode;
 
-#[Command(name: 'help', description: 'List the available commands in your application')]
+#[Command(description: 'List the available commands in your application')]
 final class Help extends CommandController
 {
     public function __invoke(): ExitCode

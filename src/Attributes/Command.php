@@ -10,7 +10,7 @@ use Attribute;
 final readonly class Command
 {
     public function __construct(
-        public string $name,
+        public string $name = '',
         public string $description = '',
         public bool $default = false,
     ) {}
