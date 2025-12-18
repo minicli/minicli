@@ -20,6 +20,8 @@ abstract class ConsoleCommand implements CommandInterface
 
     protected Logger $logger;
 
+    protected bool $quiet = false;
+
     private OutputHandler $printer;
 
     /**
@@ -27,6 +29,10 @@ abstract class ConsoleCommand implements CommandInterface
      */
     public function __call(string $name, array $arguments): mixed
     {
+        if ($this->quiet) {
+            return null;
+        }
+
         if (method_exists($this->printer, $name)) {
             return $this->printer->{$name}(...$arguments);
         }
@@ -47,6 +53,11 @@ abstract class ConsoleCommand implements CommandInterface
         $this->app = $app;
         $this->logger = $app->logger;
         $this->printer = $app->printer;
+    }
+
+    public function setQuiet(bool $quiet): void
+    {
+        $this->quiet = $quiet;
     }
 
     protected function config(string $name): mixed

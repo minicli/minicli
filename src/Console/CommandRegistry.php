@@ -14,6 +14,7 @@ use Minicli\Exceptions\BindingResolutionException;
 use Minicli\Exceptions\CastException;
 use Minicli\Exceptions\MissingParametersException;
 use Minicli\Input\InputCaster;
+use Minicli\Support\GlobalFlag;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -183,6 +184,10 @@ final class CommandRegistry implements ServiceInterface
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
 
+                if ($input->hasFlag(GlobalFlag::QUIET->value)) {
+                    $instance->setQuiet(true);
+                }
+
                 $arguments = $this->prepareArguments($invokeMethod->getParameters(), $input);
                 $result = $invokeMethod->invokeArgs($instance, $arguments);
                 $instance->teardown();
@@ -224,6 +229,10 @@ final class CommandRegistry implements ServiceInterface
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
 
+                if ($input->hasFlag(GlobalFlag::QUIET->value)) {
+                    $instance->setQuiet(true);
+                }
+
                 $arguments = $this->prepareArguments($method->getParameters(), $input);
                 $result = $method->invokeArgs($instance, $arguments);
                 $instance->teardown();
@@ -253,6 +262,10 @@ final class CommandRegistry implements ServiceInterface
                     /** @var ConsoleCommand $instance */
                     $instance = $app->make($reflection->getName());
                     $instance->boot($app);
+
+                    if ($input->hasFlag(GlobalFlag::QUIET->value)) {
+                        $instance->setQuiet(true);
+                    }
 
                     $arguments = $this->prepareArguments($method->getParameters(), $input);
                     $result = $method->invokeArgs($instance, $arguments);
