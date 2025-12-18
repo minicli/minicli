@@ -13,5 +13,7 @@ final readonly class CommandInfo
         public string $name,
         public string $description = '',
         public ?CommandInfo $parent = null,
+        /** @var array<ArgumentInfo> $arguments */
+        public array $arguments = [],
     ) {}
 }

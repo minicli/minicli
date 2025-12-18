@@ -7,6 +7,7 @@ namespace Minicli\Console;
 use BackedEnum;
 use Exception;
 use Minicli\App;
+use Minicli\Attributes\Argument;
 use Minicli\Attributes\Command;
 use Minicli\Config\AppConfig;
 use Minicli\Contracts\ServiceInterface;
@@ -14,6 +15,9 @@ use Minicli\Exceptions\BindingResolutionException;
 use Minicli\Exceptions\CastException;
 use Minicli\Exceptions\MissingParametersException;
 use Minicli\Input\InputCaster;
+use Minicli\Output\Table\Row;
+use Minicli\Output\Table\TableBuilder;
+use Minicli\Output\Theming\StyleType;
 use Minicli\Support\GlobalFlag;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -179,7 +183,20 @@ final class CommandRegistry implements ServiceInterface
         // Check if it has an __invoke method (single command)
         if ($reflection->hasMethod('__invoke')) {
             $invokeMethod = $reflection->getMethod('__invoke');
-            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod): mixed {
+            $argumentsInfo = $this->extractArgumentInfo($invokeMethod->getParameters());
+
+            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod, $commandName, $classCommand, $argumentsInfo): mixed {
+                if ($input->hasFlag(GlobalFlag::HELP->value)) {
+                    $tempCommandInfo = new CommandInfo(
+                        callable: fn (): ExitCode => ExitCode::Success,
+                        name: $commandName,
+                        description: $classCommand->description,
+                        arguments: $argumentsInfo
+                    );
+
+                    return $this->displayHelp($app, $tempCommandInfo);
+                }
+
                 /** @var ConsoleCommand $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
@@ -198,7 +215,8 @@ final class CommandRegistry implements ServiceInterface
             $commandInfo = new CommandInfo(
                 callable: $closure,
                 name: $commandName,
-                description: $classCommand->description
+                description: $classCommand->description,
+                arguments: $argumentsInfo
             );
 
             $this->registerCommand($commandName, $commandInfo);
@@ -224,7 +242,21 @@ final class CommandRegistry implements ServiceInterface
                 $subcommandName = toKebabCase($method->getName());
             }
 
-            $closure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
+            $argumentsInfo = $this->extractArgumentInfo($method->getParameters());
+            $fullCommandName = "{$commandName} {$subcommandName}";
+
+            $closure = function (CommandCall $input, App $app) use ($reflection, $method, $fullCommandName, $methodCommand, $argumentsInfo): mixed {
+                if ($input->hasFlag(GlobalFlag::HELP->value)) {
+                    $tempCommandInfo = new CommandInfo(
+                        callable: fn (): ExitCode => ExitCode::Success,
+                        name: $fullCommandName,
+                        description: $methodCommand->description,
+                        arguments: $argumentsInfo
+                    );
+
+                    return $this->displayHelp($app, $tempCommandInfo);
+                }
+
                 /** @var ConsoleCommand $instance */
                 $instance = $app->make($reflection->getName());
                 $instance->boot($app);
@@ -240,13 +272,11 @@ final class CommandRegistry implements ServiceInterface
                 return $result;
             };
 
-            // Register the full command name
-            $fullCommandName = "{$commandName} {$subcommandName}";
-
             $commandInfo = new CommandInfo(
                 callable: $closure,
                 name: $fullCommandName,
-                description: $methodCommand->description
+                description: $methodCommand->description,
+                arguments: $argumentsInfo
             );
 
             $this->registerCommand($fullCommandName, $commandInfo);
@@ -258,7 +288,18 @@ final class CommandRegistry implements ServiceInterface
             // If this method is marked as default, also register it with just the class command name
             if ($methodCommand->default) {
                 // Create a separate closure for the default command to ensure proper binding
-                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method): mixed {
+                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $classCommand, $argumentsInfo): mixed {
+                    if ($input->hasFlag(GlobalFlag::HELP->value)) {
+                        $tempCommandInfo = new CommandInfo(
+                            callable: fn (): ExitCode => ExitCode::Success,
+                            name: $commandName,
+                            description: $classCommand->description,
+                            arguments: $argumentsInfo
+                        );
+
+                        return $this->displayHelp($app, $tempCommandInfo);
+                    }
+
                     /** @var ConsoleCommand $instance */
                     $instance = $app->make($reflection->getName());
                     $instance->boot($app);
@@ -277,7 +318,8 @@ final class CommandRegistry implements ServiceInterface
                 $defaultCommandInfo = new CommandInfo(
                     callable: $defaultClosure,
                     name: $commandName,
-                    description: $classCommand->description
+                    description: $classCommand->description,
+                    arguments: $argumentsInfo
                 );
 
                 $this->registerCommand($commandName, $defaultCommandInfo);
@@ -314,9 +356,77 @@ final class CommandRegistry implements ServiceInterface
         }
     }
 
+    private function displayHelp(App $app, CommandInfo $commandInfo): ExitCode
+    {
+        if ($commandInfo->description !== '') {
+            $app->info(content: $commandInfo->description, formats: [StyleType::BOLD]);
+        }
+
+        if ($commandInfo->arguments === []) {
+            $app->warning(content: 'This command has no arguments.', formats: [StyleType::BOLD]);
+
+            return ExitCode::Success;
+        }
+
+        $table = TableBuilder::make();
+        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED'], StyleType::ALT));
+
+        foreach ($commandInfo->arguments as $argumentInfo) {
+            $table->addRow(Row::make([
+                $argumentInfo->name,
+                $argumentInfo->description,
+                $argumentInfo->required ? 'YES' : 'NO',
+            ]));
+        }
+
+        $app->table($table);
+
+        return ExitCode::Success;
+    }
+
     /**
-     * Prepare arguments from CommandCall based on method parameters
-     *
+     * @param  array<ReflectionParameter>  $parameters
+     * @return array<ArgumentInfo>
+     */
+    private function extractArgumentInfo(array $parameters): array
+    {
+        $argumentsInfo = [];
+
+        foreach ($parameters as $parameter) {
+            $type = $parameter->getType();
+
+            if (! $type instanceof ReflectionNamedType) {
+                continue;
+            }
+
+            $typeName = $type->getName();
+            $isNullable = $type->allowsNull();
+            $hasDefault = $parameter->isDefaultValueAvailable();
+
+            $argumentAttributes = $parameter->getAttributes(Argument::class);
+            $argumentAttribute = empty($argumentAttributes)
+                ? null
+                : $argumentAttributes[0]->newInstance();
+
+            $name = $argumentAttribute && $argumentAttribute->name !== ''
+                ? $argumentAttribute->name
+                : toKebabCase($parameter->getName());
+
+            if ($typeName === 'bool' && ! str_starts_with($name, '--')) {
+                $name = '--' . $name;
+            }
+
+            $argumentsInfo[] = new ArgumentInfo(
+                name: $name,
+                description: $argumentAttribute->description ?? '',
+                required: ! $isNullable && ! $hasDefault,
+            );
+        }
+
+        return $argumentsInfo;
+    }
+
+    /**
      * @param  array<ReflectionParameter>  $parameters
      * @return array<mixed>
      *
@@ -328,8 +438,6 @@ final class CommandRegistry implements ServiceInterface
         $missing = [];
 
         foreach ($parameters as $parameter) {
-            $paramName = $parameter->getName();
-            $kebabName = toKebabCase($paramName);
             $type = $parameter->getType();
 
             if (! $type instanceof ReflectionNamedType) {
@@ -340,7 +448,15 @@ final class CommandRegistry implements ServiceInterface
             $isNullable = $type->allowsNull();
             $hasDefault = $parameter->isDefaultValueAvailable();
 
-            // Handle boolean parameters as flags
+            $argumentAttributes = $parameter->getAttributes(Argument::class);
+            $argumentAttribute = empty($argumentAttributes)
+                ? null
+                : $argumentAttributes[0]->newInstance();
+
+            $kebabName = $argumentAttribute && $argumentAttribute->name !== ''
+                ? $argumentAttribute->name
+                : toKebabCase($parameter->getName());
+
             if ($typeName === 'bool') {
                 $arguments[] = $input->hasFlag($kebabName);
 
