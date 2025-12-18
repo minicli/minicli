@@ -369,13 +369,23 @@ final class CommandRegistry implements ServiceInterface
         }
 
         $table = TableBuilder::make();
-        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED'], StyleType::ALT));
+        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'], StyleType::ALT));
 
         foreach ($commandInfo->arguments as $argumentInfo) {
+            /** @var string $defaultValue */
+            $defaultValue = match (true) {
+                $argumentInfo->required => 'N/A',
+                $argumentInfo->default === null => 'NULL',
+                is_bool($argumentInfo->default) => $argumentInfo->default ? 'TRUE' : 'FALSE',
+                is_array($argumentInfo->default) => json_encode($argumentInfo->default),
+                default => (string) $argumentInfo->default,
+            };
+
             $table->addRow(Row::make([
                 $argumentInfo->name,
                 $argumentInfo->description,
                 $argumentInfo->required ? 'YES' : 'NO',
+                $defaultValue,
             ]));
         }
 
@@ -419,7 +429,10 @@ final class CommandRegistry implements ServiceInterface
             $argumentsInfo[] = new ArgumentInfo(
                 name: $name,
                 description: $argumentAttribute->description ?? '',
-                required: ! $isNullable && ! $hasDefault,
+                required: $typeName === 'bool' ? false : (! $isNullable && ! $hasDefault),
+                default: $typeName === 'bool'
+                    ? ($hasDefault && $parameter->getDefaultValue() === true)
+                    : ($hasDefault ? $parameter->getDefaultValue() : null),
             );
         }
 

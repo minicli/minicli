@@ -10,5 +10,6 @@ final readonly class ArgumentInfo
         public string $name,
         public string $description,
         public bool $required,
+        public mixed $default = null,
     ) {}
 }
