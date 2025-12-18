@@ -11,6 +11,20 @@
         "dependency free",
         "minicli"
     ],
+    "authors": [
+        {
+            "role": "Maintainer",
+            "name": "Wendell Adriel",
+            "email": "wendell.adriel@gmail.com",
+            "homepage": "https://wendelladriel.com/"
+        },
+        {
+            "role": "Maintainer",
+            "name": "Steve McDougall",
+            "email": "steve@juststeveking.com",
+            "homepage": "https://juststeveking.link/"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Minicli\\": "src/"
