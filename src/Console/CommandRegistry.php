@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Console;
 
+use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
 use Minicli\Config\AppConfig;
@@ -157,60 +158,74 @@ final class CommandRegistry implements ServiceInterface
 
         /** @var Command $classCommand */
         $classCommand = $classAttributes[0]->newInstance();
+        $commandName = $this->generateCommandName($classCommand->name, $reflection->getShortName());
 
-        // Auto-generate command name if not provided
-        $commandName = $classCommand->name;
-        if ($commandName === '') {
-            $className = $reflection->getShortName();
-            /** @var string $className */
-            $className = preg_replace('/Command$/', '', $className);
-            $commandName = toKebabCase($className);
-        }
+        $this->registerInvokeCommand($reflection, $commandName, $classCommand);
+        $result = $this->registerSubcommands($reflection, $commandName, $classCommand);
 
-        // Check if it has an __invoke method (single command)
-        if ($reflection->hasMethod('__invoke')) {
-            $invokeMethod = $reflection->getMethod('__invoke');
-            $argumentsHandler = new ArgumentsHandler($invokeMethod->getParameters());
-            $argumentsInfo = $argumentsHandler->extractArgumentInfo();
-
-            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod, $commandName, $classCommand, $argumentsInfo, $argumentsHandler): mixed {
-                if ($input->hasFlag(GlobalFlag::HELP->value)) {
-                    $tempCommandInfo = new CommandInfo(
-                        callable: fn (): ExitCode => ExitCode::Success,
-                        name: $commandName,
-                        description: $classCommand->description,
-                        arguments: $argumentsInfo
-                    );
-
-                    return $tempCommandInfo->displayHelp($app);
-                }
-
-                /** @var ConsoleCommand $instance */
-                $instance = $app->make($reflection->getName());
-                $instance->boot($app);
-
-                if ($input->hasFlag(GlobalFlag::QUIET->value)) {
-                    $instance->setQuiet(true);
-                }
-
-                $arguments = $argumentsHandler->prepareArguments($input);
-                $result = $invokeMethod->invokeArgs($instance, $arguments);
-                $instance->teardown();
-
-                return $result;
-            };
-
-            $commandInfo = new CommandInfo(
-                callable: $closure,
-                name: $commandName,
-                description: $classCommand->description,
-                arguments: $argumentsInfo
+        if ($result['subcommands'] !== [] && ! $result['hasDefault']) {
+            $this->registerParentCommandWithSubcommands(
+                $commandName,
+                $classCommand->description,
+                $result['subcommands']
             );
+        }
+    }
 
-            $this->registerCommand($commandName, $commandInfo);
+    private function generateCommandName(string $providedName, string $className): string
+    {
+        if ($providedName !== '') {
+            return $providedName;
         }
 
-        // Check for methods with Command attributes (sub-commands)
+        /** @var string $cleanedName */
+        $cleanedName = preg_replace('/Command$/', '', $className);
+
+        return toKebabCase($cleanedName);
+    }
+
+    /**
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
+     *
+     * @throws ReflectionException
+     */
+    private function registerInvokeCommand(ReflectionClass $reflection, string $commandName, Command $classCommand): void
+    {
+        if (! $reflection->hasMethod('__invoke')) {
+            return;
+        }
+
+        $invokeMethod = $reflection->getMethod('__invoke');
+        $argumentsHandler = new ArgumentsHandler($invokeMethod->getParameters());
+        $argumentsInfo = $argumentsHandler->extractArgumentInfo();
+
+        $closure = $this->createCommandExecutionClosure(
+            $reflection,
+            $invokeMethod,
+            $commandName,
+            $classCommand->description,
+            $argumentsHandler,
+            $argumentsInfo
+        );
+
+        $commandInfo = new CommandInfo(
+            callable: $closure,
+            name: $commandName,
+            description: $classCommand->description,
+            arguments: $argumentsInfo
+        );
+
+        $this->registerCommand($commandName, $commandInfo);
+    }
+
+    /**
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
+     * @return array{subcommands: array<CommandRegisterInfo|null>, hasDefault: bool}
+     *
+     * @throws ReflectionException
+     */
+    private function registerSubcommands(ReflectionClass $reflection, string $commandName, Command $classCommand): array
+    {
         $subcommands = [];
         $hasDefault = false;
 
@@ -223,125 +238,151 @@ final class CommandRegistry implements ServiceInterface
 
             /** @var Command $methodCommand */
             $methodCommand = $methodAttributes[0]->newInstance();
-
-            // Auto-generate subcommand name if not provided
-            $subcommandName = $methodCommand->name;
-            if ($subcommandName === '') {
-                $subcommandName = toKebabCase($method->getName());
-            }
-
+            $subcommandName = $this->generateCommandName($methodCommand->name, $method->getName());
             $argumentsHandler = new ArgumentsHandler($method->getParameters());
             $argumentsInfo = $argumentsHandler->extractArgumentInfo();
-            $fullCommandName = "{$commandName} {$subcommandName}";
 
-            $closure = function (CommandCall $input, App $app) use ($reflection, $method, $fullCommandName, $methodCommand, $argumentsInfo, $argumentsHandler): mixed {
-                if ($input->hasFlag(GlobalFlag::HELP->value)) {
-                    $tempCommandInfo = new CommandInfo(
-                        callable: fn (): ExitCode => ExitCode::Success,
-                        name: $fullCommandName,
-                        description: $methodCommand->description,
-                        arguments: $argumentsInfo
-                    );
-
-                    return $tempCommandInfo->displayHelp($app);
-                }
-
-                /** @var ConsoleCommand $instance */
-                $instance = $app->make($reflection->getName());
-                $instance->boot($app);
-
-                if ($input->hasFlag(GlobalFlag::QUIET->value)) {
-                    $instance->setQuiet(true);
-                }
-
-                $arguments = $argumentsHandler->prepareArguments($input);
-                $result = $method->invokeArgs($instance, $arguments);
-                $instance->teardown();
-
-                return $result;
-            };
-
-            $commandInfo = new CommandInfo(
-                callable: $closure,
-                name: $fullCommandName,
-                description: $methodCommand->description,
-                arguments: $argumentsInfo
+            $subcommands[] = $this->registerSubcommand(
+                $reflection,
+                $method,
+                $commandName,
+                $methodCommand->description,
+                $argumentsHandler,
+                $argumentsInfo,
+                $subcommandName
             );
 
-            $this->registerCommand($fullCommandName, $commandInfo);
-            $subcommands[] = [
-                'name' => $subcommandName,
-                'description' => $methodCommand->description,
-            ];
-
-            // If this method is marked as default, also register it with just the class command name
             if ($methodCommand->default) {
-                // Create a separate closure for the default command to ensure proper binding
-                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $classCommand, $argumentsInfo, $argumentsHandler): mixed {
-                    if ($input->hasFlag(GlobalFlag::HELP->value)) {
-                        $tempCommandInfo = new CommandInfo(
-                            callable: fn (): ExitCode => ExitCode::Success,
-                            name: $commandName,
-                            description: $classCommand->description,
-                            arguments: $argumentsInfo
-                        );
-
-                        return $tempCommandInfo->displayHelp($app);
-                    }
-
-                    /** @var ConsoleCommand $instance */
-                    $instance = $app->make($reflection->getName());
-                    $instance->boot($app);
-
-                    if ($input->hasFlag(GlobalFlag::QUIET->value)) {
-                        $instance->setQuiet(true);
-                    }
-
-                    $arguments = $argumentsHandler->prepareArguments($input);
-                    $result = $method->invokeArgs($instance, $arguments);
-                    $instance->teardown();
-
-                    return $result;
-                };
-
-                $defaultCommandInfo = new CommandInfo(
-                    callable: $defaultClosure,
-                    name: $commandName,
-                    description: $classCommand->description,
-                    arguments: $argumentsInfo
+                $this->registerSubcommand(
+                    $reflection,
+                    $method,
+                    $commandName,
+                    $classCommand->description,
+                    $argumentsHandler,
+                    $argumentsInfo
                 );
-
-                $this->registerCommand($commandName, $defaultCommandInfo);
                 $hasDefault = true;
             }
         }
 
-        // If there are subcommands but no default, register parent to show available subcommands
-        if ($subcommands !== [] && ! $hasDefault) {
-            $parentClosure = function (CommandCall $input, App $app) use ($commandName, $subcommands): ExitCode {
-                $app->error("Command '{$commandName}' requires a subcommand.");
-                $app->newline();
-                $app->info('Available subcommands:');
-                $app->newline();
+        return [
+            'subcommands' => $subcommands,
+            'hasDefault' => $hasDefault,
+        ];
+    }
 
-                foreach ($subcommands as $subcommand) {
-                    $description = $subcommand['description'] !== ''
-                        ? " - {$subcommand['description']}"
-                        : '';
-                    $app->out("{$subcommand['name']}{$description}");
-                    $app->newline();
+    /**
+     * @param  array<CommandRegisterInfo|null>  $subcommands
+     */
+    private function registerParentCommandWithSubcommands(string $commandName, string $description, array $subcommands): void
+    {
+        $parentClosure = function (CommandCall $input, App $app) use ($commandName, $subcommands): ExitCode {
+            $app->error("Command '{$commandName}' requires a subcommand.");
+            $app->newline();
+            $app->info('Available subcommands:');
+            $app->newline();
+
+            foreach ($subcommands as $subcommand) {
+                if ($subcommand === null) {
+                    continue;
                 }
 
-                return ExitCode::Invalid;
-            };
+                $description = $subcommand->description !== ''
+                    ? " - {$subcommand->description}"
+                    : '';
+                $app->out("{$subcommand->name}{$description}");
+                $app->newline();
+            }
 
-            $parentCommandInfo = new CommandInfo(
-                callable: $parentClosure,
-                name: $commandName,
-                description: $classCommand->description
-            );
+            return ExitCode::Invalid;
+        };
 
-            $this->registerCommand($commandName, $parentCommandInfo);
-        }
+        $parentCommandInfo = new CommandInfo(
+            callable: $parentClosure,
+            name: $commandName,
+            description: $description
+        );
+
+        $this->registerCommand($commandName, $parentCommandInfo);
+    }
+
+    /**
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
+     * @param  array<ArgumentInfo>  $argumentsInfo
+     */
+    private function registerSubcommand(
+        ReflectionClass $reflection,
+        ReflectionMethod $method,
+        string $commandName,
+        string $description,
+        ArgumentsHandler $argumentsHandler,
+        array $argumentsInfo,
+        ?string $subcommandName = null
+    ): ?CommandRegisterInfo {
+        $fullCommandName = $subcommandName !== null
+            ? "{$commandName} {$subcommandName}"
+            : $commandName;
+
+        $closure = $this->createCommandExecutionClosure(
+            $reflection,
+            $method,
+            $fullCommandName,
+            $description,
+            $argumentsHandler,
+            $argumentsInfo
+        );
+
+        $commandInfo = new CommandInfo(
+            callable: $closure,
+            name: $fullCommandName,
+            description: $description,
+            arguments: $argumentsInfo
+        );
+
+        $this->registerCommand($fullCommandName, $commandInfo);
+
+        return $subcommandName !== null
+            ? new CommandRegisterInfo(name: $subcommandName, description: $description)
+            : null;
+    }
+
+    /**
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
+     * @param  array<ArgumentInfo>  $argumentsInfo
+     */
+    private function createCommandExecutionClosure(
+        ReflectionClass $reflection,
+        ReflectionMethod $method,
+        string $commandName,
+        string $description,
+        ArgumentsHandler $argumentsHandler,
+        array $argumentsInfo
+    ): Closure {
+        return function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $description, $argumentsHandler, $argumentsInfo): mixed {
+            if ($input->hasFlag(GlobalFlag::HELP->value)) {
+                $tempCommandInfo = new CommandInfo(
+                    callable: fn (): ExitCode => ExitCode::Success,
+                    name: $commandName,
+                    description: $description,
+                    arguments: $argumentsInfo
+                );
+
+                return $tempCommandInfo->displayHelp($app);
+            }
+
+            /** @var ConsoleCommand $instance */
+            $instance = $app->make($reflection->getName());
+            $instance->boot($app);
+
+            if ($input->hasFlag(GlobalFlag::QUIET->value)) {
+                $instance->setQuiet(true);
+            }
+
+            $arguments = $argumentsHandler->prepareArguments($input);
+            $result = $method->invokeArgs($instance, $arguments);
+            $instance->teardown();
+
+            return $result;
+        };
     }
 }
