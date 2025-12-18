@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Support;
+namespace Minicli\Console;
 
 enum GlobalFlag: string
 {

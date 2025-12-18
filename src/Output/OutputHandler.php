@@ -10,7 +10,7 @@ use Minicli\Contracts\PrinterAdapterInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Input\Input;
 use Minicli\Output\Adapter\DefaultPrinterAdapter;
-use Minicli\Output\Table\TableBuilder;
+use Minicli\Output\Components\Table\TableBuilder;
 use Minicli\Output\Theming\StyleType;
 
 final class OutputHandler implements ServiceInterface

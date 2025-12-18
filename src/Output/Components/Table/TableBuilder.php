@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Table;
+namespace Minicli\Output\Components\Table;
 
 use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Output\Filter\SimpleOutputFilter;
