@@ -11,6 +11,24 @@ use UnitEnum;
 final readonly class InputCaster
 {
     /**
+     * @throws CastException
+     */
+    public static function castValue(?string $value, string $typeName): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return match ($typeName) {
+            'string' => $value,
+            'int' => self::castToInteger($value),
+            'float' => self::castToFloat($value),
+            'array' => self::castToArray($value),
+            default => self::castToEnumOrDefault($value, $typeName),
+        };
+    }
+
+    /**
      * @return array<mixed>
      */
     public static function castToArray(string $value): array
@@ -78,5 +96,18 @@ final readonly class InputCaster
         }
 
         return (int) $value;
+    }
+
+    /**
+     * @throws CastException
+     */
+    private static function castToEnumOrDefault(string $value, string $typeName): mixed
+    {
+        if (is_subclass_of($typeName, UnitEnum::class) || is_subclass_of($typeName, BackedEnum::class)) {
+            return self::castToEnum($value, $typeName);
+        }
+
+        // For other types, return as-is (string)
+        return $value;
     }
 }

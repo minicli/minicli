@@ -4,28 +4,16 @@ declare(strict_types=1);
 
 namespace Minicli\Console;
 
-use BackedEnum;
-use Exception;
 use Minicli\App;
-use Minicli\Attributes\Argument;
 use Minicli\Attributes\Command;
 use Minicli\Config\AppConfig;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
-use Minicli\Exceptions\CastException;
-use Minicli\Exceptions\MissingParametersException;
-use Minicli\Input\InputCaster;
-use Minicli\Output\Components\Table\Row;
-use Minicli\Output\Components\Table\TableBuilder;
-use Minicli\Output\Theming\StyleType;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
-use UnitEnum;
 
 final class CommandRegistry implements ServiceInterface
 {
@@ -182,9 +170,10 @@ final class CommandRegistry implements ServiceInterface
         // Check if it has an __invoke method (single command)
         if ($reflection->hasMethod('__invoke')) {
             $invokeMethod = $reflection->getMethod('__invoke');
-            $argumentsInfo = $this->extractArgumentInfo($invokeMethod->getParameters());
+            $argumentsHandler = new ArgumentsHandler($invokeMethod->getParameters());
+            $argumentsInfo = $argumentsHandler->extractArgumentInfo();
 
-            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod, $commandName, $classCommand, $argumentsInfo): mixed {
+            $closure = function (CommandCall $input, App $app) use ($reflection, $invokeMethod, $commandName, $classCommand, $argumentsInfo, $argumentsHandler): mixed {
                 if ($input->hasFlag(GlobalFlag::HELP->value)) {
                     $tempCommandInfo = new CommandInfo(
                         callable: fn (): ExitCode => ExitCode::Success,
@@ -193,7 +182,7 @@ final class CommandRegistry implements ServiceInterface
                         arguments: $argumentsInfo
                     );
 
-                    return $this->displayHelp($app, $tempCommandInfo);
+                    return $tempCommandInfo->displayHelp($app);
                 }
 
                 /** @var ConsoleCommand $instance */
@@ -204,7 +193,7 @@ final class CommandRegistry implements ServiceInterface
                     $instance->setQuiet(true);
                 }
 
-                $arguments = $this->prepareArguments($invokeMethod->getParameters(), $input);
+                $arguments = $argumentsHandler->prepareArguments($input);
                 $result = $invokeMethod->invokeArgs($instance, $arguments);
                 $instance->teardown();
 
@@ -241,10 +230,11 @@ final class CommandRegistry implements ServiceInterface
                 $subcommandName = toKebabCase($method->getName());
             }
 
-            $argumentsInfo = $this->extractArgumentInfo($method->getParameters());
+            $argumentsHandler = new ArgumentsHandler($method->getParameters());
+            $argumentsInfo = $argumentsHandler->extractArgumentInfo();
             $fullCommandName = "{$commandName} {$subcommandName}";
 
-            $closure = function (CommandCall $input, App $app) use ($reflection, $method, $fullCommandName, $methodCommand, $argumentsInfo): mixed {
+            $closure = function (CommandCall $input, App $app) use ($reflection, $method, $fullCommandName, $methodCommand, $argumentsInfo, $argumentsHandler): mixed {
                 if ($input->hasFlag(GlobalFlag::HELP->value)) {
                     $tempCommandInfo = new CommandInfo(
                         callable: fn (): ExitCode => ExitCode::Success,
@@ -253,7 +243,7 @@ final class CommandRegistry implements ServiceInterface
                         arguments: $argumentsInfo
                     );
 
-                    return $this->displayHelp($app, $tempCommandInfo);
+                    return $tempCommandInfo->displayHelp($app);
                 }
 
                 /** @var ConsoleCommand $instance */
@@ -264,7 +254,7 @@ final class CommandRegistry implements ServiceInterface
                     $instance->setQuiet(true);
                 }
 
-                $arguments = $this->prepareArguments($method->getParameters(), $input);
+                $arguments = $argumentsHandler->prepareArguments($input);
                 $result = $method->invokeArgs($instance, $arguments);
                 $instance->teardown();
 
@@ -287,7 +277,7 @@ final class CommandRegistry implements ServiceInterface
             // If this method is marked as default, also register it with just the class command name
             if ($methodCommand->default) {
                 // Create a separate closure for the default command to ensure proper binding
-                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $classCommand, $argumentsInfo): mixed {
+                $defaultClosure = function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $classCommand, $argumentsInfo, $argumentsHandler): mixed {
                     if ($input->hasFlag(GlobalFlag::HELP->value)) {
                         $tempCommandInfo = new CommandInfo(
                             callable: fn (): ExitCode => ExitCode::Success,
@@ -296,7 +286,7 @@ final class CommandRegistry implements ServiceInterface
                             arguments: $argumentsInfo
                         );
 
-                        return $this->displayHelp($app, $tempCommandInfo);
+                        return $tempCommandInfo->displayHelp($app);
                     }
 
                     /** @var ConsoleCommand $instance */
@@ -307,7 +297,7 @@ final class CommandRegistry implements ServiceInterface
                         $instance->setQuiet(true);
                     }
 
-                    $arguments = $this->prepareArguments($method->getParameters(), $input);
+                    $arguments = $argumentsHandler->prepareArguments($input);
                     $result = $method->invokeArgs($instance, $arguments);
                     $instance->teardown();
 
@@ -353,187 +343,5 @@ final class CommandRegistry implements ServiceInterface
 
             $this->registerCommand($commandName, $parentCommandInfo);
         }
-    }
-
-    private function displayHelp(App $app, CommandInfo $commandInfo): ExitCode
-    {
-        if ($commandInfo->description !== '') {
-            $app->info(content: $commandInfo->description, formats: [StyleType::BOLD]);
-        }
-
-        if ($commandInfo->arguments === []) {
-            $app->warning(content: 'This command has no arguments.', formats: [StyleType::BOLD]);
-
-            return ExitCode::Success;
-        }
-
-        $table = TableBuilder::make();
-        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'], StyleType::ALT));
-
-        foreach ($commandInfo->arguments as $argumentInfo) {
-            /** @var string $defaultValue */
-            $defaultValue = match (true) {
-                $argumentInfo->required => 'N/A',
-                $argumentInfo->default === null => 'NULL',
-                is_bool($argumentInfo->default) => $argumentInfo->default ? 'TRUE' : 'FALSE',
-                is_array($argumentInfo->default) => json_encode($argumentInfo->default),
-                default => (string) $argumentInfo->default,
-            };
-
-            $table->addRow(Row::make([
-                $argumentInfo->name,
-                $argumentInfo->description,
-                $argumentInfo->required ? 'YES' : 'NO',
-                $defaultValue,
-            ]));
-        }
-
-        $app->table($table);
-
-        return ExitCode::Success;
-    }
-
-    /**
-     * @param  array<ReflectionParameter>  $parameters
-     * @return array<ArgumentInfo>
-     */
-    private function extractArgumentInfo(array $parameters): array
-    {
-        $argumentsInfo = [];
-
-        foreach ($parameters as $parameter) {
-            $type = $parameter->getType();
-
-            if (! $type instanceof ReflectionNamedType) {
-                continue;
-            }
-
-            $typeName = $type->getName();
-            $isNullable = $type->allowsNull();
-            $hasDefault = $parameter->isDefaultValueAvailable();
-
-            $argumentAttributes = $parameter->getAttributes(Argument::class);
-            $argumentAttribute = empty($argumentAttributes)
-                ? null
-                : $argumentAttributes[0]->newInstance();
-
-            $name = $argumentAttribute && $argumentAttribute->name !== ''
-                ? $argumentAttribute->name
-                : toKebabCase($parameter->getName());
-
-            if ($typeName === 'bool' && ! str_starts_with($name, '--')) {
-                $name = '--' . $name;
-            }
-
-            $argumentsInfo[] = new ArgumentInfo(
-                name: $name,
-                description: $argumentAttribute->description ?? '',
-                required: $typeName === 'bool' ? false : (! $isNullable && ! $hasDefault),
-                default: $typeName === 'bool'
-                    ? ($hasDefault && $parameter->getDefaultValue() === true)
-                    : ($hasDefault ? $parameter->getDefaultValue() : null),
-            );
-        }
-
-        return $argumentsInfo;
-    }
-
-    /**
-     * @param  array<ReflectionParameter>  $parameters
-     * @return array<mixed>
-     *
-     * @throws MissingParametersException|CastException|ReflectionException
-     */
-    private function prepareArguments(array $parameters, CommandCall $input): array
-    {
-        $arguments = [];
-        $missing = [];
-
-        foreach ($parameters as $parameter) {
-            $type = $parameter->getType();
-
-            if (! $type instanceof ReflectionNamedType) {
-                continue;
-            }
-
-            $typeName = $type->getName();
-            $isNullable = $type->allowsNull();
-            $hasDefault = $parameter->isDefaultValueAvailable();
-
-            $argumentAttributes = $parameter->getAttributes(Argument::class);
-            $argumentAttribute = empty($argumentAttributes)
-                ? null
-                : $argumentAttributes[0]->newInstance();
-
-            $kebabName = $argumentAttribute && $argumentAttribute->name !== ''
-                ? $argumentAttribute->name
-                : toKebabCase($parameter->getName());
-
-            if ($typeName === 'bool') {
-                $arguments[] = $input->hasFlag($kebabName);
-
-                continue;
-            }
-
-            $hasValue = $input->hasParam($kebabName);
-            if (! $hasValue && ! $isNullable && ! $hasDefault) {
-                $missing[] = $kebabName;
-
-                continue;
-            }
-
-            // If parameter is missing but optional, use default or null
-            if (! $hasValue) {
-                $arguments[] = $hasDefault
-                    ? $parameter->getDefaultValue()
-                    : null;
-
-                continue;
-            }
-
-            $value = $input->getParam($kebabName);
-            try {
-                $arguments[] = $this->castValue($value, $typeName);
-            } catch (Exception) {
-                throw new CastException($kebabName);
-            }
-        }
-
-        if ($missing !== []) {
-            throw new MissingParametersException($missing);
-        }
-
-        return $arguments;
-    }
-
-    /**
-     * @throws CastException
-     */
-    private function castValue(?string $value, string $typeName): mixed
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return match ($typeName) {
-            'string' => $value,
-            'int' => InputCaster::castToInteger($value),
-            'float' => InputCaster::castToFloat($value),
-            'array' => InputCaster::castToArray($value),
-            default => $this->castToEnumOrDefault($value, $typeName),
-        };
-    }
-
-    /**
-     * @throws CastException
-     */
-    private function castToEnumOrDefault(string $value, string $typeName): mixed
-    {
-        if (is_subclass_of($typeName, UnitEnum::class) || is_subclass_of($typeName, BackedEnum::class)) {
-            return InputCaster::castToEnum($value, $typeName);
-        }
-
-        // For other types, return as-is (string)
-        return $value;
     }
 }
