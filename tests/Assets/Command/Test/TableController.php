@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Assets\Command\Test;
 
-use Minicli\Components\Table\TableBuilder;
+use Minicli\Components\Table\Table;
 use Minicli\Console\ConsoleCommand;
 
 class TableController extends ConsoleCommand
 {
     public function handle(): void
     {
-        $table = new TableBuilder();
+        $table = new Table();
 
         $table->addHeader(['ID', 'NAME', 'FIELD3']);
 

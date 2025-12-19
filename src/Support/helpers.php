@@ -30,3 +30,8 @@ function toKebabCase(string $string): string
 
     return strtolower(ltrim((string) $kebab, '-'));
 }
+
+function paddedString(string $tableCell, int $colSize = 5): string
+{
+    return mb_str_pad($tableCell, $colSize);
+}

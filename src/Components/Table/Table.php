@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Minicli\Components\Table;
 
-use Minicli\Contracts\OutputFilterInterface;
-use Minicli\Output\Filter\SimpleOutputFilter;
+use Minicli\Components\Component;
 
-class TableBuilder
+class Table extends Component
 {
     /** @var array<Row> */
     protected array $rows;
@@ -40,19 +39,27 @@ class TableBuilder
         return count($this->rows);
     }
 
-    /**
-     * @param  OutputFilterInterface|null  $filter  In case no filter is provided, a SimpleOutputFilter is used by default.
-     */
-    public function table(?OutputFilterInterface $filter = null): string
+    public function output(): string
     {
-        $filter ??= new SimpleOutputFilter();
-        $table = '';
+        $columnSizes = $this->calculateColumnSizes();
+        $output = '';
 
         foreach ($this->rows as $row) {
-            $table .= "\n{$this->rowToString($row->cells, $filter)}";
+            $row->applyStylesToCells();
+            foreach ($row->cells as $columnIndex => $cell) {
+                $paddedContent = paddedString(
+                    $cell->content(),
+                    $columnSizes[$columnIndex]
+                );
+
+                $cell->setContent($paddedContent);
+                $output .= $cell->withoutLineBreak()->output();
+            }
+
+            $output .= "\n";
         }
 
-        return $table;
+        return $output;
     }
 
     /**
@@ -77,35 +84,13 @@ class TableBuilder
 
             foreach ($rowContent->cells as $cell) {
                 $columnSizes[$columnCount] ??= $minColSize;
-                if (mb_strlen($cell->content) >= $columnSizes[$columnCount]) {
-                    $columnSizes[$columnCount] = mb_strlen($cell->content) + 2;
+                if (mb_strlen($cell->content()) >= $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = mb_strlen($cell->content()) + 2;
                 }
                 $columnCount++;
             }
         }
 
         return $columnSizes;
-    }
-
-    /**
-     * @param  array<Cell>  $row
-     */
-    protected function rowToString(array $row, OutputFilterInterface $filter): string
-    {
-        // first, determine the size of each column
-        $columnSizes = $this->calculateColumnSizes();
-        $formattedRow = '';
-
-        foreach ($row as $column => $cell) {
-            $paddedContent = $this->getPaddedString($cell->content, $columnSizes[$column]);
-            $formattedRow .= $filter->filter($paddedContent, [$cell->style]);
-        }
-
-        return $formattedRow;
-    }
-
-    protected function getPaddedString(string $tableCell, int $colSize = 5): string
-    {
-        return mb_str_pad($tableCell, $colSize);
     }
 }

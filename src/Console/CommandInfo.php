@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Minicli\Console;
 
 use Closure;
-use Minicli\App;
+use Minicli\Components\LineBreak;
 use Minicli\Components\Table\Row;
-use Minicli\Components\Table\TableBuilder;
+use Minicli\Components\Table\Table;
 use Minicli\Components\Text;
-use Minicli\Output\Theming\StyleType;
 
 final readonly class CommandInfo
 {
@@ -22,21 +21,19 @@ final readonly class CommandInfo
         public array $arguments = [],
     ) {}
 
-    public function displayHelp(App $app): ExitCode
+    public function displayHelp(): ExitCode
     {
         if ($this->description !== '') {
             Text::make($this->description)->info()->bold()->render();
+            LineBreak::make()->render();
         }
-
         if ($this->arguments === []) {
             Text::make('This command has no arguments.')->warning()->bold()->render();
 
             return ExitCode::Success;
         }
-
-        $table = TableBuilder::make();
-        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'], StyleType::ALT));
-
+        $table = Table::make();
+        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'])->default(true)->bold());
         foreach ($this->arguments as $argumentInfo) {
             /** @var string $defaultValue */
             $defaultValue = match (true) {
@@ -54,8 +51,7 @@ final readonly class CommandInfo
                 $defaultValue,
             ]));
         }
-
-        $app->table($table);
+        $table->render();
 
         return ExitCode::Success;
     }

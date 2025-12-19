@@ -368,7 +368,7 @@ final class CommandRegistry implements ServiceInterface
                     arguments: $argumentsInfo
                 );
 
-                return $tempCommandInfo->displayHelp($app);
+                return $tempCommandInfo->displayHelp();
             }
 
             /** @var ConsoleCommand $instance */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
+use Minicli\Components\LineBreak;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Console\ConsoleCommand;
@@ -18,6 +19,7 @@ final class Help extends ConsoleCommand
         /** @var AppConfig $config */
         $config = $this->config('app');
         Text::make($config->name)->success()->render();
+        LineBreak::make()->render();
 
         $commands = $this->app->commandRegistry->getCommandMap();
         ksort($commands);

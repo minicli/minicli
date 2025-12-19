@@ -4,31 +4,46 @@ declare(strict_types=1);
 
 namespace Minicli\Components\Table;
 
-use Minicli\Output\Theming\StyleType;
+use Minicli\Components\Text;
+use Minicli\Concerns\HasStyles;
 
-final readonly class Row
+final class Row
 {
-    /** @var array<Cell> */
+    use HasStyles;
+
+    /** @var array<Text> */
     public array $cells;
 
     /**
-     * @param  array<Cell|string>  $cells
+     * @param  array<Text|string>  $cells
      */
     public function __construct(
         array $cells,
-        public StyleType $style = StyleType::DEFAULT,
     ) {
         $this->cells = array_map(
-            fn (Cell|string $cell): Cell => $cell instanceof Cell ? $cell : new Cell($cell, $style),
+            fn (Text|string $cell): Text => $cell instanceof Text ? $cell : Text::make($cell),
             $cells
         );
     }
 
     /**
-     * @param  array<Cell|string>  $cells
+     * @param  array<Text|string>  $cells
      */
-    public static function make(array $cells, StyleType $style = StyleType::DEFAULT): self
+    public static function make(array $cells): self
     {
-        return new self($cells, $style);
+        return new self($cells);
+    }
+
+    public function applyStylesToCells(): void
+    {
+        if (! $this->hasStyles()) {
+            return;
+        }
+
+        foreach ($this->cells as $cell) {
+            if (! $cell->hasStyles()) {
+                $cell->applyStyles($this->styles());
+            }
+        }
     }
 }
