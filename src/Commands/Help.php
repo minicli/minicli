@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
+use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Console\ConsoleCommand;
 use Minicli\Console\ExitCode;
@@ -16,7 +17,7 @@ final class Help extends ConsoleCommand
     {
         /** @var AppConfig $config */
         $config = $this->config('app');
-        $this->success($config->name);
+        Text::make($config->name)->success()->render();
 
         $commands = $this->app->commandRegistry->getCommandMap();
         ksort($commands);
@@ -33,9 +34,7 @@ final class Help extends ConsoleCommand
             }
         }
 
-        $this->newline();
-        $this->info('Available commands:');
-        $this->newline();
+        Text::make('Available commands:')->info()->render();
 
         foreach ($commands as $name => $commandInfo) {
             $isSubcommand = str_contains($name, ' ');
@@ -65,8 +64,7 @@ final class Help extends ConsoleCommand
                 ? " - {$commandInfo->description}"
                 : '';
 
-            $this->out("{$padding}{$displayName}{$description}{$defaultInfo}");
-            $this->newline();
+            Text::make("{$padding}{$displayName}{$description}{$defaultInfo}")->render();
         }
 
         return ExitCode::Success;

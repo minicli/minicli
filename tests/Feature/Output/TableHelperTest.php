@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Minicli\Output\Components\Table\TableBuilder;
+use Minicli\Components\Table\TableBuilder;
 
 it('asserts that TableBuilder creates table from constructor', function (): void {
     $table = [

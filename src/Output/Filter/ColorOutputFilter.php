@@ -29,33 +29,35 @@ class ColorOutputFilter implements OutputFilterInterface
     }
 
     /**
-     * Filters a string according to the specified style.
+     * Filters a string according to the specified styles.
      *
-     * @param  array<StyleType>  $formats
+     * @param  array<StyleType>  $styles
      */
-    public function filter(string $message, ?StyleType $style = null, array $formats = []): string
+    public function filter(string $message, array $styles = []): string
     {
-        return $this->format($message, $style ?? StyleType::DEFAULT, $formats);
+        return $this->format($message, $styles);
     }
 
     /**
      * Formats a message with color codes based on a theme
      *
-     * @param  array<StyleType>  $formats
+     * @param  array<StyleType>  $styles
      */
-    public function format(string $message, StyleType $style = StyleType::DEFAULT, array $formats = []): string
+    public function format(string $message, array $styles = []): string
     {
-        $styleColors = $this->theme->style($style);
-
-        $codes = [$styleColors->foreground->value];
-
-        if (! in_array($styleColors->background?->value, [null, '', '0'], true)) {
-            $codes[] = $styleColors->background->value;
+        if ($styles === []) {
+            $styles = [StyleType::DEFAULT];
         }
 
-        foreach ($formats as $format) {
-            $formatStyle = $this->theme->style($format);
-            $codes[] = $formatStyle->foreground->value;
+        $codes = [];
+
+        foreach ($styles as $style) {
+            $styleColors = $this->theme->style($style);
+            $codes[] = $styleColors->foreground->value;
+
+            if (! in_array($styleColors->background?->value, [null, '', '0'], true)) {
+                $codes[] = $styleColors->background->value;
+            }
         }
 
         return sprintf("\e[%sm%s\e[0m", implode(';', $codes), $message);

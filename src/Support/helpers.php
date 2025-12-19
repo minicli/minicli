@@ -2,6 +2,20 @@
 
 declare(strict_types=1);
 
+function dd(mixed ...$args): never
+{
+    if ($args === []) {
+        var_dump('🐛');
+        exit();
+    }
+
+    foreach ($args as $arg) {
+        var_dump($arg);
+    }
+
+    exit();
+}
+
 function envconfig(string $key, ?string $default = null): ?string
 {
     $value = getenv($key);

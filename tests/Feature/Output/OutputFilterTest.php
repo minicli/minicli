@@ -22,7 +22,7 @@ it('asserts that ColorOutputFilter sets theme correctly and formats with style',
     $color->setTheme(new UnicornTheme());
 
     $text = 'My content';
-    $styled = $color->filter($text, StyleType::INFO);
+    $styled = $color->filter($text, [StyleType::INFO]);
     $expected = sprintf("\e[%sm%s\e[0m", Foreground::MAGENTA->value, $text);
 
     expect($color->theme())->toBeInstanceOf(UnicornTheme::class)

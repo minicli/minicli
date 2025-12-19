@@ -6,8 +6,9 @@ namespace Minicli\Console;
 
 use Closure;
 use Minicli\App;
-use Minicli\Output\Components\Table\Row;
-use Minicli\Output\Components\Table\TableBuilder;
+use Minicli\Components\Table\Row;
+use Minicli\Components\Table\TableBuilder;
+use Minicli\Components\Text;
 use Minicli\Output\Theming\StyleType;
 
 final readonly class CommandInfo
@@ -24,11 +25,11 @@ final readonly class CommandInfo
     public function displayHelp(App $app): ExitCode
     {
         if ($this->description !== '') {
-            $app->info(content: $this->description, formats: [StyleType::BOLD]);
+            Text::make($this->description)->info()->bold()->render();
         }
 
         if ($this->arguments === []) {
-            $app->warning(content: 'This command has no arguments.', formats: [StyleType::BOLD]);
+            Text::make('This command has no arguments.')->warning()->bold()->render();
 
             return ExitCode::Success;
         }

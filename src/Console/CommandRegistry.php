@@ -7,6 +7,8 @@ namespace Minicli\Console;
 use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
+use Minicli\Components\LineBreak;
+use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
@@ -277,10 +279,10 @@ final class CommandRegistry implements ServiceInterface
     private function registerParentCommandWithSubcommands(string $commandName, string $description, array $subcommands): void
     {
         $parentClosure = function (CommandCall $input, App $app) use ($commandName, $subcommands): ExitCode {
-            $app->error("Command '{$commandName}' requires a subcommand.");
-            $app->newline();
-            $app->info('Available subcommands:');
-            $app->newline();
+            Text::make("Command '{$commandName}' requires a subcommand.")->error()->render();
+            LineBreak::make()->render();
+            Text::make('Available subcommands:')->info()->render();
+            LineBreak::make()->render();
 
             foreach ($subcommands as $subcommand) {
                 if ($subcommand === null) {
@@ -290,8 +292,7 @@ final class CommandRegistry implements ServiceInterface
                 $description = $subcommand->description !== ''
                     ? " - {$subcommand->description}"
                     : '';
-                $app->out("{$subcommand->name}{$description}");
-                $app->newline();
+                Text::make("{$subcommand->name}{$description}")->render();
             }
 
             return ExitCode::Invalid;

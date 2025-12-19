@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Assets\Command\Test;
 
+use Minicli\Components\Table\TableBuilder;
 use Minicli\Console\ConsoleCommand;
-use Minicli\Output\Components\Table\TableBuilder;
 
 class TableController extends ConsoleCommand
 {

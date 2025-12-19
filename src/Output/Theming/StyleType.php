@@ -21,4 +21,21 @@ enum StyleType: string
     case ITALIC = 'italic';
     case UNDERLINE = 'underline';
     case INVERT = 'invert';
+
+    /**
+     * @return array<StyleType>
+     */
+    public static function colorStyles(): array
+    {
+        return array_filter(
+            self::cases(),
+            fn (StyleType $style): bool => ! in_array($style, [
+                self::BOLD,
+                self::DIM,
+                self::ITALIC,
+                self::UNDERLINE,
+                self::INVERT,
+            ])
+        );
+    }
 }

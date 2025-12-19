@@ -15,9 +15,9 @@ class TimestampOutputFilter implements OutputFilterInterface
     ) {}
 
     /**
-     * @param  array<StyleType>  $formats
+     * @param  array<StyleType>  $styles
      */
-    public function filter(string $message, ?StyleType $style = null, array $formats = []): string
+    public function filter(string $message, array $styles = []): string
     {
         $datetime = new DateTimeImmutable();
 

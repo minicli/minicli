@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace Minicli;
 
-use BadMethodCallException;
 use Closure;
-use Minicli\Config\AppConfig;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandInfo;
 use Minicli\Console\CommandRegistry;
 use Minicli\Console\ExitCode;
 use Minicli\Container\Container;
 use Minicli\Contracts\ServiceInterface;
-use Minicli\Contracts\ThemeInterface;
 use Minicli\Exceptions\BindingResolutionException;
 use Minicli\Exceptions\CommandNotFoundException;
 use Minicli\Log\Logger;
-use Minicli\Output\OutputHandler;
-use Minicli\Output\Theming\ThemeHelper;
 use Minicli\Support\ConfigLoader;
 use Minicli\Support\ServiceLoader;
 use ReflectionException;
@@ -26,10 +21,7 @@ use Throwable;
 
 /**
  * @property Logger $logger
- * @property OutputHandler $printer
  * @property CommandRegistry $commandRegistry
- *
- * @mixin OutputHandler
  */
 final readonly class App
 {
@@ -61,18 +53,6 @@ final readonly class App
     }
 
     /**
-     * @param  array<mixed>  $arguments
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        if (method_exists($this->printer, $name)) {
-            return $this->printer->{$name}(...$arguments);
-        }
-
-        throw new BadMethodCallException("Method {$name} does not exist.");
-    }
-
-    /**
      * @throws BindingResolutionException|ReflectionException
      */
     public function boot(): void
@@ -80,10 +60,9 @@ final readonly class App
         new ConfigLoader()->load($this);
         new ServiceLoader()->load($this);
 
-        /** @var AppConfig $config */
-        $config = $this->config('app');
+        $this->config('app');
         $this->addService('commandRegistry', new CommandRegistry());
-        $this->setTheme($config->theme);
+        $this->setTheme();
     }
 
     public function appRoot(): string
@@ -111,12 +90,6 @@ final readonly class App
     public function addConfig(string $name, object $configInstance): void
     {
         $this->container->singleton($this->configKey($name), fn (): object => $configInstance);
-    }
-
-    public function setOutputHandler(OutputHandler $outputPrinter): void
-    {
-        $this->container->remove('printer');
-        $this->addService('printer', $outputPrinter);
     }
 
     /**
@@ -155,15 +128,9 @@ final readonly class App
         return $this->container->get('logs_path');
     }
 
-    /**
-     * @param  class-string<ThemeInterface>  $theme
-     */
-    public function setTheme(?string $theme): void
+    public function setTheme(): void
     {
-        $output = new OutputHandler();
-        $output->registerFilter(new ThemeHelper($theme)->getOutputFilter());
-
-        $this->addService('printer', $output);
+        // TODO
     }
 
     public function registerCommand(string $name, CommandInfo $commandInfo): void

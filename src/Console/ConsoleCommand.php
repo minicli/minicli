@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Minicli\Console;
 
-use BadMethodCallException;
 use Exception;
 use Minicli\App;
 use Minicli\Contracts\CommandInterface;
 use Minicli\Log\Logger;
-use Minicli\Output\OutputHandler;
 
-/**
- * @mixin OutputHandler
- */
 abstract class ConsoleCommand implements CommandInterface
 {
     protected App $app;
@@ -21,24 +16,6 @@ abstract class ConsoleCommand implements CommandInterface
     protected Logger $logger;
 
     protected bool $quiet = false;
-
-    private OutputHandler $printer;
-
-    /**
-     * @param  array<mixed>  $arguments
-     */
-    public function __call(string $name, array $arguments): mixed
-    {
-        if ($this->quiet) {
-            return null;
-        }
-
-        if (method_exists($this->printer, $name)) {
-            return $this->printer->{$name}(...$arguments);
-        }
-
-        throw new BadMethodCallException("Method {$name} does not exist.");
-    }
 
     /**
      * Called after the command execution
@@ -52,7 +29,6 @@ abstract class ConsoleCommand implements CommandInterface
     {
         $this->app = $app;
         $this->logger = $app->logger;
-        $this->printer = $app->printer;
     }
 
     public function setQuiet(bool $quiet): void

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Components\Table;
+namespace Minicli\Components\Table;
 
 use Minicli\Contracts\OutputFilterInterface;
 use Minicli\Output\Filter\SimpleOutputFilter;
@@ -98,7 +98,7 @@ class TableBuilder
 
         foreach ($row as $column => $cell) {
             $paddedContent = $this->getPaddedString($cell->content, $columnSizes[$column]);
-            $formattedRow .= $filter->filter($paddedContent, $cell->style);
+            $formattedRow .= $filter->filter($paddedContent, [$cell->style]);
         }
 
         return $formattedRow;

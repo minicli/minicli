@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Minicli\Output\Components\Table;
+namespace Minicli\Components\Table;
 
 use Minicli\Output\Theming\StyleType;
 
