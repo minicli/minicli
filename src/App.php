@@ -26,6 +26,7 @@ use Throwable;
 /**
  * @property Logger $logger
  * @property CommandRegistry $commandRegistry
+ * @property AppConfig $config
  */
 final readonly class App
 {
@@ -51,9 +52,21 @@ final readonly class App
      */
     public function __get(string $name): mixed
     {
-        return $this->container->has($name)
-            ? $this->container->get($name)
-            : null;
+        if (! $this->container->has($name)) {
+            return null;
+        }
+
+        return $this->container->get($name);
+    }
+
+    public function __isset(string $name): bool
+    {
+        return $this->container->has($name);
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        $this->container->bind($name, fn (): mixed => $value);
     }
 
     /**
@@ -102,9 +115,11 @@ final readonly class App
     {
         $configKey = $this->configKey($name);
 
-        return $this->container->has($configKey)
-            ? $this->container->get($configKey)
-            : null;
+        if (! $this->container->has($configKey)) {
+            return $name === 'app' ? new AppConfig() : null;
+        }
+
+        return $this->container->get($configKey);
     }
 
     /**
@@ -136,10 +151,6 @@ final readonly class App
         /** @var AppConfig $config */
         $config = $this->config('app');
 
-        if (! isset($config->theme)) {
-            return;
-        }
-
         /** @var class-string<ThemeInterface> $themeClass */
         $themeClass = $config->theme;
 
@@ -147,8 +158,8 @@ final readonly class App
             return;
         }
 
-        /** @var ThemeInterface $theme */
         $theme = new $themeClass();
+
         $filter = new ColorOutputFilter($theme);
 
         Component::setFilter($filter);
@@ -178,24 +189,14 @@ final readonly class App
     {
         $input = new CommandCall($argv);
 
-        if (count($input->args) < 2) {
-            // Run help command by default
-            $helpCommand = $this->commandRegistry->getCommand('help');
-            if ($helpCommand !== null) {
-                /** @var ExitCode $result */
-                $result = ($helpCommand->callable)($input, $this);
+        $commandName = $this->resolveCommandName($input);
+        $command = $this->commandRegistry->getCommand($commandName);
+
+        if ($command === null) {
+            if ($commandName === '' || $commandName === 'help') {
+                return $this->runHelp($input);
             }
 
-            return $result->value ?? ExitCode::Failure->value;
-        }
-
-        $commandName = $input->command;
-        if ($input->subcommand !== null) {
-            $commandName .= " {$input->subcommand}";
-        }
-
-        $command = $this->commandRegistry->getCommand($commandName);
-        if ($command === null) {
             throw new CommandNotFoundException("Command '{$commandName}' not found.");
         }
 
@@ -231,6 +232,31 @@ final readonly class App
         return $this->container->make($abstract);
     }
 
+    private function resolveCommandName(CommandCall $input): string
+    {
+        $commandName = $input->command;
+
+        if ($input->subcommand !== null) {
+            $commandName .= " {$input->subcommand}";
+        }
+
+        return $commandName;
+    }
+
+    private function runHelp(CommandCall $input): int
+    {
+        $helpCommand = $this->commandRegistry->getCommand('help');
+
+        if ($helpCommand === null) {
+            return ExitCode::Failure->value;
+        }
+
+        /** @var ExitCode $result */
+        $result = ($helpCommand->callable)($input, $this);
+
+        return $result->value;
+    }
+
     private function bindPaths(?string $appRoot): void
     {
         $appRoot ??= $this->appRoot();
@@ -244,7 +270,7 @@ final readonly class App
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-        // Index 0 is current method, index 1 is the instantiation
+        // Index 0 is the current method, index 1 is the instantiation
         return basename($backtrace[1]['file'] ?? 'minicli');
     }
 
