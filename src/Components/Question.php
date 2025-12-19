@@ -32,7 +32,7 @@ class Question
 
         $input = new Input()->read();
         if ($input === '' && $this->required) {
-            Text::make('Input cannot be empty. Please provide a value.')->warning()->render();
+            Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
             LineBreak::make()->render();
 
             return $this->ask();

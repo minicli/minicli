@@ -13,7 +13,7 @@ class Text extends Component
     private bool $lineBreak = true;
 
     public function __construct(
-        private string $content = '',
+        private string $content,
     ) {}
 
     public static function make(string $content): self
@@ -49,7 +49,7 @@ class Text extends Component
 
     public function output(): string
     {
-        $output = "{$this->printer()->out($this->filter()->filter($this->content, $this->styles))}";
+        $output = "{$this->printer()->out($this->filter()->filter($this->content, $this->styles()))}";
 
         return $this->lineBreak ? "{$output}\n" : $output;
     }

@@ -11,37 +11,58 @@ trait HasStyles
     /** @var array<StyleType> */
     private array $styles = [];
 
-    public function default(bool $alt = false): self
+    private bool $altStyle = false;
+
+    public function alt(): self
     {
-        $this->addColorStyle($alt ? StyleType::ALT : StyleType::DEFAULT);
+        $this->altStyle = true;
 
         return $this;
     }
 
-    public function error(bool $alt = false): self
+    public function normal(): self
     {
-        $this->addColorStyle($alt ? StyleType::ERROR_ALT : StyleType::ERROR);
+        $this->altStyle = false;
 
         return $this;
     }
 
-    public function warning(bool $alt = false): self
+    public function isAlt(): bool
     {
-        $this->addColorStyle($alt ? StyleType::WARNING_ALT : StyleType::WARNING);
+        return $this->altStyle;
+    }
+
+    public function default(): self
+    {
+        $this->addColorStyle(StyleType::DEFAULT);
 
         return $this;
     }
 
-    public function success(bool $alt = false): self
+    public function error(): self
     {
-        $this->addColorStyle($alt ? StyleType::SUCCESS_ALT : StyleType::SUCCESS);
+        $this->addColorStyle(StyleType::ERROR);
 
         return $this;
     }
 
-    public function info(bool $alt = false): self
+    public function warning(): self
     {
-        $this->addColorStyle($alt ? StyleType::INFO_ALT : StyleType::INFO);
+        $this->addColorStyle(StyleType::WARNING);
+
+        return $this;
+    }
+
+    public function success(): self
+    {
+        $this->addColorStyle(StyleType::SUCCESS);
+
+        return $this;
+    }
+
+    public function info(): self
+    {
+        $this->addColorStyle(StyleType::INFO);
 
         return $this;
     }
@@ -101,7 +122,7 @@ trait HasStyles
      */
     public function styles(): array
     {
-        return $this->styles;
+        return $this->applyAltStyleTransformation($this->styles);
     }
 
     protected function addColorStyle(StyleType $style): void
@@ -112,5 +133,24 @@ trait HasStyles
         );
 
         $this->styles = [$style, ...$this->styles];
+    }
+
+    /**
+     * @param  array<StyleType>  $styles
+     * @return array<StyleType>
+     */
+    protected function applyAltStyleTransformation(array $styles): array
+    {
+        return array_map(
+            fn (StyleType $style): StyleType => match ($style) {
+                StyleType::DEFAULT, StyleType::ALT => $this->altStyle ? StyleType::ALT : StyleType::DEFAULT,
+                StyleType::ERROR, StyleType::ERROR_ALT => $this->altStyle ? StyleType::ERROR_ALT : StyleType::ERROR,
+                StyleType::WARNING, StyleType::WARNING_ALT => $this->altStyle ? StyleType::WARNING_ALT : StyleType::WARNING,
+                StyleType::SUCCESS, StyleType::SUCCESS_ALT => $this->altStyle ? StyleType::SUCCESS_ALT : StyleType::SUCCESS,
+                StyleType::INFO, StyleType::INFO_ALT => $this->altStyle ? StyleType::INFO_ALT : StyleType::INFO,
+                default => $style,
+            },
+            $styles
+        );
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Console;
 
 use Closure;
+use Minicli\Components\Alert;
 use Minicli\Components\LineBreak;
 use Minicli\Components\Table\Row;
 use Minicli\Components\Table\Table;
@@ -25,15 +26,14 @@ final readonly class CommandInfo
     {
         if ($this->description !== '') {
             Text::make($this->description)->info()->bold()->render();
-            LineBreak::make()->render();
         }
         if ($this->arguments === []) {
-            Text::make('This command has no arguments.')->warning()->bold()->render();
+            Alert::make('This command has no arguments.')->warning()->render();
 
             return ExitCode::Success;
         }
         $table = Table::make();
-        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'])->default(true)->bold());
+        $table->addRow(Row::make(['ARGUMENT', 'DESCRIPTION', 'REQUIRED', 'DEFAULT'])->default()->alt()->bold());
         foreach ($this->arguments as $argumentInfo) {
             /** @var string $defaultValue */
             $defaultValue = match (true) {
@@ -51,6 +51,8 @@ final readonly class CommandInfo
                 $defaultValue,
             ]));
         }
+
+        LineBreak::make()->render();
         $table->render();
 
         return ExitCode::Success;

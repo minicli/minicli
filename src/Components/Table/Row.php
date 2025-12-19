@@ -43,6 +43,10 @@ final class Row
         foreach ($this->cells as $cell) {
             if (! $cell->hasStyles()) {
                 $cell->applyStyles($this->styles());
+
+                if ($this->isAlt()) {
+                    $cell->alt();
+                }
             }
         }
     }

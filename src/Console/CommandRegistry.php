@@ -7,6 +7,7 @@ namespace Minicli\Console;
 use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
+use Minicli\Components\Alert;
 use Minicli\Components\LineBreak;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
@@ -279,7 +280,7 @@ final class CommandRegistry implements ServiceInterface
     private function registerParentCommandWithSubcommands(string $commandName, string $description, array $subcommands): void
     {
         $parentClosure = function (CommandCall $input, App $app) use ($commandName, $subcommands): ExitCode {
-            Text::make("Command '{$commandName}' requires a subcommand.")->error()->render();
+            Alert::make("Command '{$commandName}' requires a subcommand.")->error()->render();
             LineBreak::make()->render();
             Text::make('Available subcommands:')->info()->render();
             LineBreak::make()->render();
