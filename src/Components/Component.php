@@ -16,25 +16,32 @@ abstract class Component implements ComponentInterface
 
     protected static ?PrinterAdapterInterface $printer = null;
 
+    protected static bool $quiet = false;
+
     abstract public function output(): string;
+
+    public static function setFilter(OutputFilterInterface $filter): void
+    {
+        self::$filter = $filter;
+    }
+
+    public static function setPrinter(PrinterAdapterInterface $printer): void
+    {
+        self::$printer = $printer;
+    }
+
+    public static function setQuiet(bool $quiet): void
+    {
+        self::$quiet = $quiet;
+    }
 
     public function render(): void
     {
+        if (self::$quiet) {
+            return;
+        }
+
         echo $this->output();
-    }
-
-    public function setFilter(OutputFilterInterface $filter): self
-    {
-        self::$filter = $filter;
-
-        return $this;
-    }
-
-    public function setPrinter(PrinterAdapterInterface $printer): self
-    {
-        self::$printer = $printer;
-
-        return $this;
     }
 
     protected function filter(): OutputFilterInterface

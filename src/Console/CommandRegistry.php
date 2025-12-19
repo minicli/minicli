@@ -8,6 +8,7 @@ use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
 use Minicli\Components\Alert;
+use Minicli\Components\Component;
 use Minicli\Components\LineBreak;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
@@ -377,12 +378,15 @@ final class CommandRegistry implements ServiceInterface
             $instance->boot($app);
 
             if ($input->hasFlag(GlobalFlag::QUIET->value)) {
-                $instance->setQuiet(true);
+                Component::setQuiet(true);
             }
 
             $arguments = $argumentsHandler->prepareArguments($input);
             $result = $method->invokeArgs($instance, $arguments);
             $instance->teardown();
+
+            // Reset quiet flag after command execution
+            Component::setQuiet(false);
 
             return $result;
         };

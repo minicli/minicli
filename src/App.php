@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Minicli;
 
 use Closure;
+use Minicli\Components\Component;
+use Minicli\Config\AppConfig;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandInfo;
 use Minicli\Console\CommandRegistry;
 use Minicli\Console\ExitCode;
 use Minicli\Container\Container;
 use Minicli\Contracts\ServiceInterface;
+use Minicli\Contracts\ThemeInterface;
 use Minicli\Exceptions\BindingResolutionException;
 use Minicli\Exceptions\CommandNotFoundException;
 use Minicli\Log\Logger;
+use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Support\ConfigLoader;
 use Minicli\Support\ServiceLoader;
 use ReflectionException;
@@ -60,7 +64,6 @@ final readonly class App
         new ConfigLoader()->load($this);
         new ServiceLoader()->load($this);
 
-        $this->config('app');
         $this->addService('commandRegistry', new CommandRegistry());
         $this->setTheme();
     }
@@ -130,7 +133,25 @@ final readonly class App
 
     public function setTheme(): void
     {
-        // TODO
+        /** @var AppConfig $config */
+        $config = $this->config('app');
+
+        if (! isset($config->theme)) {
+            return;
+        }
+
+        /** @var class-string<ThemeInterface> $themeClass */
+        $themeClass = $config->theme;
+
+        if (! class_exists($themeClass)) {
+            return;
+        }
+
+        /** @var ThemeInterface $theme */
+        $theme = new $themeClass();
+        $filter = new ColorOutputFilter($theme);
+
+        Component::setFilter($filter);
     }
 
     public function registerCommand(string $name, CommandInfo $commandInfo): void

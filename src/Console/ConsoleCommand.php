@@ -15,8 +15,6 @@ abstract class ConsoleCommand implements CommandInterface
 
     protected Logger $logger;
 
-    protected bool $quiet = false;
-
     /**
      * Called after the command execution
      */
@@ -29,11 +27,6 @@ abstract class ConsoleCommand implements CommandInterface
     {
         $this->app = $app;
         $this->logger = $app->logger;
-    }
-
-    public function setQuiet(bool $quiet): void
-    {
-        $this->quiet = $quiet;
     }
 
     protected function config(string $name): mixed
