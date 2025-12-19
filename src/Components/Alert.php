@@ -78,11 +78,8 @@ class Alert extends Component
         $messageLines = explode("\n", $this->message);
 
         // Calculate the maximum width needed across all lines
-        $titleLength = mb_strlen($this->title);
-        $maxLength = $titleLength;
-        foreach ($messageLines as $line) {
-            $maxLength = max($maxLength, mb_strlen($line));
-        }
+        $titleLength = $this->stringWidth($this->title);
+        $maxLength = max($titleLength, $this->maxStringWidth($messageLines));
 
         // Add padding on both sides (2 spaces on each side)
         $paddingSize = 2;

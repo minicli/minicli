@@ -84,8 +84,8 @@ class Table extends Component
 
             foreach ($rowContent->cells as $cell) {
                 $columnSizes[$columnCount] ??= $minColSize;
-                if (mb_strlen($cell->content()) >= $columnSizes[$columnCount]) {
-                    $columnSizes[$columnCount] = mb_strlen($cell->content()) + 2;
+                if ($this->stringWidth($cell->content()) >= $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = $this->stringWidth($cell->content()) + 2;
                 }
                 $columnCount++;
             }

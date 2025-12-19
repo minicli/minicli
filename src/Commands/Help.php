@@ -6,6 +6,8 @@ namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
 use Minicli\Components\LineBreak;
+use Minicli\Components\List\ItemList;
+use Minicli\Components\List\ListItem;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Console\ConsoleCommand;
@@ -24,50 +26,63 @@ final class Help extends ConsoleCommand
         $commands = $this->app->commandRegistry->getCommandMap();
         ksort($commands);
 
-        // Identify parent commands and their defaults
+        // Group commands by parent
         $parentCommands = [];
+        $subcommands = [];
+
         foreach ($commands as $name => $commandInfo) {
-            if (str_contains($name, ' ')) {
-                [$parent, $sub] = explode(' ', $name, 2);
-                if (! isset($parentCommands[$parent])) {
-                    $parentCommands[$parent] = [];
-                }
-                $parentCommands[$parent][] = $sub;
+            if (! str_contains($name, ' ')) {
+                $parentCommands[$name] = $commandInfo;
+
+                continue;
             }
+
+            [$parent, $sub] = explode(' ', $name, 2);
+            if (! isset($subcommands[$parent])) {
+                $subcommands[$parent] = [];
+            }
+            $subcommands[$parent][$sub] = $commandInfo;
         }
 
         Text::make('Available commands:')->info()->render();
 
-        foreach ($commands as $name => $commandInfo) {
-            $isSubcommand = str_contains($name, ' ');
+        $list = ItemList::make();
 
-            // Extract just the subcommand name if this is a subcommand
-            $displayName = $name;
-            if ($isSubcommand) {
-                $parts = explode(' ', $name, 2);
-                $displayName = $parts[1];
+        foreach ($parentCommands as $name => $commandInfo) {
+            $description = $commandInfo->description;
+
+            // Standalone command without subcommands
+            if (! isset($subcommands[$name])) {
+                $list->addItem(ListItem::make($name, $description));
+
+                continue;
             }
 
-            $padding = $isSubcommand ? "\t" : '';
-
-            // Check if this is a parent command with a default
+            // Parent command with subcommands - find default
             $defaultInfo = '';
-            if (! $isSubcommand && isset($parentCommands[$name])) {
-                foreach ($parentCommands[$name] as $subName) {
-                    $fullSubName = "{$name} {$subName}";
-                    if (isset($commands[$fullSubName]) && $commands[$fullSubName]->callable === $commandInfo->callable) {
-                        $defaultInfo = " (default: {$subName})";
-                        break;
-                    }
+            foreach ($subcommands[$name] as $subName => $subCommandInfo) {
+                if ($subCommandInfo->callable === $commandInfo->callable) {
+                    $defaultInfo = " (default: {$subName})";
+                    break;
                 }
             }
 
-            $description = $commandInfo->description !== ''
-                ? " - {$commandInfo->description}"
-                : '';
+            // Build nested list of subcommands
+            $nestedList = ItemList::make();
+            foreach ($subcommands[$name] as $subName => $subCommandInfo) {
+                $subDescription = $subCommandInfo->description;
+                $nestedList->addItem(ListItem::make($subName, $subDescription));
+            }
 
-            Text::make("{$padding}{$displayName}{$description}{$defaultInfo}")->render();
+            // Add parent with description and nested subcommands
+            $fullDescription = $description . $defaultInfo;
+            $list->addItem(
+                ListItem::make($name, $fullDescription !== '' ? $fullDescription : null)
+                    ->nested($nestedList)
+            );
         }
+
+        $list->render();
 
         return ExitCode::Success;
     }
