@@ -7,7 +7,7 @@ namespace Minicli\Components\List;
 use Minicli\Components\Text;
 use Minicli\Concerns\HasStyles;
 
-final class ListItem
+final class Item
 {
     use HasStyles;
 

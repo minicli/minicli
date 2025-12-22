@@ -9,7 +9,7 @@ use Minicli\Components\Text;
 
 class ItemList extends Component
 {
-    /** @var array<ListItem> */
+    /** @var array<Item> */
     protected array $items;
 
     protected string $separator = '.';
@@ -21,7 +21,7 @@ class ItemList extends Component
     protected int $parentMaxWidth = 0;
 
     /**
-     * @param  array<ListItem>|null  $items
+     * @param  array<Item>|null  $items
      */
     public function __construct(?array $items = null)
     {
@@ -31,14 +31,14 @@ class ItemList extends Component
     }
 
     /**
-     * @param  array<ListItem>|null  $items
+     * @param  array<Item>|null  $items
      */
     public static function make(?array $items = null): self
     {
         return new self($items);
     }
 
-    public function addItem(ListItem $item): void
+    public function addItem(Item $item): void
     {
         $this->items[] = $item;
     }
@@ -138,7 +138,7 @@ class ItemList extends Component
     }
 
     /**
-     * @param  array<ListItem>  $items
+     * @param  array<Item>  $items
      */
     protected function setItems(array $items): void
     {
@@ -150,8 +150,8 @@ class ItemList extends Component
     protected function calculateMaxNameWidth(): int
     {
         $names = array_map(
-            fn (ListItem $item): string => $item->name->content(),
-            array_filter($this->items, fn (ListItem $item): bool => $item->hasDescription())
+            fn (Item $item): string => $item->name->content(),
+            array_filter($this->items, fn (Item $item): bool => $item->hasDescription())
         );
 
         return $names !== [] ? $this->maxStringWidth($names) : 0;

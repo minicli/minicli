@@ -6,8 +6,8 @@ namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
 use Minicli\Components\LineBreak;
+use Minicli\Components\List\Item;
 use Minicli\Components\List\ItemList;
-use Minicli\Components\List\ListItem;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Console\ConsoleCommand;
@@ -53,7 +53,7 @@ final class Help extends ConsoleCommand
 
             // Standalone command without subcommands
             if (! isset($subcommands[$name])) {
-                $list->addItem(ListItem::make($name, $description));
+                $list->addItem(Item::make($name, $description));
 
                 continue;
             }
@@ -71,13 +71,13 @@ final class Help extends ConsoleCommand
             $nestedList = ItemList::make();
             foreach ($subcommands[$name] as $subName => $subCommandInfo) {
                 $subDescription = $subCommandInfo->description;
-                $nestedList->addItem(ListItem::make($subName, $subDescription));
+                $nestedList->addItem(Item::make($subName, $subDescription));
             }
 
             // Add parent with description and nested subcommands
             $fullDescription = $description . $defaultInfo;
             $list->addItem(
-                ListItem::make($name, $fullDescription !== '' ? $fullDescription : null)
+                Item::make($name, $fullDescription !== '' ? $fullDescription : null)
                     ->nested($nestedList)
             );
         }
