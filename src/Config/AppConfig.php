@@ -24,9 +24,7 @@ final readonly class AppConfig
 Minimalist, dependency-free framework for building CLI-centric PHP applications
 APPNAME,
         /** @var array<string> $commandPaths */
-        public array $commandPaths = [
-            __DIR__ . '/../app/Commands',
-        ],
+        public array $commandPaths = [],
         /** @var class-string<ThemeInterface> */
         public string $theme = DefaultTheme::class,
         public bool $debug = true,

@@ -12,7 +12,8 @@ it('discovers attribute-based commands from configured paths', function (): void
         ->and($registry->getCommand('test'))->not->toBeNull()
         ->and($registry->getCommand('test greet'))->not->toBeNull()
         ->and($registry->getCommand('test tags'))->not->toBeNull()
-        ->and($registry->getCommand('test cast'))->not->toBeNull();
+        ->and($registry->getCommand('test cast'))->not->toBeNull()
+        ->and($registry->getCommand('global-cmd'))->not->toBeNull();
 });
 
 it('returns null when command is not registered', function (): void {

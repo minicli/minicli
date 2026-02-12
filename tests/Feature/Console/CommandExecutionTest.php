@@ -45,3 +45,23 @@ it('throws for missing required parameter', function (): void {
 it('throws for invalid casted value', function (): void {
     getConfiguredApp()->runCommand(['minicli', 'test', 'cast', 'count=abc']);
 })->throws(CastException::class);
+
+it('throws when command returns non ExitCode', function (): void {
+    getConfiguredApp()->runCommand(['minicli', 'test', 'invalid-return']);
+})->throws(RuntimeException::class, "Command 'test invalid-return' must return Minicli\\Console\\ExitCode.");
+
+it('resets quiet mode when command fails', function (): void {
+    $app = getConfiguredApp();
+
+    try {
+        $app->runCommand(['minicli', 'test', 'explode', '--quiet']);
+    } catch (RuntimeException) {
+        // expected for this test
+    }
+
+    ob_start();
+    Minicli\Components\Text::make('after')->render();
+    $output = (string) ob_get_clean();
+
+    expect($output)->toContain('after');
+});

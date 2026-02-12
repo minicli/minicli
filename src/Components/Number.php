@@ -64,18 +64,20 @@ final class Number extends InputComponent
 
     public function ask(): int|float
     {
-        $this->message->render();
+        while (true) {
+            $this->message->render();
 
-        $selected = $this->readInput();
-        if (is_string($selected) && $selected === '') {
-            return $this->ask();
+            $selected = $this->readInput();
+            if (is_string($selected) && $selected === '') {
+                continue;
+            }
+
+            if (is_int($selected) || is_float($selected)) {
+                return $selected;
+            }
+
+            return 0;
         }
-
-        if (is_int($selected) || is_float($selected)) {
-            return $selected;
-        }
-
-        return 0;
     }
 
     protected function readInput(): string|int|float

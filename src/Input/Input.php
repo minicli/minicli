@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Minicli\Input;
 
+use RuntimeException;
+
 final class Input
 {
     /**
@@ -16,7 +18,15 @@ final class Input
 
     public function read(): string
     {
-        return $this->storeInput((string) readline($this->prompt));
+        if (function_exists('readline')) {
+            return $this->storeInput((string) readline($this->prompt));
+        }
+
+        if ($this->prompt !== '') {
+            fwrite(STDOUT, $this->prompt);
+        }
+
+        return $this->storeInput($this->readFromStdin());
     }
 
     public function readHidden(): string
@@ -40,11 +50,7 @@ final class Input
 
         try {
             while (true) {
-                $char = fgetc(STDIN);
-
-                if ($char === false) {
-                    continue;
-                }
+                $char = $this->readChar();
 
                 if ($char === "\n" || $char === "\r") {
                     break;
@@ -105,11 +111,7 @@ final class Input
 
         try {
             while (true) {
-                $char = fgetc(STDIN);
-
-                if ($char === false) {
-                    continue;
-                }
+                $char = $this->readChar();
 
                 if ($char === "\n" || $char === "\r") {
                     break;
@@ -125,12 +127,9 @@ final class Input
                 }
 
                 if ($char === "\033") {
-                    $sequenceOne = fgetc(STDIN);
-                    $sequenceTwo = fgetc(STDIN);
+                    $sequenceOne = $this->readChar();
+                    $sequenceTwo = $this->readChar();
                     if ($sequenceOne !== '[') {
-                        continue;
-                    }
-                    if ($sequenceTwo === false) {
                         continue;
                     }
 
@@ -196,11 +195,7 @@ final class Input
 
         try {
             while (true) {
-                $char = fgetc(STDIN);
-
-                if ($char === false) {
-                    continue;
-                }
+                $char = $this->readChar();
 
                 if ($char === "\n" || $char === "\r") {
                     break;
@@ -214,12 +209,9 @@ final class Input
                 }
 
                 if ($char === "\033") {
-                    $sequenceOne = fgetc(STDIN);
-                    $sequenceTwo = fgetc(STDIN);
+                    $sequenceOne = $this->readChar();
+                    $sequenceTwo = $this->readChar();
                     if ($sequenceOne !== '[') {
-                        continue;
-                    }
-                    if ($sequenceTwo === false) {
                         continue;
                     }
 
@@ -313,11 +305,7 @@ final class Input
 
         try {
             while (true) {
-                $char = fgetc(STDIN);
-
-                if ($char === false) {
-                    continue;
-                }
+                $char = $this->readChar();
 
                 if ($char === "\n" || $char === "\r") {
                     break;
@@ -347,12 +335,9 @@ final class Input
                 }
 
                 if ($char === "\033") {
-                    $sequenceOne = fgetc(STDIN);
-                    $sequenceTwo = fgetc(STDIN);
+                    $sequenceOne = $this->readChar();
+                    $sequenceTwo = $this->readChar();
                     if ($sequenceOne !== '[') {
-                        continue;
-                    }
-                    if ($sequenceTwo === false) {
                         continue;
                     }
 
@@ -504,7 +489,26 @@ final class Input
     {
         $line = fgets(STDIN);
 
-        return trim($line === false ? '' : $line, "\r\n");
+        if ($line === false) {
+            throw new RuntimeException('No input available from STDIN (EOF).');
+        }
+
+        return trim($line, "\r\n");
+    }
+
+    private function readChar(): string
+    {
+        $char = fgetc(STDIN);
+
+        if ($char !== false) {
+            return $char;
+        }
+
+        if (feof(STDIN)) {
+            throw new RuntimeException('STDIN closed while waiting for input.');
+        }
+
+        throw new RuntimeException('Unable to read input from STDIN.');
     }
 
     private function storeInput(string $input): string

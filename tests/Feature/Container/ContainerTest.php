@@ -107,6 +107,23 @@ it('can inject dependencies', function (): void {
     )->toBeInstanceOf(ApiMailer::class);
 });
 
+it('resolves scalar constructor defaults', function (): void {
+    $container = Container::getInstance();
+    $container->flush();
+
+    $service = $container->make(ScalarDefaultService::class);
+
+    expect($service)->toBeInstanceOf(ScalarDefaultService::class)
+        ->and($service->name)->toBe('minicli');
+});
+
+it('throws for circular dependencies with chain context', function (): void {
+    $container = Container::getInstance();
+    $container->flush();
+
+    $container->make(CycleA::class);
+})->throws(BindingResolutionException::class, 'Circular dependency detected');
+
 it('can check for the existence of a binding', function (): void {
     $container = Container::getInstance();
     $container->flush();
@@ -170,6 +187,21 @@ class ApiMailer implements MailerInterface
 }
 
 class Api {}
+
+class ScalarDefaultService
+{
+    public function __construct(public string $name = 'minicli') {}
+}
+
+class CycleA
+{
+    public function __construct(public CycleB $b) {}
+}
+
+class CycleB
+{
+    public function __construct(public CycleA $a) {}
+}
 
 class MakeBreak
 {

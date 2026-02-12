@@ -7,15 +7,10 @@ use Minicli\Components\Component;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandRegistry;
 use Minicli\Container\Container;
-use Minicli\Output\Adapter\DefaultPrinterAdapter;
-use Minicli\Output\Filter\ColorOutputFilter;
 
 beforeEach(function (): void {
     Container::getInstance()->flush();
-
-    Component::setQuiet(false);
-    Component::setFilter(new ColorOutputFilter());
-    Component::setPrinter(new DefaultPrinterAdapter());
+    Component::resetState();
 });
 
 function getBasicApp(): App

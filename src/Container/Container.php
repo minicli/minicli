@@ -30,9 +30,9 @@ final class Container implements ArrayAccess
     private array $instances = [];
 
     /**
-     * @return void
+     * @var array<string>
      */
-    private function __construct() {}
+    private array $resolving = [];
 
     public static function getInstance(): static
     {
@@ -45,6 +45,8 @@ final class Container implements ArrayAccess
 
     public function bind(string $abstract, Closure|string|null $concrete = null, bool $shared = false): void
     {
+        unset($this->instances[$abstract]);
+
         $this->bindings[$abstract] = [
             'concrete' => $concrete,
             'shared' => $shared,
@@ -70,15 +72,26 @@ final class Container implements ArrayAccess
             return $this->instances[$abstract];
         }
 
-        $concrete = $this->bindings[$abstract]['concrete'] ?? $abstract;
-
-        $object = $concrete instanceof Closure || $concrete === $abstract ? $this->build($concrete) : $this->make($concrete);
-
-        if (array_key_exists($abstract, $this->bindings) && $this->bindings[$abstract]['shared']) {
-            $this->instances[$abstract] = $object;
+        if (in_array($abstract, $this->resolving, true)) {
+            $chain = implode(' -> ', [...$this->resolving, $abstract]);
+            throw new BindingResolutionException("Circular dependency detected: {$chain}");
         }
 
-        return $object;
+        $this->resolving[] = $abstract;
+
+        try {
+            $concrete = $this->bindings[$abstract]['concrete'] ?? $abstract;
+
+            $object = $concrete instanceof Closure || $concrete === $abstract ? $this->build($concrete) : $this->make($concrete);
+
+            if (array_key_exists($abstract, $this->bindings) && $this->bindings[$abstract]['shared']) {
+                $this->instances[$abstract] = $object;
+            }
+
+            return $object;
+        } finally {
+            array_pop($this->resolving);
+        }
     }
 
     public function contains(string $abstract): bool
@@ -88,7 +101,8 @@ final class Container implements ArrayAccess
 
     public function remove(string $abstract): void
     {
-        unset($this->bindings[$abstract]);
+        unset($this->bindings[$abstract], $this->instances[$abstract]);
+
     }
 
     /**
@@ -212,12 +226,51 @@ final class Container implements ArrayAccess
             // This is a much simpler version of what Laravel does
             $type = $dependency->getType(); // ReflectionType|null
 
-            if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
+            if (! $type instanceof ReflectionNamedType) {
+                if ($dependency->isDefaultValueAvailable()) {
+                    $results[] = $dependency->getDefaultValue();
+
+                    continue;
+                }
+
                 $declaringClass = $dependency->getDeclaringClass() instanceof ReflectionClass ? $dependency->getDeclaringClass()->getName() : '';
                 throw new BindingResolutionException("Unresolvable dependency resolving [{$dependency}] in class {$declaringClass}");
             }
 
-            $results[] = $this->make($type->getName());
+            if ($type->isBuiltin()) {
+                if ($dependency->isDefaultValueAvailable()) {
+                    $results[] = $dependency->getDefaultValue();
+
+                    continue;
+                }
+
+                if ($type->allowsNull()) {
+                    $results[] = null;
+
+                    continue;
+                }
+
+                $declaringClass = $dependency->getDeclaringClass() instanceof ReflectionClass ? $dependency->getDeclaringClass()->getName() : '';
+                throw new BindingResolutionException("Unresolvable dependency resolving [{$dependency}] in class {$declaringClass}");
+            }
+
+            try {
+                $results[] = $this->make($type->getName());
+            } catch (BindingResolutionException $exception) {
+                if ($dependency->isDefaultValueAvailable()) {
+                    $results[] = $dependency->getDefaultValue();
+
+                    continue;
+                }
+
+                if ($type->allowsNull()) {
+                    $results[] = null;
+
+                    continue;
+                }
+
+                throw $exception;
+            }
         }
 
         return $results;

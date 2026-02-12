@@ -41,8 +41,7 @@
     "prefer-stable": true,
     "minimum-stability": "dev",
     "require": {
-        "php": "^8.4",
-        "ext-readline": "*"
+        "php": "^8.4"
     },
     "require-dev": {
         "laravel/pint": "^1.26",

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Minicli\Console;
 
-use Exception;
 use Minicli\App;
 use Minicli\Contracts\CommandInterface;
 use Minicli\Log\Logger;
@@ -31,10 +30,6 @@ abstract class ConsoleCommand implements CommandInterface
 
     protected function config(string $name): mixed
     {
-        try {
-            return $this->app->config($name);
-        } catch (Exception) {
-            return null;
-        }
+        return $this->app->config($name);
     }
 }

@@ -10,7 +10,7 @@ use Minicli\Components\Text;
 class ItemList extends Component
 {
     /** @var array<Item> */
-    protected array $items;
+    protected array $items = [];
 
     protected string $separator = '.';
 

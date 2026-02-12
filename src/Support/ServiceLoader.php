@@ -22,18 +22,16 @@ final readonly class ServiceLoader
     public function load(App $app): void
     {
         $this->loadDefaultServices($app);
-        $basePath = $app->basePath() . '/app';
+        $servicesPath = $app->basePath() . '/app/Services';
 
-        if (! is_dir($basePath)) {
+        if (! is_dir($servicesPath)) {
             return;
         }
 
         $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($basePath, RecursiveDirectoryIterator::SKIP_DOTS),
+            new RecursiveDirectoryIterator($servicesPath, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
         );
-
-        $processedClasses = [];
 
         foreach ($iterator as $file) {
             if (! $file->isFile()) {
@@ -42,46 +40,21 @@ final readonly class ServiceLoader
             if ($file->getExtension() !== 'php') {
                 continue;
             }
+
             $filePath = $file->getRealPath();
-            // Skip vendor and config directories
-            if (str_contains((string) $filePath, '/vendor/')) {
-                continue;
-            }
-            if (str_contains((string) $filePath, '/config/')) {
+            if (! is_string($filePath)) {
                 continue;
             }
 
-            // Track classes before requiring file
-            $classesBefore = get_declared_classes();
-
-            require_once $filePath;
-
-            // Get newly declared classes from this file
-            $classesAfter = get_declared_classes();
-            $newClasses = array_diff($classesAfter, $classesBefore);
-
-            foreach ($newClasses as $className) {
-                // Skip if already processed
-                if (isset($processedClasses[$className])) {
-                    continue;
-                }
-
-                $processedClasses[$className] = true;
-
-                if (! class_exists($className)) {
-                    continue;
-                }
-
+            foreach ($this->classesDefinedInFile($filePath) as $className) {
                 $reflectionClass = new ReflectionClass($className);
 
-                // Check if class has Service attribute
                 $serviceAttributes = $reflectionClass->getAttributes(Service::class);
 
                 if ($serviceAttributes === []) {
                     continue;
                 }
 
-                // Check if class implements ServiceInterface
                 if (! $reflectionClass->implementsInterface(ServiceInterface::class)) {
                     continue;
                 }
@@ -90,10 +63,40 @@ final readonly class ServiceLoader
                 $serviceName = $serviceAttribute->name;
 
                 /** @var ServiceInterface $serviceInstance */
-                $serviceInstance = new $className();
+                $serviceInstance = $app->make($className);
                 $app->addService($serviceName, $serviceInstance);
             }
         }
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    private function classesDefinedInFile(string $filePath): array
+    {
+        $realPath = realpath($filePath);
+        if ($realPath === false) {
+            return [];
+        }
+
+        require_once $realPath;
+
+        $classes = [];
+
+        foreach (get_declared_classes() as $className) {
+            if (! class_exists($className)) {
+                continue;
+            }
+
+            /** @var class-string $className */
+            $reflection = new ReflectionClass($className);
+
+            if ($reflection->getFileName() === $realPath) {
+                $classes[] = $className;
+            }
+        }
+
+        return $classes;
     }
 
     private function loadDefaultServices(App $app): void

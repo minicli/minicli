@@ -5,7 +5,7 @@ declare(strict_types=1);
 function dd(mixed ...$args): never
 {
     if ($args === []) {
-        var_dump('🐛');
+        var_dump('miniCLI Debug');
         exit();
     }
 

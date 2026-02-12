@@ -35,6 +35,13 @@ abstract class Component implements ComponentInterface
         self::$quiet = $quiet;
     }
 
+    public static function resetState(): void
+    {
+        self::$filter = null;
+        self::$printer = null;
+        self::$quiet = false;
+    }
+
     public function render(): void
     {
         if (self::$quiet) {

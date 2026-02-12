@@ -9,7 +9,6 @@ use Minicli\Attributes\Config;
 use Minicli\Exceptions\BindingResolutionException;
 use ReflectionClass;
 use ReflectionException;
-use RuntimeException;
 
 final readonly class ConfigLoader
 {
@@ -31,29 +30,52 @@ final readonly class ConfigLoader
         }
 
         foreach ($configFiles as $configFile) {
-            require_once $configFile;
+            $configClasses = $this->classesDefinedInFile($configFile);
 
-            $className = basename($configFile, '.php');
+            foreach ($configClasses as $configClass) {
+                $reflectionClass = new ReflectionClass($configClass);
+                $configAttributes = $reflectionClass->getAttributes(Config::class);
 
-            if (! class_exists($className) && ! class_exists("\\{$className}")) {
+                if ($configAttributes === []) {
+                    continue;
+                }
+
+                $configAttribute = $configAttributes[0]->newInstance();
+                $configName = $configAttribute->name;
+
+                $configInstance = new $configClass();
+                $app->addConfig($configName, $configInstance);
+            }
+        }
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    private function classesDefinedInFile(string $filePath): array
+    {
+        $realPath = realpath($filePath);
+        if ($realPath === false) {
+            return [];
+        }
+
+        require_once $realPath;
+
+        $classes = [];
+
+        foreach (get_declared_classes() as $className) {
+            if (! class_exists($className)) {
                 continue;
             }
 
-            // Prefer global namespace if class exists there
-            $fullyQualifiedClassName = class_exists("\\{$className}") ? "\\{$className}" : $className;
-            /** @var class-string $fullyQualifiedClassName */
-            $reflectionClass = new ReflectionClass($fullyQualifiedClassName);
-            $configAttributes = $reflectionClass->getAttributes(Config::class);
+            /** @var class-string $className */
+            $reflection = new ReflectionClass($className);
 
-            if ($configAttributes === []) {
-                throw new RuntimeException("Configuration class {$className} must have a Config attribute.");
+            if ($reflection->getFileName() === $realPath) {
+                $classes[] = $className;
             }
-
-            $configAttribute = $configAttributes[0]->newInstance();
-            $configName = $configAttribute->name;
-
-            $configInstance = new $fullyQualifiedClassName();
-            $app->addConfig($configName, $configInstance);
         }
+
+        return $classes;
     }
 }

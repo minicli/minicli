@@ -7,6 +7,8 @@ use Minicli\Input\InputCaster;
 
 it('casts scalar and array values', function (): void {
     expect(InputCaster::castValue('10', 'int'))->toBe(10)
+        ->and(InputCaster::castValue('+1', 'int'))->toBe(1)
+        ->and(InputCaster::castValue('01', 'int'))->toBe(1)
         ->and(InputCaster::castValue('3.14', 'float'))->toBe(3.14)
         ->and(InputCaster::castValue('hello', 'string'))->toBe('hello')
         ->and(InputCaster::castValue('a,b,c', 'array'))->toBe(['a', 'b', 'c'])

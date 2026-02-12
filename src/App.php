@@ -21,6 +21,7 @@ use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Support\ConfigLoader;
 use Minicli\Support\ServiceLoader;
 use ReflectionException;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -39,7 +40,7 @@ final readonly class App
      */
     public function __construct(?string $appRoot = null)
     {
-        $this->container = Container::getInstance();
+        $this->container = new Container();
 
         $this->bindPaths($appRoot);
         $this->boot();
@@ -101,6 +102,7 @@ final readonly class App
 
         $service->load($this);
         $this->container->bind($name, fn (): ServiceInterface => $service);
+        $this->container->singleton($service::class, fn (): ServiceInterface => $service);
     }
 
     public function addConfig(string $name, object $configInstance): void
@@ -116,7 +118,9 @@ final readonly class App
         $configKey = $this->configKey($name);
 
         if (! $this->container->has($configKey)) {
-            return $name === 'app' ? new AppConfig() : null;
+            return $name === 'app'
+                ? new AppConfig(commandPaths: [$this->basePath() . '/app/Commands'])
+                : null;
         }
 
         return $this->container->get($configKey);
@@ -201,7 +205,10 @@ final readonly class App
         }
 
         /** @var ExitCode $result */
-        $result = ($command->callable)($input, $this);
+        $result = $this->resolveExitCode(
+            result: ($command->callable)($input, $this),
+            commandName: $commandName,
+        );
 
         return $result->value;
     }
@@ -252,9 +259,23 @@ final readonly class App
         }
 
         /** @var ExitCode $result */
-        $result = ($helpCommand->callable)($input, $this);
+        $result = $this->resolveExitCode(
+            result: ($helpCommand->callable)($input, $this),
+            commandName: 'help',
+        );
 
         return $result->value;
+    }
+
+    private function resolveExitCode(mixed $result, string $commandName): ExitCode
+    {
+        if (! $result instanceof ExitCode) {
+            throw new RuntimeException(
+                "Command '{$commandName}' must return " . ExitCode::class . '.'
+            );
+        }
+
+        return $result;
     }
 
     private function bindPaths(?string $appRoot): void

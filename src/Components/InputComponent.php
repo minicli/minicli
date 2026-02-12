@@ -31,17 +31,19 @@ abstract class InputComponent implements InputComponentInterface
      */
     public function ask(): string|bool|int|float|array
     {
-        $this->message->render();
+        while (true) {
+            $this->message->render();
 
-        $input = $this->readInput();
-        if (is_string($input) && $input === '' && $this->required) {
-            Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
-            LineBreak::make()->render();
+            $input = $this->readInput();
+            if (is_string($input) && $input === '' && $this->required) {
+                Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
+                LineBreak::make()->render();
 
-            return $this->ask();
+                continue;
+            }
+
+            return $input;
         }
-
-        return $input;
     }
 
     public function required(): static

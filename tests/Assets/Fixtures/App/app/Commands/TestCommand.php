@@ -8,6 +8,7 @@ use Minicli\Attributes\Argument;
 use Minicli\Attributes\Command;
 use Minicli\Console\ConsoleCommand;
 use Minicli\Console\ExitCode;
+use RuntimeException;
 
 #[Command(name: 'test', description: 'Test command root')]
 final class TestCommand extends ConsoleCommand
@@ -39,5 +40,17 @@ final class TestCommand extends ConsoleCommand
         echo (string) $count;
 
         return ExitCode::Success;
+    }
+
+    #[Command(description: 'Throw runtime exception')]
+    public function explode(): ExitCode
+    {
+        throw new RuntimeException('Boom');
+    }
+
+    #[Command(name: 'invalid-return', description: 'Return invalid command value')]
+    public function invalidReturn(): string
+    {
+        return 'invalid';
     }
 }

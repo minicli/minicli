@@ -91,7 +91,7 @@ final readonly class InputCaster
      */
     public static function castToInteger(string $value): int
     {
-        if (! is_numeric($value) || (string) (int) $value !== $value) {
+        if (! preg_match('/^[+-]?\d+$/', $value)) {
             throw new CastException($value);
         }
 

@@ -19,6 +19,7 @@ use RecursiveIteratorIterator;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use RuntimeException;
 
 final class CommandRegistry implements ServiceInterface
 {
@@ -114,37 +115,51 @@ final class CommandRegistry implements ServiceInterface
 
     private function loadAndRegisterCommandsFromFile(string $filePath): void
     {
-        $content = file_get_contents($filePath);
-        if ($content === false) {
-            return;
-        }
+        $classes = $this->classesDefinedInFile($filePath);
 
-        if (! preg_match('/namespace\s+([^;]+);/', $content, $namespaceMatches)) {
-            return;
-        }
-        $namespace = $namespaceMatches[1];
-
-        if (! preg_match('/class\s+(\w+)/', $content, $classMatches)) {
-            return;
-        }
-
-        $className = $classMatches[1];
-        $fullName = $namespace . '\\' . $className;
-
-        try {
-            if (! class_exists($fullName)) {
-                return;
+        foreach ($classes as $className) {
+            if (! class_exists($className)) {
+                continue;
             }
 
-            $reflection = new ReflectionClass($fullName);
+            /** @var class-string $className */
+            $reflection = new ReflectionClass($className);
             if (! $reflection->isSubclassOf(ConsoleCommand::class)) {
-                return;
+                continue;
             }
 
             $this->registerCommandClass($reflection);
-        } catch (ReflectionException) {
-            // Skip classes that can't be reflected
         }
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function classesDefinedInFile(string $filePath): array
+    {
+        $realPath = realpath($filePath);
+        if ($realPath === false) {
+            return [];
+        }
+
+        require_once $realPath;
+
+        $classes = [];
+
+        foreach (get_declared_classes() as $className) {
+            if (! class_exists($className)) {
+                continue;
+            }
+
+            /** @var class-string $className */
+            $reflection = new ReflectionClass($className);
+
+            if ($reflection->getFileName() === $realPath) {
+                $classes[] = $className;
+            }
+        }
+
+        return $classes;
     }
 
     /**
@@ -361,7 +376,7 @@ final class CommandRegistry implements ServiceInterface
         ArgumentsHandler $argumentsHandler,
         array $argumentsInfo
     ): Closure {
-        return function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $description, $argumentsHandler, $argumentsInfo): mixed {
+        return function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $description, $argumentsHandler, $argumentsInfo): ExitCode {
             if ($input->hasFlag(GlobalFlag::HELP->value)) {
                 $tempCommandInfo = new CommandInfo(
                     callable: fn (): ExitCode => ExitCode::Success,
@@ -381,14 +396,25 @@ final class CommandRegistry implements ServiceInterface
                 Component::setQuiet(true);
             }
 
-            $arguments = $argumentsHandler->prepareArguments($input);
-            $result = $method->invokeArgs($instance, $arguments);
-            $instance->teardown();
+            try {
+                $arguments = $argumentsHandler->prepareArguments($input);
+                $result = $method->invokeArgs($instance, $arguments);
 
-            // Reset quiet flag after command execution
-            Component::setQuiet(false);
+                if (! $result instanceof ExitCode) {
+                    throw new RuntimeException(
+                        "Command '{$commandName}' must return " . ExitCode::class . '.'
+                    );
+                }
 
-            return $result;
+                return $result;
+            } finally {
+                try {
+                    $instance->teardown();
+                } finally {
+                    // Reset quiet flag after command execution
+                    Component::setQuiet(false);
+                }
+            }
         };
     }
 }

@@ -9,6 +9,7 @@ use Minicli\Config\LogConfig;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
 use ReflectionException;
+use RuntimeException;
 
 class Logger implements ServiceInterface
 {
@@ -86,17 +87,19 @@ class Logger implements ServiceInterface
 
     private function writeLog(string $message): void
     {
-        if (! is_dir($this->logsPath)) {
-            mkdir($this->logsPath, 0775, true);
+        if (! is_dir($this->logsPath) && (! mkdir($this->logsPath, 0775, true) && ! is_dir($this->logsPath))) {
+            throw new RuntimeException("Unable to create logs directory: {$this->logsPath}");
         }
 
         $logFile = $this->getLogFilePath();
 
-        if (! file_exists($logFile)) {
-            touch($logFile);
+        if (! file_exists($logFile) && ! touch($logFile)) {
+            throw new RuntimeException("Unable to create log file: {$logFile}");
         }
 
-        file_put_contents($logFile, $message, FILE_APPEND);
+        if (file_put_contents($logFile, $message, FILE_APPEND | LOCK_EX) === false) {
+            throw new RuntimeException("Unable to write log file: {$logFile}");
+        }
     }
 
     private function getLogFilePath(): string

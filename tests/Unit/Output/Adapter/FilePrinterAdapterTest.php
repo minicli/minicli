@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Minicli\Output\Adapter\FilePrinterAdapter;
+use RuntimeException;
 
 it('writes output to file', function (): void {
     $filePath = sys_get_temp_dir() . '/minicli-output-test.log';
@@ -21,4 +22,4 @@ it('writes output to file', function (): void {
 it('throws when output file directory is not writable', function (): void {
     $adapter = new FilePrinterAdapter('/root/cant_write_here/minicli.log');
     $adapter->out('test');
-})->throws(TypeError::class);
+})->throws(RuntimeException::class);
