@@ -6,52 +6,15 @@ namespace Minicli\Components;
 
 use Minicli\Input\Input;
 
-class Question
+class Question extends InputComponent
 {
-    private readonly Text $message;
-
-    private bool $required = true;
-
-    public function __construct(Text|string $message)
-    {
-        if (is_string($message)) {
-            $message = Text::make($message);
-        }
-
-        $this->message = $message;
-    }
-
     public static function make(Text|string $message): self
     {
         return new self($message);
     }
 
-    public function ask(): string
+    protected function readInput(): string
     {
-        $this->message->render();
-
-        $input = new Input()->read();
-        if ($input === '' && $this->required) {
-            Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
-            LineBreak::make()->render();
-
-            return $this->ask();
-        }
-
-        return $input;
-    }
-
-    public function required(): self
-    {
-        $this->required = true;
-
-        return $this;
-    }
-
-    public function optional(): self
-    {
-        $this->required = false;
-
-        return $this;
+        return new Input()->read();
     }
 }

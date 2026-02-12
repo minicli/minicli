@@ -22,6 +22,67 @@ final class Input
         return $input;
     }
 
+    public function readHidden(): string
+    {
+        if (! defined('STDIN') || ! stream_isatty(STDIN)) {
+            $fallback = fgets(STDIN);
+            $input = trim($fallback === false ? '' : $fallback, "\r\n");
+            $this->inputHistory[] = $input;
+
+            return $input;
+        }
+
+        if ($this->prompt !== '') {
+            fwrite(STDOUT, $this->prompt);
+        }
+
+        $sttyMode = shell_exec('stty -g');
+        if (! is_string($sttyMode) || $sttyMode === '') {
+            $fallback = fgets(STDIN);
+            $input = trim($fallback === false ? '' : $fallback, "\r\n");
+            $this->inputHistory[] = $input;
+
+            return $input;
+        }
+
+        shell_exec('stty -echo -icanon min 1 time 0');
+
+        $input = '';
+
+        try {
+            while (true) {
+                $char = fgetc(STDIN);
+
+                if ($char === false) {
+                    continue;
+                }
+
+                if ($char === "\n" || $char === "\r") {
+                    break;
+                }
+
+                if ($char === "\010" || $char === "\177") {
+                    if ($input !== '') {
+                        $input = substr($input, 0, -1);
+                        fwrite(STDOUT, "\010 \010");
+                    }
+
+                    continue;
+                }
+
+                $input .= $char;
+                fwrite(STDOUT, '*');
+            }
+        } finally {
+            shell_exec('stty ' . trim($sttyMode));
+        }
+
+        fwrite(STDOUT, PHP_EOL);
+        $this->inputHistory[] = $input;
+
+        return $input;
+    }
+
     /**
      * @return array<string>
      */
