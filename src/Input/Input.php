@@ -172,6 +172,142 @@ final class Input
     }
 
     /**
+     * @param  array<string>  $options
+     * @param  array<int>  $selectedIndices
+     * @return array<int>
+     */
+    public function readMultiChoice(array $options, array $selectedIndices = [], int $activeIndex = 0): array
+    {
+        if ($options === []) {
+            return [];
+        }
+
+        $activeIndex = $this->normalizeChoiceIndex($activeIndex, $options);
+        $selected = $this->normalizeSelectedIndices($selectedIndices, $options);
+
+        if (! $this->isInteractiveInput()) {
+            $line = $this->readFromStdin();
+            if ($line !== '') {
+                $selected = $this->resolveMultiChoiceIndices($line, $options, $selected);
+            }
+
+            $this->storeInput(implode(',', array_map(
+                static fn (int $index): string => $options[$index],
+                $selected,
+            )));
+
+            return $selected;
+        }
+
+        $this->hideCursor();
+        $this->renderMultiChoices($options, $selected, $activeIndex);
+
+        $sttyMode = $this->getSttyMode();
+        if ($sttyMode === null) {
+            fwrite(STDOUT, PHP_EOL);
+            $line = $this->readFromStdin();
+            if ($line !== '') {
+                $selected = $this->resolveMultiChoiceIndices($line, $options, $selected);
+            }
+
+            $this->storeInput(implode(',', array_map(
+                static fn (int $index): string => $options[$index],
+                $selected,
+            )));
+            $this->showCursor();
+
+            return $selected;
+        }
+
+        shell_exec('stty -echo -icanon min 1 time 0');
+
+        try {
+            while (true) {
+                $char = fgetc(STDIN);
+
+                if ($char === false) {
+                    continue;
+                }
+
+                if ($char === "\n" || $char === "\r") {
+                    break;
+                }
+
+                if ($char === ' ') {
+                    if (in_array($activeIndex, $selected, true)) {
+                        $selected = array_values(array_filter(
+                            $selected,
+                            static fn (int $index): bool => $index !== $activeIndex,
+                        ));
+                    } else {
+                        $selected[] = $activeIndex;
+                        sort($selected);
+                    }
+
+                    $this->renderMultiChoices($options, $selected, $activeIndex);
+
+                    continue;
+                }
+
+                if ($char === "\t") {
+                    $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
+                    $this->renderMultiChoices($options, $selected, $activeIndex);
+
+                    continue;
+                }
+
+                if ($char === "\033") {
+                    $sequenceOne = fgetc(STDIN);
+                    $sequenceTwo = fgetc(STDIN);
+                    if ($sequenceOne !== '[') {
+                        continue;
+                    }
+                    if ($sequenceTwo === false) {
+                        continue;
+                    }
+
+                    if ($sequenceTwo === 'C' || $sequenceTwo === 'B') {
+                        $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
+                        $this->renderMultiChoices($options, $selected, $activeIndex);
+                    }
+
+                    if ($sequenceTwo === 'D' || $sequenceTwo === 'A') {
+                        $activeIndex = $this->moveChoiceIndex($activeIndex, -1, $options);
+                        $this->renderMultiChoices($options, $selected, $activeIndex);
+                    }
+
+                    continue;
+                }
+
+                if ($char === 'h' || $char === 'k') {
+                    $activeIndex = $this->moveChoiceIndex($activeIndex, -1, $options);
+                    $this->renderMultiChoices($options, $selected, $activeIndex);
+
+                    continue;
+                }
+
+                if ($char === 'l' || $char === 'j') {
+                    $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
+                    $this->renderMultiChoices($options, $selected, $activeIndex);
+
+                    continue;
+                }
+            }
+        } finally {
+            $this->restoreSttyMode($sttyMode);
+            $this->showCursor();
+        }
+
+        fwrite(STDOUT, PHP_EOL);
+        $this->storeInput(implode(',', array_map(
+            static fn (int $index): string => $options[$index],
+            $selected,
+        )));
+
+        return $selected;
+    }
+
+    /**
      * @return array<string>
      */
     public function getInputHistory(): array
@@ -199,6 +335,28 @@ final class Input
         foreach ($options as $index => $option) {
             $marker = $index === $selectedIndex ? '(*)' : '( )';
             $formatted[] = "{$marker} {$option}";
+        }
+
+        fwrite(STDOUT, "\r\033[2K" . implode('   ', $formatted));
+    }
+
+    /**
+     * @param  array<string>  $options
+     * @param  array<int>  $selectedIndices
+     */
+    private function renderMultiChoices(array $options, array $selectedIndices, int $activeIndex): void
+    {
+        $formatted = [];
+
+        foreach ($options as $index => $option) {
+            $checked = in_array($index, $selectedIndices, true) ? 'x' : ' ';
+            $item = sprintf('[%s] %s', $checked, $option);
+
+            if ($index === $activeIndex) {
+                $item = "\033[7m{$item}\033[0m";
+            }
+
+            $formatted[] = $item;
         }
 
         fwrite(STDOUT, "\r\033[2K" . implode('   ', $formatted));
@@ -280,6 +438,72 @@ final class Input
         $count = count($options);
 
         return ($currentIndex + $direction + $count) % $count;
+    }
+
+    /**
+     * @param  array<int>  $selectedIndices
+     * @param  array<string>  $options
+     * @return array<int>
+     */
+    private function normalizeSelectedIndices(array $selectedIndices, array $options): array
+    {
+        $normalized = [];
+
+        foreach ($selectedIndices as $index) {
+            if ($index < 0) {
+                continue;
+            }
+            if ($index >= count($options)) {
+                continue;
+            }
+
+            $normalized[$index] = $index;
+        }
+
+        sort($normalized);
+
+        return $normalized;
+    }
+
+    /**
+     * @param  array<string>  $options
+     * @param  array<int>  $current
+     * @return array<int>
+     */
+    private function resolveMultiChoiceIndices(string $input, array $options, array $current): array
+    {
+        $tokens = array_filter(array_map(trim(...), explode(',', $input)), static fn (string $token): bool => $token !== '');
+        if ($tokens === []) {
+            return $current;
+        }
+
+        $selected = [];
+
+        foreach ($tokens as $token) {
+            if (ctype_digit($token)) {
+                $index = (int) $token - 1;
+                if ($index >= 0 && $index < count($options)) {
+                    $selected[$index] = $index;
+                }
+
+                continue;
+            }
+
+            foreach ($options as $index => $option) {
+                if (strcasecmp($option, $token) === 0) {
+                    $selected[$index] = $index;
+                    break;
+                }
+            }
+        }
+
+        if ($selected === []) {
+            return $current;
+        }
+
+        sort($selected);
+
+        return $selected;
     }
 
     private function hideCursor(): void

@@ -21,9 +21,15 @@ abstract class InputComponent implements InputComponentInterface
         $this->message = $message;
     }
 
-    abstract protected function readInput(): string|bool;
+    /**
+     * @return string|bool|array<string>
+     */
+    abstract protected function readInput(): string|bool|array;
 
-    public function ask(): string|bool
+    /**
+     * @return string|bool|array<string>
+     */
+    public function ask(): string|bool|array
     {
         $this->message->render();
 
