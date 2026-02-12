@@ -3,13 +3,20 @@
 declare(strict_types=1);
 
 use Minicli\App;
+use Minicli\Components\Component;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandRegistry;
+use Minicli\Container\Container;
+use Minicli\Output\Adapter\DefaultPrinterAdapter;
+use Minicli\Output\Filter\ColorOutputFilter;
 
-function getCommandsPath(): string
-{
-    return __DIR__ . '/Assets/Command';
-}
+beforeEach(function (): void {
+    Container::getInstance()->flush();
+
+    Component::setQuiet(false);
+    Component::setFilter(new ColorOutputFilter());
+    Component::setPrinter(new DefaultPrinterAdapter());
+});
 
 function getBasicApp(): App
 {
@@ -28,7 +35,12 @@ function getThemedApp(): App
 
 function getConfiguredApp(): App
 {
-    return new App(__DIR__ . '/Assets');
+    return new App(getFixtureAppRoot());
+}
+
+function getFixtureAppRoot(): string
+{
+    return __DIR__ . '/Assets/Fixtures/App';
 }
 
 function getCommandCall(?array $parameters = null): CommandCall
@@ -38,8 +50,7 @@ function getCommandCall(?array $parameters = null): CommandCall
 
 function getRegistry(): CommandRegistry
 {
-    $app = new App();
-    $app->registerCommand('minicli-test', new Minicli\Console\CommandInfo(fn (): true => true, 'minicli-test'));
+    $app = getConfiguredApp();
 
     /** @var CommandRegistry $registry */
     $registry = $app->commandRegistry;
@@ -49,10 +60,25 @@ function getRegistry(): CommandRegistry
 
 function getRegistryWithMultiplePaths(): CommandRegistry
 {
-    $app = new App();
+    $app = getConfiguredApp();
 
     /** @var CommandRegistry $registry */
     $registry = $app->commandRegistry;
 
     return $registry;
+}
+
+function runInlinePhpWithInput(string $phpCode, string $stdin): string
+{
+    $script = "require 'vendor/autoload.php';\n{$phpCode}";
+
+    $command = sprintf(
+        'printf %%s %s | php -r %s',
+        escapeshellarg($stdin),
+        escapeshellarg($script),
+    );
+
+    $output = shell_exec($command);
+
+    return is_string($output) ? $output : '';
 }
