@@ -9,7 +9,9 @@ use Minicli\Components\Component;
 class Table extends Component
 {
     /** @var array<Row> */
-    protected array $rows;
+    protected array $rows = [];
+
+    protected bool $withBorders = false;
 
     /**
      * @param  array<Row>|null  $table
@@ -39,12 +41,27 @@ class Table extends Component
         return count($this->rows);
     }
 
+    public function withBorders(): self
+    {
+        $this->withBorders = true;
+
+        return $this;
+    }
+
     public function output(): string
     {
         $columnSizes = $this->calculateColumnSizes();
         $output = '';
 
+        if ($this->withBorders) {
+            $output .= $this->borderLine($columnSizes);
+        }
+
         foreach ($this->rows as $row) {
+            if ($this->withBorders) {
+                $output .= '|';
+            }
+
             $row->applyStylesToCells();
             foreach ($row->cells as $columnIndex => $cell) {
                 $paddedContent = paddedString(
@@ -54,9 +71,17 @@ class Table extends Component
 
                 $cell->setContent($paddedContent);
                 $output .= $cell->withoutLineBreak()->output();
+
+                if ($this->withBorders) {
+                    $output .= '|';
+                }
             }
 
             $output .= "\n";
+
+            if ($this->withBorders) {
+                $output .= $this->borderLine($columnSizes);
+            }
         }
 
         return $output;
@@ -92,5 +117,19 @@ class Table extends Component
         }
 
         return $columnSizes;
+    }
+
+    /**
+     * @param  array<int>  $columnSizes
+     */
+    protected function borderLine(array $columnSizes): string
+    {
+        $line = '+';
+
+        foreach ($columnSizes as $columnSize) {
+            $line .= str_repeat('-', $columnSize) . '+';
+        }
+
+        return $line . "\n";
     }
 }
