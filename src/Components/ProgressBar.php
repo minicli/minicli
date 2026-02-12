@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Minicli\Components;
 
+use Minicli\Concerns\HasStyles;
+
 final class ProgressBar extends Component
 {
+    use HasStyles;
+
     private Text $message;
 
     private float $progress = 0.0;
@@ -148,12 +152,12 @@ final class ProgressBar extends Component
 
     public function output(): string
     {
-        return $this->formattedLine() . ($this->isInteractiveOutput() ? '' : PHP_EOL);
+        return $this->styledLine() . ($this->isInteractiveOutput() ? '' : PHP_EOL);
     }
 
     private function renderProgress(): void
     {
-        $line = $this->formattedLine();
+        $line = $this->styledLine();
 
         if ($this->isInteractiveOutput()) {
             fwrite(STDOUT, "\r\033[2K{$line}");
@@ -164,13 +168,18 @@ final class ProgressBar extends Component
         fwrite(STDOUT, $line . PHP_EOL);
     }
 
+    private function styledLine(): string
+    {
+        return $this->printer()->out($this->filter()->filter($this->formattedLine(), $this->styles()));
+    }
+
     private function formattedLine(): string
     {
         $filled = (int) round(($this->progress / 100) * $this->width);
         $empty = $this->width - $filled;
         $bar = str_repeat('█', $filled) . str_repeat(' ', $empty);
         $percent = sprintf('%3d', (int) round($this->progress));
-        $text = $this->message->withoutLineBreak()->output();
+        $text = $this->message->content();
         $stepCount = $this->formattedStepCount();
 
         if ($stepCount !== null) {

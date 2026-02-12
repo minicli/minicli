@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Minicli\Components;
 
+use Minicli\Concerns\HasStyles;
+
 class Divider extends Component
 {
+    use HasStyles;
+
     private bool $useFullWidth = false;
 
     public function __construct(
         private string $style = '─',
         private int $width = 5,
-    ) {}
+    ) {
+        $this->dim();
+    }
 
     public static function make(string $style = '─', int $width = 5): self
     {
@@ -47,7 +53,9 @@ class Divider extends Component
 
     public function output(): string
     {
-        return str_repeat($this->style, $this->resolvedWidth()) . "\n";
+        $line = str_repeat($this->style, $this->resolvedWidth());
+
+        return $this->printer()->out($this->filter()->filter($line, $this->styles())) . "\n";
     }
 
     private function resolvedWidth(): int

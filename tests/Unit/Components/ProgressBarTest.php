@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Minicli\Components\Component;
 use Minicli\Components\ProgressBar;
+use Minicli\Output\Filter\ColorOutputFilter;
 use Minicli\Output\Filter\SimpleOutputFilter;
 
 it('formats progress bar output', function (): void {
@@ -35,4 +36,16 @@ it('runs through all configured steps', function (): void {
         ->and($bar->output())->toContain('Run')
         ->and($bar->output())->toContain('2/2')
         ->toContain('100%');
+});
+
+it('supports styling through has styles trait', function (): void {
+    Component::setFilter(new ColorOutputFilter());
+
+    $bar = ProgressBar::make('Styled')->warning()->bold();
+    $bar->setProgress(10);
+
+    expect($bar->output())
+        ->toContain("\e[")
+        ->toContain('Styled')
+        ->toContain('10%');
 });
