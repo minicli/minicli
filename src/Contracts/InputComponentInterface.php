@@ -6,7 +6,7 @@ namespace Minicli\Contracts;
 
 interface InputComponentInterface
 {
-    public function ask(): string;
+    public function ask(): string|bool;
 
     public function required(): static;
 

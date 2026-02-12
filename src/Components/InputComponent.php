@@ -21,14 +21,14 @@ abstract class InputComponent implements InputComponentInterface
         $this->message = $message;
     }
 
-    abstract protected function readInput(): string;
+    abstract protected function readInput(): string|bool;
 
-    public function ask(): string
+    public function ask(): string|bool
     {
         $this->message->render();
 
         $input = $this->readInput();
-        if ($input === '' && $this->required) {
+        if (is_string($input) && $input === '' && $this->required) {
             Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
             LineBreak::make()->render();
 
