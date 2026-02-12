@@ -6,6 +6,7 @@ namespace Minicli\Components\Table;
 
 use Minicli\Components\Text;
 use Minicli\Concerns\HasStyles;
+use Minicli\Support\Alignment;
 
 final class Row
 {
@@ -13,6 +14,8 @@ final class Row
 
     /** @var array<Text> */
     public array $cells;
+
+    private ?Alignment $alignment = null;
 
     /**
      * @param  array<Text|string>  $cells
@@ -49,5 +52,31 @@ final class Row
                 }
             }
         }
+    }
+
+    public function alignLeft(): self
+    {
+        $this->alignment = Alignment::Left;
+
+        return $this;
+    }
+
+    public function alignCenter(): self
+    {
+        $this->alignment = Alignment::Center;
+
+        return $this;
+    }
+
+    public function alignRight(): self
+    {
+        $this->alignment = Alignment::Right;
+
+        return $this;
+    }
+
+    public function alignment(): ?Alignment
+    {
+        return $this->alignment;
     }
 }

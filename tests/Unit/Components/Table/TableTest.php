@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Minicli\Components\Component;
 use Minicli\Components\Table\Row;
 use Minicli\Components\Table\Table;
+use Minicli\Components\Text;
+use Minicli\Output\Filter\SimpleOutputFilter;
 
 it('renders rows created with row objects', function (): void {
     $table = new Table([
@@ -42,4 +45,37 @@ it('renders border mode consistently', function (): void {
     expect($output)->toContain('+')
         ->toContain('|')
         ->and($borderLines)->toHaveCount(3);
+});
+
+it('keeps text alignment when rendering cells', function (): void {
+    Component::setFilter(new SimpleOutputFilter());
+
+    $table = Table::make([
+        Row::make([
+            Text::make('left')->width(8)->alignLeft(),
+            Text::make('mid')->width(8)->alignCenter(),
+            Text::make('right')->width(8)->alignRight(),
+        ]),
+    ])->withBorders();
+
+    $output = $table->output();
+
+    expect($output)->toContain('| left')
+        ->toContain('  mid')
+        ->toContain('right |');
+});
+
+it('applies row alignment to all cells', function (): void {
+    Component::setFilter(new SimpleOutputFilter());
+
+    $table = Table::make([
+        Row::make(['A', 'B', 'C']),
+        Row::make(['left', 'middle', 'right'])->alignCenter(),
+    ])->withBorders();
+
+    $output = $table->output();
+
+    expect($output)->toContain('|  left')
+        ->toContain(' middle ')
+        ->toContain(' right  |');
 });

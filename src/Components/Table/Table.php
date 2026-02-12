@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Components\Table;
 
 use Minicli\Components\Component;
-use Minicli\Components\Text;
+use Minicli\Support\Alignment;
 
 class Table extends Component
 {
@@ -67,21 +67,27 @@ class Table extends Component
             foreach ($row->cells as $columnIndex => $cell) {
                 $columnSize = $columnSizes[$columnIndex];
                 $innerSize = $this->withBorders ? max(0, $columnSize - 2) : $columnSize;
-                $paddedContent = paddedString($cell->content(), $innerSize);
 
-                if ($this->withBorders) {
-                    $paddedContent = " {$paddedContent} ";
+                $textCell = clone $cell;
+                $textCell->setContent($cell->content())
+                    ->width($innerSize);
+
+                if ($row->alignment() !== null) {
+                    match ($row->alignment()) {
+                        Alignment::Center => $textCell->alignCenter(),
+                        Alignment::Right => $textCell->alignRight(),
+                        default => $textCell->alignLeft(),
+                    };
                 }
 
-                $textCell = Text::make($paddedContent)->applyStyles($cell->styles());
-                if ($cell->isAlt()) {
-                    $textCell->alt();
+                if ($this->withBorders) {
+                    $output .= ' ';
                 }
 
                 $output .= $textCell->withoutLineBreak()->output();
 
                 if ($this->withBorders) {
-                    $output .= '|';
+                    $output .= ' |';
                 }
             }
 
