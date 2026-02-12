@@ -24,6 +24,10 @@ final class ProgressBar extends Component
 
     private int $width = 30;
 
+    private int $currentStep = 0;
+
+    private int $totalSteps = 0;
+
     public function __construct(Text|string $message)
     {
         if (is_string($message)) {
@@ -55,6 +59,7 @@ final class ProgressBar extends Component
     public function steps(array $steps): self
     {
         $this->steps = $steps;
+        $this->totalSteps = count($steps);
 
         return $this;
     }
@@ -96,6 +101,8 @@ final class ProgressBar extends Component
         }
 
         $total = count($this->steps);
+        $this->totalSteps = $total;
+        $this->currentStep = 0;
         $this->setProgress(0);
 
         foreach ($this->steps as $index => $step) {
@@ -103,6 +110,7 @@ final class ProgressBar extends Component
                 ($this->callback)($step, $index);
             }
 
+            $this->currentStep = $index + 1;
             $this->setProgress((($index + 1) / $total) * 100);
         }
 
@@ -121,6 +129,11 @@ final class ProgressBar extends Component
 
         if ($this->progress < 100.0) {
             $this->progress = 100.0;
+
+            if ($this->totalSteps > 0) {
+                $this->currentStep = $this->totalSteps;
+            }
+
             $this->renderProgress();
         }
 
@@ -155,11 +168,25 @@ final class ProgressBar extends Component
     {
         $filled = (int) round(($this->progress / 100) * $this->width);
         $empty = $this->width - $filled;
-        $bar = str_repeat('=', $filled) . str_repeat('-', $empty);
+        $bar = str_repeat('█', $filled) . str_repeat(' ', $empty);
         $percent = sprintf('%3d', (int) round($this->progress));
         $text = $this->message->withoutLineBreak()->output();
+        $stepCount = $this->formattedStepCount();
+
+        if ($stepCount !== null) {
+            return sprintf('%s %s [%s] %s%%', $text, $stepCount, $bar, $percent);
+        }
 
         return sprintf('%s [%s] %s%%', $text, $bar, $percent);
+    }
+
+    private function formattedStepCount(): ?string
+    {
+        if ($this->totalSteps <= 0) {
+            return null;
+        }
+
+        return sprintf('%d/%d', $this->currentStep, $this->totalSteps);
     }
 
     private function isInteractiveOutput(): bool
