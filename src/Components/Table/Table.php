@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Minicli\Components\Table;
 
 use Minicli\Components\Component;
+use Minicli\Components\Text;
 
 class Table extends Component
 {
@@ -57,20 +58,27 @@ class Table extends Component
             $output .= $this->borderLine($columnSizes);
         }
 
-        foreach ($this->rows as $row) {
+        foreach ($this->rows as $rowIndex => $row) {
             if ($this->withBorders) {
                 $output .= '|';
             }
 
             $row->applyStylesToCells();
             foreach ($row->cells as $columnIndex => $cell) {
-                $paddedContent = paddedString(
-                    $cell->content(),
-                    $columnSizes[$columnIndex]
-                );
+                $columnSize = $columnSizes[$columnIndex];
+                $innerSize = $this->withBorders ? max(0, $columnSize - 2) : $columnSize;
+                $paddedContent = paddedString($cell->content(), $innerSize);
 
-                $cell->setContent($paddedContent);
-                $output .= $cell->withoutLineBreak()->output();
+                if ($this->withBorders) {
+                    $paddedContent = " {$paddedContent} ";
+                }
+
+                $textCell = Text::make($paddedContent)->applyStyles($cell->styles());
+                if ($cell->isAlt()) {
+                    $textCell->alt();
+                }
+
+                $output .= $textCell->withoutLineBreak()->output();
 
                 if ($this->withBorders) {
                     $output .= '|';
@@ -79,9 +87,13 @@ class Table extends Component
 
             $output .= "\n";
 
-            if ($this->withBorders) {
+            if ($this->withBorders && $rowIndex === 0 && $this->totalRows() > 1) {
                 $output .= $this->borderLine($columnSizes);
             }
+        }
+
+        if ($this->withBorders && $this->rows !== []) {
+            $output .= $this->borderLine($columnSizes);
         }
 
         return $output;

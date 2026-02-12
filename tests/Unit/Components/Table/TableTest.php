@@ -36,7 +36,10 @@ it('renders border mode consistently', function (): void {
     ])->withBorders();
 
     $output = $table->output();
+    $lines = array_values(array_filter(explode("\n", trim($output))));
+    $borderLines = array_values(array_filter($lines, static fn (string $line): bool => str_starts_with($line, '+')));
 
     expect($output)->toContain('+')
-        ->toContain('|');
+        ->toContain('|')
+        ->and($borderLines)->toHaveCount(3);
 });
