@@ -22,14 +22,14 @@ abstract class InputComponent implements InputComponentInterface
     }
 
     /**
-     * @return string|bool|array<string>
+     * @return string|bool|int|float|array<string>
      */
-    abstract protected function readInput(): string|bool|array;
+    abstract protected function readInput(): string|bool|int|float|array;
 
     /**
-     * @return string|bool|array<string>
+     * @return string|bool|int|float|array<string>
      */
-    public function ask(): string|bool|array
+    public function ask(): string|bool|int|float|array
     {
         $this->message->render();
 

@@ -71,6 +71,96 @@ final class Input
         return $this->storeInput($input);
     }
 
+    public function readNumber(
+        int|float|null $defaultValue = null,
+        int|float $step = 1,
+        int|float|null $minValue = null,
+        int|float|null $maxValue = null,
+    ): string {
+        if (! $this->isInteractiveInput()) {
+            $input = $this->readFromStdin();
+            if ($input === '' && $defaultValue !== null) {
+                $input = $this->stringifyNumber($this->clampNumber($defaultValue, $minValue, $maxValue));
+            }
+
+            return $this->storeInput($input);
+        }
+
+        $sttyMode = $this->getSttyMode();
+        if ($sttyMode === null) {
+            $input = $this->readFromStdin();
+            if ($input === '' && $defaultValue !== null) {
+                $input = $this->stringifyNumber($this->clampNumber($defaultValue, $minValue, $maxValue));
+            }
+
+            return $this->storeInput($input);
+        }
+
+        $input = $defaultValue !== null
+            ? $this->stringifyNumber($this->clampNumber($defaultValue, $minValue, $maxValue))
+            : '';
+
+        shell_exec('stty -echo -icanon min 1 time 0');
+        $this->renderCurrentNumberInput($input);
+
+        try {
+            while (true) {
+                $char = fgetc(STDIN);
+
+                if ($char === false) {
+                    continue;
+                }
+
+                if ($char === "\n" || $char === "\r") {
+                    break;
+                }
+
+                if ($char === "\010" || $char === "\177") {
+                    if ($input !== '') {
+                        $input = substr($input, 0, -1);
+                        $this->renderCurrentNumberInput($input);
+                    }
+
+                    continue;
+                }
+
+                if ($char === "\033") {
+                    $sequenceOne = fgetc(STDIN);
+                    $sequenceTwo = fgetc(STDIN);
+                    if ($sequenceOne !== '[') {
+                        continue;
+                    }
+                    if ($sequenceTwo === false) {
+                        continue;
+                    }
+
+                    if ($sequenceTwo === 'A') {
+                        $input = $this->adjustNumericInput($input, abs($step), $defaultValue, $minValue, $maxValue);
+                        $this->renderCurrentNumberInput($input);
+                    }
+
+                    if ($sequenceTwo === 'B') {
+                        $input = $this->adjustNumericInput($input, -abs($step), $defaultValue, $minValue, $maxValue);
+                        $this->renderCurrentNumberInput($input);
+                    }
+
+                    continue;
+                }
+
+                if (in_array($char, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-', '+'], true)) {
+                    $input .= $char;
+                    $this->renderCurrentNumberInput($input);
+                }
+            }
+        } finally {
+            $this->restoreSttyMode($sttyMode);
+        }
+
+        fwrite(STDOUT, PHP_EOL);
+
+        return $this->storeInput($input);
+    }
+
     /**
      * @param  array<string>  $options
      */
@@ -541,5 +631,56 @@ final class Input
     private function showCursor(): void
     {
         fwrite(STDOUT, "\033[?25h");
+    }
+
+    private function renderCurrentNumberInput(string $input): void
+    {
+        fwrite(STDOUT, "\r\033[2K{$this->prompt}{$input}");
+    }
+
+    private function adjustNumericInput(
+        string $input,
+        int|float $step,
+        int|float|null $defaultValue,
+        int|float|null $minValue,
+        int|float|null $maxValue,
+    ): string {
+        if (is_numeric($input)) {
+            $value = (float) $input;
+
+            return $this->stringifyNumber($this->clampNumber($value + $step, $minValue, $maxValue));
+        }
+
+        if ($defaultValue !== null) {
+            return $this->stringifyNumber($this->clampNumber($defaultValue + $step, $minValue, $maxValue));
+        }
+
+        return $this->stringifyNumber($this->clampNumber($step, $minValue, $maxValue));
+    }
+
+    private function clampNumber(int|float $value, int|float|null $minValue, int|float|null $maxValue): int|float
+    {
+        if ($minValue !== null && $value < $minValue) {
+            return $minValue;
+        }
+
+        if ($maxValue !== null && $value > $maxValue) {
+            return $maxValue;
+        }
+
+        return $value;
+    }
+
+    private function stringifyNumber(int|float $value): string
+    {
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if (fmod($value, 1.0) === 0.0) {
+            return (string) (int) $value;
+        }
+
+        return rtrim(rtrim(sprintf('%.14F', $value), '0'), '.');
     }
 }
