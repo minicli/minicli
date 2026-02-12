@@ -74,7 +74,7 @@ final class Input
     /**
      * @param  array<string>  $options
      */
-    public function readChoice(array $options, int $selectedIndex = 0): int
+    public function readChoice(array $options, int $selectedIndex = 0, bool $vertical = false): int
     {
         if ($options === []) {
             return 0;
@@ -90,7 +90,7 @@ final class Input
         }
 
         $this->hideCursor();
-        $this->renderChoices($options, $selectedIndex);
+        $this->renderChoices($options, $selectedIndex, $vertical);
 
         $sttyMode = $this->getSttyMode();
         if ($sttyMode === null) {
@@ -118,7 +118,7 @@ final class Input
 
                 if ($char === "\t") {
                     $selectedIndex = $this->moveChoiceIndex($selectedIndex, 1, $options);
-                    $this->renderChoices($options, $selectedIndex);
+                    $this->renderChoices($options, $selectedIndex, $vertical, true);
 
                     continue;
                 }
@@ -135,12 +135,12 @@ final class Input
 
                     if ($sequenceTwo === 'C' || $sequenceTwo === 'B') {
                         $selectedIndex = $this->moveChoiceIndex($selectedIndex, 1, $options);
-                        $this->renderChoices($options, $selectedIndex);
+                        $this->renderChoices($options, $selectedIndex, $vertical, true);
                     }
 
                     if ($sequenceTwo === 'D' || $sequenceTwo === 'A') {
                         $selectedIndex = $this->moveChoiceIndex($selectedIndex, -1, $options);
-                        $this->renderChoices($options, $selectedIndex);
+                        $this->renderChoices($options, $selectedIndex, $vertical, true);
                     }
 
                     continue;
@@ -148,14 +148,14 @@ final class Input
 
                 if ($char === 'h' || $char === 'k') {
                     $selectedIndex = $this->moveChoiceIndex($selectedIndex, -1, $options);
-                    $this->renderChoices($options, $selectedIndex);
+                    $this->renderChoices($options, $selectedIndex, $vertical, true);
 
                     continue;
                 }
 
                 if ($char === 'l' || $char === 'j') {
                     $selectedIndex = $this->moveChoiceIndex($selectedIndex, 1, $options);
-                    $this->renderChoices($options, $selectedIndex);
+                    $this->renderChoices($options, $selectedIndex, $vertical, true);
 
                     continue;
                 }
@@ -176,7 +176,7 @@ final class Input
      * @param  array<int>  $selectedIndices
      * @return array<int>
      */
-    public function readMultiChoice(array $options, array $selectedIndices = [], int $activeIndex = 0): array
+    public function readMultiChoice(array $options, array $selectedIndices = [], int $activeIndex = 0, bool $vertical = false): array
     {
         if ($options === []) {
             return [];
@@ -200,7 +200,7 @@ final class Input
         }
 
         $this->hideCursor();
-        $this->renderMultiChoices($options, $selected, $activeIndex);
+        $this->renderMultiChoices($options, $selected, $activeIndex, $vertical);
 
         $sttyMode = $this->getSttyMode();
         if ($sttyMode === null) {
@@ -244,14 +244,14 @@ final class Input
                         sort($selected);
                     }
 
-                    $this->renderMultiChoices($options, $selected, $activeIndex);
+                    $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
 
                     continue;
                 }
 
                 if ($char === "\t") {
                     $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
-                    $this->renderMultiChoices($options, $selected, $activeIndex);
+                    $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
 
                     continue;
                 }
@@ -268,12 +268,12 @@ final class Input
 
                     if ($sequenceTwo === 'C' || $sequenceTwo === 'B') {
                         $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
-                        $this->renderMultiChoices($options, $selected, $activeIndex);
+                        $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
                     }
 
                     if ($sequenceTwo === 'D' || $sequenceTwo === 'A') {
                         $activeIndex = $this->moveChoiceIndex($activeIndex, -1, $options);
-                        $this->renderMultiChoices($options, $selected, $activeIndex);
+                        $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
                     }
 
                     continue;
@@ -281,14 +281,14 @@ final class Input
 
                 if ($char === 'h' || $char === 'k') {
                     $activeIndex = $this->moveChoiceIndex($activeIndex, -1, $options);
-                    $this->renderMultiChoices($options, $selected, $activeIndex);
+                    $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
 
                     continue;
                 }
 
                 if ($char === 'l' || $char === 'j') {
                     $activeIndex = $this->moveChoiceIndex($activeIndex, 1, $options);
-                    $this->renderMultiChoices($options, $selected, $activeIndex);
+                    $this->renderMultiChoices($options, $selected, $activeIndex, $vertical, true);
 
                     continue;
                 }
@@ -328,7 +328,7 @@ final class Input
     /**
      * @param  array<string>  $options
      */
-    private function renderChoices(array $options, int $selectedIndex): void
+    private function renderChoices(array $options, int $selectedIndex, bool $vertical, bool $refresh = false): void
     {
         $formatted = [];
 
@@ -337,14 +337,14 @@ final class Input
             $formatted[] = "{$marker} {$option}";
         }
 
-        fwrite(STDOUT, "\r\033[2K" . implode('   ', $formatted));
+        $this->renderOptionLines($formatted, $vertical, $refresh);
     }
 
     /**
      * @param  array<string>  $options
      * @param  array<int>  $selectedIndices
      */
-    private function renderMultiChoices(array $options, array $selectedIndices, int $activeIndex): void
+    private function renderMultiChoices(array $options, array $selectedIndices, int $activeIndex, bool $vertical, bool $refresh = false): void
     {
         $formatted = [];
 
@@ -359,7 +359,34 @@ final class Input
             $formatted[] = $item;
         }
 
-        fwrite(STDOUT, "\r\033[2K" . implode('   ', $formatted));
+        $this->renderOptionLines($formatted, $vertical, $refresh);
+    }
+
+    /**
+     * @param  array<string>  $lines
+     */
+    private function renderOptionLines(array $lines, bool $vertical, bool $refresh): void
+    {
+        if (! $vertical) {
+            fwrite(STDOUT, "\r\033[2K" . implode('   ', $lines));
+
+            return;
+        }
+
+        $lineCount = count($lines);
+
+        fwrite(STDOUT, "\r");
+        if ($refresh && $lineCount > 1) {
+            fwrite(STDOUT, "\033[" . ($lineCount - 1) . 'A');
+        }
+
+        foreach ($lines as $index => $line) {
+            fwrite(STDOUT, "\033[2K{$line}");
+
+            if ($index < $lineCount - 1) {
+                fwrite(STDOUT, PHP_EOL);
+            }
+        }
     }
 
     private function isInteractiveInput(): bool

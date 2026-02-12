@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Minicli\Components;
 
+use Minicli\Concerns\HasOptionLayout;
 use Minicli\Input\Input;
 
 final class Confirm extends InputComponent
 {
+    use HasOptionLayout;
+
     private string $yesLabel = 'Yes';
 
     private string $noLabel = 'No';
@@ -52,6 +55,7 @@ final class Confirm extends InputComponent
         $selected = new Input('')->readChoice(
             options: [$this->yesLabel, $this->noLabel],
             selectedIndex: $this->defaultValue ? 0 : 1,
+            vertical: $this->isVerticalLayout(),
         );
 
         return $selected === 0;

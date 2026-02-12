@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Minicli\Components;
 
 use InvalidArgumentException;
+use Minicli\Concerns\HasOptionLayout;
 use Minicli\Input\Input;
 
 final class Select extends InputComponent
 {
+    use HasOptionLayout;
+
     /**
      * @var array<string>
      */
@@ -84,6 +87,7 @@ final class Select extends InputComponent
         $selectedIndex = new Input('')->readChoice(
             options: $this->labels,
             selectedIndex: $defaultIndex,
+            vertical: $this->isVerticalLayout(),
         );
 
         return $this->values[$selectedIndex];

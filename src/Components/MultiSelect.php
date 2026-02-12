@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Minicli\Components;
 
 use InvalidArgumentException;
+use Minicli\Concerns\HasOptionLayout;
 use Minicli\Input\Input;
 
 final class MultiSelect extends InputComponent
 {
+    use HasOptionLayout;
+
     /**
      * @var array<string>
      */
@@ -96,6 +99,7 @@ final class MultiSelect extends InputComponent
         $selectedIndices = new Input('')->readMultiChoice(
             options: $this->labels,
             selectedIndices: $defaultIndices,
+            vertical: $this->isVerticalLayout(),
         );
 
         return array_values(array_map(
