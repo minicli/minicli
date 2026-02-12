@@ -10,3 +10,16 @@ PHP, "\n");
 
     expect($output)->toContain('RESULT=7');
 });
+
+it('retries number input when validation fails', function (): void {
+    $output = runInlinePhpWithInput(<<<'PHP'
+$value = Minicli\Components\Number::make('How many?')
+    ->validate(fn (int|float $input): ?string => $input < 18 ? 'Input must be at least 18.' : null)
+    ->ask();
+echo "RESULT={$value}";
+PHP, "16\n18\n");
+
+    expect($output)
+        ->toContain('Input must be at least 18.')
+        ->toContain('RESULT=18');
+});

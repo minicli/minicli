@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Minicli\Components;
 
+use Closure;
 use Minicli\Contracts\InputComponentInterface;
 
 abstract class InputComponent implements InputComponentInterface
@@ -11,6 +12,11 @@ abstract class InputComponent implements InputComponentInterface
     protected readonly Text $message;
 
     protected bool $required = true;
+
+    /**
+     * @var null|Closure(string|bool|int|float|array<mixed>): ?string
+     */
+    protected ?Closure $validationCallback = null;
 
     public function __construct(Text|string $message)
     {
@@ -36,7 +42,15 @@ abstract class InputComponent implements InputComponentInterface
 
             $input = $this->readInput();
             if (is_string($input) && $input === '' && $this->required) {
-                Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
+                Alert::make('Input cannot be empty. Please provide a value.')->error()->render();
+                LineBreak::make()->render();
+
+                continue;
+            }
+
+            $validationError = $this->validateInput($input);
+            if ($validationError !== null) {
+                Alert::make($validationError)->error()->render();
                 LineBreak::make()->render();
 
                 continue;
@@ -44,6 +58,18 @@ abstract class InputComponent implements InputComponentInterface
 
             return $input;
         }
+    }
+
+    /**
+     * @param  callable(string|bool|int|float|array<mixed>): ?string  $callback
+     */
+    public function validate(callable $callback): static
+    {
+        $validationCallback = $callback(...);
+        /** @var Closure(string|bool|int|float|array<mixed>): ?string $validationCallback */
+        $this->validationCallback = $validationCallback;
+
+        return $this;
     }
 
     public function required(): static
@@ -58,5 +84,17 @@ abstract class InputComponent implements InputComponentInterface
         $this->required = false;
 
         return $this;
+    }
+
+    /**
+     * @param  string|bool|int|float|array<mixed>  $input
+     */
+    protected function validateInput(string|bool|int|float|array $input): ?string
+    {
+        if (! $this->validationCallback instanceof Closure) {
+            return null;
+        }
+
+        return ($this->validationCallback)($input);
     }
 }

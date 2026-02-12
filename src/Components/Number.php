@@ -73,6 +73,14 @@ final class Number extends InputComponent
             }
 
             if (is_int($selected) || is_float($selected)) {
+                $validationError = $this->validateInput($selected);
+                if ($validationError !== null) {
+                    Alert::make($validationError)->error()->render();
+                    LineBreak::make()->render();
+
+                    continue;
+                }
+
                 return $selected;
             }
 
@@ -98,14 +106,14 @@ final class Number extends InputComponent
                 return $this->clampToBounds(0);
             }
 
-            Alert::make('Input cannot be empty. Please provide a value.')->warning()->render();
+            Alert::make('Input cannot be empty. Please provide a value.')->error()->render();
             LineBreak::make()->render();
 
             return '';
         }
 
         if (! is_numeric($input)) {
-            Alert::make('Input must be a valid number.')->warning()->render();
+            Alert::make('Input must be a valid number.')->error()->render();
             LineBreak::make()->render();
 
             return '';
@@ -114,7 +122,7 @@ final class Number extends InputComponent
         $value = $this->toNumeric($input);
 
         if ($this->isBelowMin($value) || $this->isAboveMax($value)) {
-            Alert::make($this->rangeErrorMessage())->warning()->render();
+            Alert::make($this->rangeErrorMessage())->error()->render();
             LineBreak::make()->render();
 
             return '';
