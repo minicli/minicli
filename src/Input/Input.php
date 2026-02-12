@@ -89,6 +89,7 @@ final class Input
             return $selectedIndex;
         }
 
+        $this->hideCursor();
         $this->renderChoices($options, $selectedIndex);
 
         $sttyMode = $this->getSttyMode();
@@ -96,6 +97,7 @@ final class Input
             fwrite(STDOUT, PHP_EOL);
             $selectedIndex = $this->resolveChoiceIndex($this->readFromStdin(), $options, $selectedIndex);
             $this->storeInput($options[$selectedIndex]);
+            $this->showCursor();
 
             return $selectedIndex;
         }
@@ -160,6 +162,7 @@ final class Input
             }
         } finally {
             $this->restoreSttyMode($sttyMode);
+            $this->showCursor();
         }
 
         fwrite(STDOUT, PHP_EOL);
@@ -277,5 +280,15 @@ final class Input
         $count = count($options);
 
         return ($currentIndex + $direction + $count) % $count;
+    }
+
+    private function hideCursor(): void
+    {
+        fwrite(STDOUT, "\033[?25l");
+    }
+
+    private function showCursor(): void
+    {
+        fwrite(STDOUT, "\033[?25h");
     }
 }
