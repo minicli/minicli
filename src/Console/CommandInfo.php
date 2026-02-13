@@ -7,7 +7,6 @@ namespace Minicli\Console;
 use Closure;
 use Minicli\Components\Alert;
 use Minicli\Components\Divider;
-use Minicli\Components\LineBreak;
 use Minicli\Components\Table\Row;
 use Minicli\Components\Table\Table;
 use Minicli\Components\Text;
@@ -27,6 +26,7 @@ final readonly class CommandInfo
     {
         if ($this->description !== '') {
             Text::make($this->description)->info()->bold()->render();
+            Divider::make()->fullWidth()->render();
         }
 
         if ($this->arguments === []) {
@@ -54,7 +54,6 @@ final readonly class CommandInfo
                 ]));
             }
 
-            LineBreak::make()->render();
             $table->render();
         }
 
@@ -68,7 +67,6 @@ final readonly class CommandInfo
             $flagsTable->addRow(Row::make([$flag->value, $flag->description()]));
         }
 
-        LineBreak::make()->render();
         $flagsTable->render();
 
         return ExitCode::Success;
