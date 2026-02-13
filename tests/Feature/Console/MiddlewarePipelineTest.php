@@ -17,3 +17,9 @@ it('allows middleware to short-circuit command execution', function (): void {
 it('throws when middleware does not implement middleware interface', function (): void {
     getConfiguredApp()->runCommand(['minicli', 'middleware-invalid']);
 })->throws(RuntimeException::class, "Middleware 'Assets\\Fixtures\\App\\app\\Middlewares\\InvalidMiddleware' must implement Minicli\\Contracts\\MiddlewareInterface.");
+
+it('injects middleware configuration from middleware attribute', function (): void {
+    $result = getConfiguredApp()->runCommand(['minicli', 'middleware-configured']);
+
+    expect($result)->toBe(0);
+})->expectOutputString('retry(3,2000)>command<retry');

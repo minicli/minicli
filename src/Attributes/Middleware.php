@@ -10,7 +10,7 @@ use Attribute;
 final readonly class Middleware
 {
     /**
-     * @param  array<class-string>  $middlewares
+     * @param  array<int, class-string>|array<int|string, class-string|array<string, mixed>>  $middlewares
      */
     public function __construct(
         public array $middlewares,

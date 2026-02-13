@@ -24,6 +24,7 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use RuntimeException;
 
 final class CommandRegistry implements ServiceInterface
@@ -220,7 +221,7 @@ final class CommandRegistry implements ServiceInterface
 
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
-     * @param  array<class-string>  $middlewares
+     * @param  array<int, array{class: class-string, config: array<string, mixed>}>  $middlewares
      *
      * @throws ReflectionException
      */
@@ -260,7 +261,7 @@ final class CommandRegistry implements ServiceInterface
 
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
-     * @param  array<class-string>  $classMiddlewares
+     * @param  array<int, array{class: class-string, config: array<string, mixed>}>  $classMiddlewares
      * @return array{subcommands: array<CommandRegisterInfo|null>, hasDefault: bool}
      *
      * @throws ReflectionException
@@ -395,7 +396,7 @@ final class CommandRegistry implements ServiceInterface
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
      * @param  array<ArgumentInfo>  $argumentsInfo
-     * @param  array<class-string>  $middlewares
+     * @param  array<int, array{class: class-string, config: array<string, mixed>}>  $middlewares
      */
     private function registerSubcommand(
         ReflectionClass $reflection,
@@ -438,7 +439,7 @@ final class CommandRegistry implements ServiceInterface
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
      * @param  array<ArgumentInfo>  $argumentsInfo
-     * @param  array<class-string>  $middlewares
+     * @param  array<int, array{class: class-string, config: array<string, mixed>}>  $middlewares
      */
     private function createCommandExecutionClosure(
         ReflectionClass $reflection,
@@ -497,7 +498,7 @@ final class CommandRegistry implements ServiceInterface
 
     /**
      * @param  array<ReflectionAttribute<Middleware>>  $attributes
-     * @return array<class-string>
+     * @return array<int, array{class: class-string, config: array<string, mixed>}>
      */
     private function extractMiddlewares(array $attributes): array
     {
@@ -508,11 +509,47 @@ final class CommandRegistry implements ServiceInterface
         /** @var Middleware $middlewareAttribute */
         $middlewareAttribute = $attributes[0]->newInstance();
 
-        return $middlewareAttribute->middlewares;
+        return $this->normalizeMiddlewares($middlewareAttribute->middlewares);
     }
 
     /**
-     * @param  array<class-string>  $middlewares
+     * @param  array<int|string, class-string|array<string, mixed>>  $middlewares
+     * @return array<int, array{class: class-string, config: array<string, mixed>}>
+     */
+    private function normalizeMiddlewares(array $middlewares): array
+    {
+        $normalized = [];
+
+        foreach ($middlewares as $middlewareClass => $configuration) {
+            if (is_int($middlewareClass)) {
+                if (! is_string($configuration)) {
+                    throw new RuntimeException('Middleware definition must be a class string or a keyed configuration array.');
+                }
+
+                $normalized[] = [
+                    'class' => $configuration,
+                    'config' => [],
+                ];
+
+                continue;
+            }
+
+            if (! is_array($configuration)) {
+                throw new RuntimeException("Middleware '{$middlewareClass}' configuration must be an array.");
+            }
+
+            /** @var class-string $middlewareClass */
+            $normalized[] = [
+                'class' => $middlewareClass,
+                'config' => $configuration,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param  array<int, array{class: class-string, config: array<string, mixed>}>  $middlewares
      * @param  Closure(CommandCall, App): ExitCode  $destination
      */
     private function runMiddlewarePipeline(
@@ -523,8 +560,10 @@ final class CommandRegistry implements ServiceInterface
     ): ExitCode {
         $pipeline = array_reduce(
             array_reverse($middlewares),
-            fn (Closure $next, string $middlewareClass): Closure => function (CommandCall $input, App $application) use ($next, $middlewareClass, $app): ExitCode {
-                $middleware = $app->make($middlewareClass);
+            fn (Closure $next, array $middlewareDefinition): Closure => function (CommandCall $input, App $application) use ($next, $middlewareDefinition, $app): ExitCode {
+                $middlewareClass = $middlewareDefinition['class'];
+                $middlewareConfig = $middlewareDefinition['config'];
+                $middleware = $this->makeMiddlewareInstance($middlewareClass, $middlewareConfig, $app);
 
                 if (! $middleware instanceof MiddlewareInterface) {
                     throw new RuntimeException(
@@ -538,5 +577,69 @@ final class CommandRegistry implements ServiceInterface
         );
 
         return $pipeline($input, $app);
+    }
+
+    /**
+     * @param  class-string  $middlewareClass
+     * @param  array<string, mixed>  $config
+     */
+    private function makeMiddlewareInstance(string $middlewareClass, array $config, App $app): mixed
+    {
+        if ($config === []) {
+            return $app->make($middlewareClass);
+        }
+
+        $reflection = new ReflectionClass($middlewareClass);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor === null) {
+            return new $middlewareClass();
+        }
+
+        $arguments = [];
+        $consumedConfigKeys = [];
+
+        foreach ($constructor->getParameters() as $parameter) {
+            $parameterName = $parameter->getName();
+
+            if (array_key_exists($parameterName, $config)) {
+                $arguments[] = $config[$parameterName];
+                $consumedConfigKeys[] = $parameterName;
+
+                continue;
+            }
+
+            $parameterType = $parameter->getType();
+            if ($parameterType instanceof ReflectionNamedType && ! $parameterType->isBuiltin()) {
+                $arguments[] = $app->make($parameterType->getName());
+
+                continue;
+            }
+
+            if ($parameter->isDefaultValueAvailable()) {
+                $arguments[] = $parameter->getDefaultValue();
+
+                continue;
+            }
+
+            if ($parameterType instanceof ReflectionNamedType && $parameterType->allowsNull()) {
+                $arguments[] = null;
+
+                continue;
+            }
+
+            throw new RuntimeException(
+                "Unable to resolve middleware parameter '{$parameterName}' for '{$middlewareClass}'."
+            );
+        }
+
+        $unknownConfig = array_diff_key($config, array_flip($consumedConfigKeys));
+        if ($unknownConfig !== []) {
+            throw new RuntimeException(
+                "Unknown middleware configuration option(s) for '{$middlewareClass}': " . implode(', ', array_keys($unknownConfig))
+            );
+        }
+
+        return $reflection->newInstanceArgs($arguments);
     }
 }
