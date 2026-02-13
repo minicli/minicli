@@ -7,15 +7,18 @@ namespace Minicli\Console;
 use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
+use Minicli\Attributes\Middleware;
 use Minicli\Components\Alert;
 use Minicli\Components\Component;
 use Minicli\Components\LineBreak;
 use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
+use Minicli\Contracts\MiddlewareInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -178,9 +181,10 @@ final class CommandRegistry implements ServiceInterface
         /** @var Command $classCommand */
         $classCommand = $classAttributes[0]->newInstance();
         $commandName = $this->generateCommandName($classCommand->name, $reflection->getShortName());
+        $classMiddlewares = $this->extractMiddlewares($reflection->getAttributes(Middleware::class));
 
-        $this->registerInvokeCommand($reflection, $commandName, $classCommand);
-        $result = $this->registerSubcommands($reflection, $commandName, $classCommand);
+        $this->registerInvokeCommand($reflection, $commandName, $classCommand, $classMiddlewares);
+        $result = $this->registerSubcommands($reflection, $commandName, $classCommand, $classMiddlewares);
 
         if ($result['subcommands'] !== [] && ! $result['hasDefault']) {
             $this->registerParentCommandWithSubcommands(
@@ -205,11 +209,16 @@ final class CommandRegistry implements ServiceInterface
 
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
+     * @param  array<class-string>  $middlewares
      *
      * @throws ReflectionException
      */
-    private function registerInvokeCommand(ReflectionClass $reflection, string $commandName, Command $classCommand): void
-    {
+    private function registerInvokeCommand(
+        ReflectionClass $reflection,
+        string $commandName,
+        Command $classCommand,
+        array $middlewares = [],
+    ): void {
         if (! $reflection->hasMethod('__invoke')) {
             return;
         }
@@ -224,7 +233,8 @@ final class CommandRegistry implements ServiceInterface
             $commandName,
             $classCommand->description,
             $argumentsHandler,
-            $argumentsInfo
+            $argumentsInfo,
+            $middlewares,
         );
 
         $commandInfo = new CommandInfo(
@@ -239,12 +249,17 @@ final class CommandRegistry implements ServiceInterface
 
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
+     * @param  array<class-string>  $classMiddlewares
      * @return array{subcommands: array<CommandRegisterInfo|null>, hasDefault: bool}
      *
      * @throws ReflectionException
      */
-    private function registerSubcommands(ReflectionClass $reflection, string $commandName, Command $classCommand): array
-    {
+    private function registerSubcommands(
+        ReflectionClass $reflection,
+        string $commandName,
+        Command $classCommand,
+        array $classMiddlewares = [],
+    ): array {
         $subcommands = [];
         $hasDefault = false;
 
@@ -258,6 +273,8 @@ final class CommandRegistry implements ServiceInterface
             /** @var Command $methodCommand */
             $methodCommand = $methodAttributes[0]->newInstance();
             $subcommandName = $this->generateCommandName($methodCommand->name, $method->getName());
+            $methodMiddlewares = $this->extractMiddlewares($method->getAttributes(Middleware::class));
+            $middlewares = [...$classMiddlewares, ...$methodMiddlewares];
             $argumentsHandler = new ArgumentsHandler($method->getParameters());
             $argumentsInfo = $argumentsHandler->extractArgumentInfo();
 
@@ -268,7 +285,8 @@ final class CommandRegistry implements ServiceInterface
                 $methodCommand->description,
                 $argumentsHandler,
                 $argumentsInfo,
-                $subcommandName
+                $subcommandName,
+                $middlewares,
             );
 
             if ($methodCommand->default) {
@@ -278,7 +296,8 @@ final class CommandRegistry implements ServiceInterface
                     $commandName,
                     $classCommand->description,
                     $argumentsHandler,
-                    $argumentsInfo
+                    $argumentsInfo,
+                    middlewares: $middlewares,
                 );
                 $hasDefault = true;
             }
@@ -327,6 +346,7 @@ final class CommandRegistry implements ServiceInterface
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
      * @param  array<ArgumentInfo>  $argumentsInfo
+     * @param  array<class-string>  $middlewares
      */
     private function registerSubcommand(
         ReflectionClass $reflection,
@@ -335,7 +355,8 @@ final class CommandRegistry implements ServiceInterface
         string $description,
         ArgumentsHandler $argumentsHandler,
         array $argumentsInfo,
-        ?string $subcommandName = null
+        ?string $subcommandName = null,
+        array $middlewares = [],
     ): ?CommandRegisterInfo {
         $fullCommandName = $subcommandName !== null
             ? "{$commandName} {$subcommandName}"
@@ -347,7 +368,8 @@ final class CommandRegistry implements ServiceInterface
             $fullCommandName,
             $description,
             $argumentsHandler,
-            $argumentsInfo
+            $argumentsInfo,
+            $middlewares,
         );
 
         $commandInfo = new CommandInfo(
@@ -367,6 +389,7 @@ final class CommandRegistry implements ServiceInterface
     /**
      * @param  ReflectionClass<ConsoleCommand>  $reflection
      * @param  array<ArgumentInfo>  $argumentsInfo
+     * @param  array<class-string>  $middlewares
      */
     private function createCommandExecutionClosure(
         ReflectionClass $reflection,
@@ -374,9 +397,10 @@ final class CommandRegistry implements ServiceInterface
         string $commandName,
         string $description,
         ArgumentsHandler $argumentsHandler,
-        array $argumentsInfo
+        array $argumentsInfo,
+        array $middlewares = [],
     ): Closure {
-        return function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $description, $argumentsHandler, $argumentsInfo): ExitCode {
+        return function (CommandCall $input, App $app) use ($reflection, $method, $commandName, $description, $argumentsHandler, $argumentsInfo, $middlewares): ExitCode {
             if ($input->hasFlag(GlobalFlag::HELP->value)) {
                 $tempCommandInfo = new CommandInfo(
                     callable: fn (): ExitCode => ExitCode::Success,
@@ -396,7 +420,7 @@ final class CommandRegistry implements ServiceInterface
                 Component::setQuiet(true);
             }
 
-            try {
+            $destination = function (CommandCall $input, App $app) use ($argumentsHandler, $method, $instance, $commandName): ExitCode {
                 $arguments = $argumentsHandler->prepareArguments($input);
                 $result = $method->invokeArgs($instance, $arguments);
 
@@ -407,6 +431,10 @@ final class CommandRegistry implements ServiceInterface
                 }
 
                 return $result;
+            };
+
+            try {
+                return $this->runMiddlewarePipeline($middlewares, $input, $app, $destination);
             } finally {
                 try {
                     $instance->teardown();
@@ -416,5 +444,50 @@ final class CommandRegistry implements ServiceInterface
                 }
             }
         };
+    }
+
+    /**
+     * @param  array<ReflectionAttribute<Middleware>>  $attributes
+     * @return array<class-string>
+     */
+    private function extractMiddlewares(array $attributes): array
+    {
+        if ($attributes === []) {
+            return [];
+        }
+
+        /** @var Middleware $middlewareAttribute */
+        $middlewareAttribute = $attributes[0]->newInstance();
+
+        return $middlewareAttribute->middlewares;
+    }
+
+    /**
+     * @param  array<class-string>  $middlewares
+     * @param  Closure(CommandCall, App): ExitCode  $destination
+     */
+    private function runMiddlewarePipeline(
+        array $middlewares,
+        CommandCall $input,
+        App $app,
+        Closure $destination,
+    ): ExitCode {
+        $pipeline = array_reduce(
+            array_reverse($middlewares),
+            fn (Closure $next, string $middlewareClass): Closure => function (CommandCall $input, App $application) use ($next, $middlewareClass, $app): ExitCode {
+                $middleware = $app->make($middlewareClass);
+
+                if (! $middleware instanceof MiddlewareInterface) {
+                    throw new RuntimeException(
+                        "Middleware '{$middlewareClass}' must implement " . MiddlewareInterface::class . '.'
+                    );
+                }
+
+                return $middleware->handle($input, $application, $next);
+            },
+            $destination,
+        );
+
+        return $pipeline($input, $app);
     }
 }

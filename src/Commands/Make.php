@@ -71,6 +71,24 @@ final class Make extends ConsoleCommand
         );
     }
 
+    #[Command(description: 'Generate a new middleware class')]
+    public function middleware(?string $name = null): ExitCode
+    {
+        $className = $this->resolveClassName($name, 'middleware class');
+        if ($className === null) {
+            return ExitCode::Invalid;
+        }
+
+        return $this->generateFile(
+            className: $className,
+            directory: $this->app->basePath() . '/app/Middlewares',
+            stubPath: dirname(__DIR__) . '/Stubs/Make/middleware.stub',
+            replacements: [
+                '{{NAME}}' => $className,
+            ],
+        );
+    }
+
     /**
      * @param  array<string, string>  $replacements
      */

@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Middlewares;
+
+use Closure;
+use Minicli\App;
+use Minicli\Console\CommandCall;
+use Minicli\Console\ExitCode;
+use Minicli\Contracts\MiddlewareInterface;
+
+final class {{NAME}} implements MiddlewareInterface
+{
+    /**
+     * @param  Closure(CommandCall, App): ExitCode  $next
+     */
+    public function handle(CommandCall $input, App $app, Closure $next): ExitCode
+    {
+        return $next($input, $app);
+    }
+}

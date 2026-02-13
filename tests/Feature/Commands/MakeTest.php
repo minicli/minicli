@@ -66,7 +66,29 @@ it('generates a service class with make service', function (): void {
             ->and(file_exists($generatedFile))->toBeTrue()
             ->and(file_get_contents($generatedFile))->toContain('namespace App\\Services;')
             ->and(file_get_contents($generatedFile))->toContain("#[Service('user_notifier')]")
-            ->and(file_get_contents($generatedFile))->toContain('class UserNotifier implements ServiceInterface');
+            ->and(file_get_contents($generatedFile))->toContain('final class UserNotifier implements ServiceInterface');
+    } finally {
+        removeDirectory($appRoot);
+    }
+});
+
+it('generates a middleware class with make middleware', function (): void {
+    $appRoot = makeTempAppRoot();
+
+    try {
+        $app = new App($appRoot);
+
+        ob_start();
+        $result = $app->runCommand(['minicli', 'make', 'middleware', 'name=auth-guard']);
+        $output = (string) ob_get_clean();
+
+        $generatedFile = "{$appRoot}/app/Middlewares/AuthGuard.php";
+
+        expect($result)->toBe(0)
+            ->and($output)->toContain('Created:')
+            ->and(file_exists($generatedFile))->toBeTrue()
+            ->and(file_get_contents($generatedFile))->toContain('namespace App\\Middlewares;')
+            ->and(file_get_contents($generatedFile))->toContain('final class AuthGuard implements MiddlewareInterface');
     } finally {
         removeDirectory($appRoot);
     }
@@ -98,6 +120,7 @@ function makeTempAppRoot(): string
     $appRoot = sys_get_temp_dir() . '/minicli-make-' . bin2hex(random_bytes(8));
 
     mkdir("{$appRoot}/app/Commands", 0775, true);
+    mkdir("{$appRoot}/app/Middlewares", 0775, true);
     mkdir("{$appRoot}/app/Services", 0775, true);
     mkdir("{$appRoot}/config", 0775, true);
 
