@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+use Minicli\Attributes\Config;
+use Minicli\Contracts\ThemeInterface;
+use Minicli\Output\Theming\Themes\DefaultTheme;
+
+#[Config('{{CONFIG_KEY}}')]
+final readonly class {{NAME}}Config
+{
+    public function __construct() {}
+}

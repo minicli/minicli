@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use Minicli\App;
+use Minicli\Attributes\Service;
+use Minicli\Contracts\ServiceInterface;
+use Minicli\Exceptions\BindingResolutionException;
+use ReflectionException;
+
+#[Service('{{SERVICE_KEY}}')]
+final class {{NAME}} implements ServiceInterface
+{
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
+    public function load(App $app): void
+    {
+        // Create something awesome.
+    }
+}

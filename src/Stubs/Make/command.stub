@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Commands;
+
+use Minicli\Attributes\Command;
+use Minicli\Components\Text;
+use Minicli\Console\ConsoleCommand;
+use Minicli\Console\ExitCode;
+
+#[Command(description: '{{NAME}} command description')]
+final class {{NAME}} extends ConsoleCommand
+{
+    public function __invoke(): ExitCode
+    {
+        Text::make('Create something awesome!')->success()->bold()->render();
+
+        return ExitCode::Success;
+    }
+}

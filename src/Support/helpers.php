@@ -31,6 +31,31 @@ function toKebabCase(string $string): string
     return strtolower(ltrim((string) $kebab, '-'));
 }
 
+function toPascalCase(string $value): string
+{
+    $normalized = preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $value);
+    $normalized = preg_replace('/[^a-zA-Z0-9]+/', ' ', (string) $normalized);
+
+    $parts = preg_split('/\s+/', trim((string) $normalized));
+    if ($parts === false || $parts === []) {
+        return '';
+    }
+
+    return implode('', array_map(
+        static fn (string $part): string => ucfirst(strtolower($part)),
+        $parts,
+    ));
+}
+
+function toSnakeCase(string $value): string
+{
+    $snake = preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1_$2', $value);
+    $snake = preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', (string) $snake);
+    $snake = preg_replace('/[^a-zA-Z0-9]+/', '_', (string) $snake);
+
+    return strtolower(trim((string) $snake, '_'));
+}
+
 function paddedString(string $tableCell, int $colSize = 5): string
 {
     return mb_str_pad($tableCell, $colSize);
