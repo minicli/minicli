@@ -21,6 +21,7 @@ final readonly class ServiceLoader
      */
     public function load(App $app): void
     {
+        $cache = new DiscoveryCache($app);
         $this->loadDefaultServices($app);
         $servicesPath = $app->basePath() . '/app/Services';
 
@@ -46,27 +47,56 @@ final readonly class ServiceLoader
                 continue;
             }
 
-            foreach ($this->classesDefinedInFile($filePath) as $className) {
-                $reflectionClass = new ReflectionClass($className);
+            $serviceEntries = $cache->rememberFile(
+                domain: 'services',
+                filePath: $filePath,
+                resolver: fn (string $realPath): array => $this->extractServiceEntries($realPath),
+            );
 
-                $serviceAttributes = $reflectionClass->getAttributes(Service::class);
+            foreach ($serviceEntries as $serviceEntry) {
+                $className = $serviceEntry['class'];
+                $serviceName = $serviceEntry['name'];
 
-                if ($serviceAttributes === []) {
-                    continue;
+                if (! class_exists($className)) {
+                    require_once $serviceEntry['file'];
                 }
-
-                if (! $reflectionClass->implementsInterface(ServiceInterface::class)) {
-                    continue;
-                }
-
-                $serviceAttribute = $serviceAttributes[0]->newInstance();
-                $serviceName = $serviceAttribute->name;
 
                 /** @var ServiceInterface $serviceInstance */
                 $serviceInstance = $app->make($className);
                 $app->addService($serviceName, $serviceInstance);
             }
         }
+    }
+
+    /**
+     * @return array<array{class: class-string, name: string, file: string}>
+     */
+    private function extractServiceEntries(string $filePath): array
+    {
+        $entries = [];
+
+        foreach ($this->classesDefinedInFile($filePath) as $className) {
+            $reflectionClass = new ReflectionClass($className);
+
+            $serviceAttributes = $reflectionClass->getAttributes(Service::class);
+
+            if ($serviceAttributes === []) {
+                continue;
+            }
+
+            if (! $reflectionClass->implementsInterface(ServiceInterface::class)) {
+                continue;
+            }
+
+            $serviceAttribute = $serviceAttributes[0]->newInstance();
+            $entries[] = [
+                'class' => $className,
+                'name' => $serviceAttribute->name,
+                'file' => $filePath,
+            ];
+        }
+
+        return $entries;
     }
 
     /**

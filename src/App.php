@@ -155,6 +155,14 @@ final readonly class App
         return $this->container->get('logs_path');
     }
 
+    /**
+     * @throws ReflectionException|BindingResolutionException
+     */
+    public function discoveryPath(): string
+    {
+        return $this->container->get('discovery_path');
+    }
+
     public function setTheme(): void
     {
         /** @var AppConfig $config */
@@ -302,10 +310,16 @@ final readonly class App
     private function bindPaths(?string $appRoot): void
     {
         $appRoot ??= $this->appRoot();
+        $discoveryPath = "{$appRoot}/.minicli/discovery";
+
+        if (! is_dir($discoveryPath)) {
+            mkdir($discoveryPath, 0775, true);
+        }
 
         $this->container->bind('base_path', fn (): string => $appRoot);
         $this->container->bind('config_path', fn (): string => "{$appRoot}/config");
         $this->container->bind('logs_path', fn (): string => "{$appRoot}/logs");
+        $this->container->bind('discovery_path', fn (): string => $discoveryPath);
     }
 
     private function findBinFileName(): string

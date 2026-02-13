@@ -17,6 +17,7 @@ final readonly class ConfigLoader
      */
     public function load(App $app): void
     {
+        $cache = new DiscoveryCache($app);
         $configPath = $app->configPath();
 
         if (! is_dir($configPath)) {
@@ -30,23 +31,50 @@ final readonly class ConfigLoader
         }
 
         foreach ($configFiles as $configFile) {
-            $configClasses = $this->classesDefinedInFile($configFile);
+            $configEntries = $cache->rememberFile(
+                domain: 'config',
+                filePath: $configFile,
+                resolver: fn (string $realPath): array => $this->extractConfigEntries($realPath),
+            );
 
-            foreach ($configClasses as $configClass) {
-                $reflectionClass = new ReflectionClass($configClass);
-                $configAttributes = $reflectionClass->getAttributes(Config::class);
+            foreach ($configEntries as $configEntry) {
+                $configClass = $configEntry['class'];
+                $configName = $configEntry['name'];
 
-                if ($configAttributes === []) {
-                    continue;
+                if (! class_exists($configClass)) {
+                    require_once $configEntry['file'];
                 }
-
-                $configAttribute = $configAttributes[0]->newInstance();
-                $configName = $configAttribute->name;
 
                 $configInstance = new $configClass();
                 $app->addConfig($configName, $configInstance);
             }
         }
+    }
+
+    /**
+     * @return array<array{class: class-string, name: string, file: string}>
+     */
+    private function extractConfigEntries(string $filePath): array
+    {
+        $entries = [];
+
+        foreach ($this->classesDefinedInFile($filePath) as $configClass) {
+            $reflectionClass = new ReflectionClass($configClass);
+            $configAttributes = $reflectionClass->getAttributes(Config::class);
+
+            if ($configAttributes === []) {
+                continue;
+            }
+
+            $configAttribute = $configAttributes[0]->newInstance();
+            $entries[] = [
+                'class' => $configClass,
+                'name' => $configAttribute->name,
+                'file' => $filePath,
+            ];
+        }
+
+        return $entries;
     }
 
     /**

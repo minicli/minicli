@@ -16,6 +16,7 @@ use Minicli\Config\AppConfig;
 use Minicli\Contracts\MiddlewareInterface;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Exceptions\BindingResolutionException;
+use Minicli\Support\DiscoveryCache;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionAttribute;
@@ -36,10 +37,11 @@ final class CommandRegistry implements ServiceInterface
      */
     public function load(App $app): void
     {
+        $cache = new DiscoveryCache($app);
         $commandSources = $this->buildCommandSources($app);
 
-        $this->registerDefaultCommands();
-        $this->registerCommandsFromSources($commandSources);
+        $this->registerDefaultCommands($cache);
+        $this->registerCommandsFromSources($commandSources, $cache);
     }
 
     public function registerCommand(string $name, CommandInfo $commandInfo): void
@@ -82,27 +84,27 @@ final class CommandRegistry implements ServiceInterface
         return $commandSources;
     }
 
-    private function registerDefaultCommands(): void
+    private function registerDefaultCommands(DiscoveryCache $cache): void
     {
         $commandsPath = dirname(__DIR__) . '/Commands';
         if (is_dir($commandsPath)) {
-            $this->scanAndRegisterCommands($commandsPath);
+            $this->scanAndRegisterCommands($commandsPath, $cache);
         }
     }
 
     /**
      * @param  array<string>  $sources
      */
-    private function registerCommandsFromSources(array $sources): void
+    private function registerCommandsFromSources(array $sources, DiscoveryCache $cache): void
     {
         foreach ($sources as $source) {
             if (is_dir($source)) {
-                $this->scanAndRegisterCommands($source);
+                $this->scanAndRegisterCommands($source, $cache);
             }
         }
     }
 
-    private function scanAndRegisterCommands(string $path): void
+    private function scanAndRegisterCommands(string $path, DiscoveryCache $cache): void
     {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -111,16 +113,24 @@ final class CommandRegistry implements ServiceInterface
 
         foreach ($iterator as $file) {
             if ($file->isFile() && $file->getExtension() === 'php') {
-                $this->loadAndRegisterCommandsFromFile($file->getPathname());
+                $this->loadAndRegisterCommandsFromFile($file->getPathname(), $cache);
             }
         }
     }
 
-    private function loadAndRegisterCommandsFromFile(string $filePath): void
+    private function loadAndRegisterCommandsFromFile(string $filePath, DiscoveryCache $cache): void
     {
-        $classes = $this->classesDefinedInFile($filePath);
+        $classes = $cache->rememberFile(
+            domain: 'commands',
+            filePath: $filePath,
+            resolver: fn (string $realPath): array => $this->classesDefinedInFile($realPath),
+        );
 
         foreach ($classes as $className) {
+            if (! class_exists($className)) {
+                require_once $filePath;
+            }
+
             if (! class_exists($className)) {
                 continue;
             }
