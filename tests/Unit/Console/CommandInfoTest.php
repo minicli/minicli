@@ -18,7 +18,9 @@ it('displays no-arguments message when command has no parameters', function (): 
     $output = (string) ob_get_clean();
 
     expect($result)->toBe(ExitCode::Success)
-        ->and($output)->toContain('This command has no arguments.');
+        ->and($output)->toContain('This command has no arguments.')
+        ->and($output)->toContain('Global Flags')
+        ->and($output)->toContain('--help');
 });
 
 it('prints argument table when command has parameters', function (): void {
@@ -37,5 +39,7 @@ it('prints argument table when command has parameters', function (): void {
 
     expect($result)->toBe(ExitCode::Success)
         ->and($output)->toContain('ARGUMENT')
-        ->and($output)->toContain('count');
+        ->and($output)->toContain('count')
+        ->and($output)->toContain('+')
+        ->and($output)->toContain('Global Flags');
 });

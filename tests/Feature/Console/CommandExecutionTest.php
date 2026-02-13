@@ -35,7 +35,9 @@ it('shows command help through global help flag', function (): void {
 
     expect($result)->toBe(0)
         ->and($output)->toContain('Require integer value')
-        ->and($output)->toContain('count');
+        ->and($output)->toContain('count')
+        ->and($output)->toContain('Global Flags')
+        ->and($output)->toContain('--help');
 });
 
 it('throws for missing required parameter', function (): void {
