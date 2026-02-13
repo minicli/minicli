@@ -56,6 +56,20 @@ function toSnakeCase(string $value): string
     return strtolower(trim((string) $snake, '_'));
 }
 
+function formatBytes(int $bytes): string
+{
+    $units = ['B', 'KB', 'MB', 'GB'];
+    $size = $bytes;
+    $unitIndex = 0;
+
+    while ($size >= 1024 && $unitIndex < count($units) - 1) {
+        $size /= 1024;
+        $unitIndex++;
+    }
+
+    return number_format($size, 2) . ' ' . $units[$unitIndex];
+}
+
 function paddedString(string $tableCell, int $colSize = 5): string
 {
     return mb_str_pad($tableCell, $colSize);

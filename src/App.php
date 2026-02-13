@@ -6,11 +6,16 @@ namespace Minicli;
 
 use Closure;
 use Minicli\Components\Component;
+use Minicli\Components\Divider;
+use Minicli\Components\Table\Row;
+use Minicli\Components\Table\Table;
+use Minicli\Components\Text;
 use Minicli\Config\AppConfig;
 use Minicli\Console\CommandCall;
 use Minicli\Console\CommandInfo;
 use Minicli\Console\CommandRegistry;
 use Minicli\Console\ExitCode;
+use Minicli\Console\GlobalFlag;
 use Minicli\Container\Container;
 use Minicli\Contracts\ServiceInterface;
 use Minicli\Contracts\ThemeInterface;
@@ -192,25 +197,41 @@ final readonly class App
     public function runCommand(array $argv = []): int
     {
         $input = new CommandCall($argv);
+        $shouldProfile = $input->hasFlag(GlobalFlag::PROFILE->value);
+        $startTime = $shouldProfile ? (int) hrtime(true) : 0;
+        $startMemory = $shouldProfile ? memory_get_usage(true) : 0;
+        $commandName = '';
+        $resultCode = null;
 
-        $commandName = $this->resolveCommandName($input);
-        $command = $this->commandRegistry->getCommand($commandName);
+        try {
+            $commandName = $this->resolveCommandName($input);
+            $command = $this->commandRegistry->getCommand($commandName);
 
-        if ($command === null) {
-            if ($commandName === '' || $commandName === 'help') {
-                return $this->runHelp($input);
+            if ($command === null) {
+                if ($commandName === '' || $commandName === 'help') {
+                    return $resultCode = $this->runHelp($input);
+                }
+
+                throw new CommandNotFoundException("Command '{$commandName}' not found.");
             }
 
-            throw new CommandNotFoundException("Command '{$commandName}' not found.");
+            /** @var ExitCode $result */
+            $result = $this->resolveExitCode(
+                result: ($command->callable)($input, $this),
+                commandName: $commandName,
+            );
+
+            return $resultCode = $result->value;
+        } finally {
+            if ($shouldProfile) {
+                $this->renderProfile(
+                    commandName: $commandName,
+                    startTime: $startTime,
+                    startMemory: $startMemory,
+                    resultCode: $resultCode,
+                );
+            }
         }
-
-        /** @var ExitCode $result */
-        $result = $this->resolveExitCode(
-            result: ($command->callable)($input, $this),
-            commandName: $commandName,
-        );
-
-        return $result->value;
     }
 
     /**
@@ -298,5 +319,24 @@ final readonly class App
     private function configKey(string $name): string
     {
         return "config_{$name}";
+    }
+
+    private function renderProfile(string $commandName, int $startTime, int $startMemory, ?int $resultCode): void
+    {
+        $elapsedMilliseconds = (hrtime(true) - $startTime) / 1_000_000;
+        $memoryDiff = max(0, memory_get_usage(true) - $startMemory);
+        $peakMemory = memory_get_peak_usage(true);
+
+        Divider::make()->fullWidth()->render();
+        Text::make('Command Profile')->bold()->info()->render();
+
+        $table = Table::make()->withBorders();
+        $table->addRow(Row::make(['Metric', 'Value'])->bold());
+        $table->addRow(Row::make(['Command', $commandName === '' ? 'help' : $commandName]));
+        $table->addRow(Row::make(['Exit code', $resultCode === null ? 'exception' : (string) $resultCode]));
+        $table->addRow(Row::make(['Time', number_format($elapsedMilliseconds, 2) . ' ms']));
+        $table->addRow(Row::make(['Memory delta', formatBytes($memoryDiff)]));
+        $table->addRow(Row::make(['Peak memory', formatBytes($peakMemory)]));
+        $table->render();
     }
 }

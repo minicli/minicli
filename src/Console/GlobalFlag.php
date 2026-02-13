@@ -8,4 +8,5 @@ enum GlobalFlag: string
 {
     case HELP = '--help';
     case QUIET = '--quiet';
+    case PROFILE = '--profile';
 }
