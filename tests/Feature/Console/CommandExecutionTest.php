@@ -40,6 +40,36 @@ it('shows command help through global help flag', function (): void {
         ->and($output)->toContain('--help');
 });
 
+it('runs default method when command is called without subcommand', function (): void {
+    $result = getConfiguredApp()->runCommand(['minicli', 'test']);
+
+    expect($result)->toBe(0);
+})->expectOutputString('Hello world');
+
+it('runs method marked with default attribute when no default method exists', function (): void {
+    $result = getConfiguredApp()->runCommand(['minicli', 'default-attribute']);
+
+    expect($result)->toBe(0);
+})->expectOutputString('second');
+
+it('prioritizes default method over default attribute when both exist', function (): void {
+    $result = getConfiguredApp()->runCommand(['minicli', 'default-priority']);
+
+    expect($result)->toBe(0);
+})->expectOutputString('method-default');
+
+it('shows error when command has subcommands and no default handlers', function (): void {
+    ob_start();
+    $result = getConfiguredApp()->runCommand(['minicli', 'no-default']);
+    $output = (string) ob_get_clean();
+
+    expect($result)->toBe(2)
+        ->and($output)->toContain("Command 'no-default' requires a subcommand.")
+        ->and($output)->toContain('Available subcommands:')
+        ->and($output)->toContain('alpha')
+        ->and($output)->toContain('beta');
+});
+
 it('throws for missing required parameter', function (): void {
     getConfiguredApp()->runCommand(['minicli', 'test', 'cast']);
 })->throws(MissingParametersException::class);

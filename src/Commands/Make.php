@@ -7,6 +7,7 @@ namespace Minicli\Commands;
 use Minicli\Attributes\Command;
 use Minicli\Components\Alert;
 use Minicli\Components\Question;
+use Minicli\Components\Select;
 use Minicli\Components\Text;
 use Minicli\Console\ConsoleCommand;
 use Minicli\Console\ExitCode;
@@ -15,6 +16,26 @@ use RuntimeException;
 #[Command(description: 'Generate classes in your application')]
 final class Make extends ConsoleCommand
 {
+    public function default(): ExitCode
+    {
+        $selection = Select::make('Select a make command')
+            ->options([
+                'command' => 'command - Generate a new command class',
+                'config' => 'config - Generate a new config class',
+                'service' => 'service - Generate a new service class',
+                'middleware' => 'middleware - Generate a new middleware class',
+            ])
+            ->vertical()
+            ->ask();
+
+        return match ($selection) {
+            'command' => $this->command(),
+            'config' => $this->config(),
+            'service' => $this->service(),
+            default => $this->middleware(),
+        };
+    }
+
     #[Command(description: 'Generate a new command class')]
     public function command(?string $name = null): ExitCode
     {

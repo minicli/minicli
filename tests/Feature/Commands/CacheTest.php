@@ -72,6 +72,29 @@ it('returns success when clearing cache that does not exist', function (): void 
     }
 });
 
+it('runs interactive default discovery command when subcommand is omitted', function (): void {
+    $output = runInlinePhpWithInput(
+        <<<'PHP'
+$appRoot = sys_get_temp_dir() . '/minicli-discovery-default-' . uniqid('', true);
+mkdir($appRoot . '/app/Commands', 0775, true);
+mkdir($appRoot . '/app/Services', 0775, true);
+mkdir($appRoot . '/config', 0775, true);
+mkdir($appRoot . '/logs', 0775, true);
+
+$app = new Minicli\App($appRoot);
+$result = $app->runCommand(['minicli', 'discovery']);
+
+echo "\nRESULT={$result}";
+echo "\nCACHE_EXISTS=" . (is_file($appRoot . '/.minicli/discovery/minicli.json') ? 'yes' : 'no');
+PHP,
+        "1\n",
+    );
+
+    expect($output)->toContain('Select a discovery command')
+        ->and($output)->toContain('RESULT=0')
+        ->and($output)->toContain('CACHE_EXISTS=yes');
+});
+
 function makeCacheTempAppRoot(): string
 {
     $appRoot = sys_get_temp_dir() . '/minicli-cache-command-' . bin2hex(random_bytes(8));

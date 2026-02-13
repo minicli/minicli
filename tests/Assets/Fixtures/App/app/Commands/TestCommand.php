@@ -13,7 +13,12 @@ use RuntimeException;
 #[Command(name: 'test', description: 'Test command root')]
 final class TestCommand extends ConsoleCommand
 {
-    #[Command(name: 'greet', description: 'Greet by name', default: true)]
+    public function default(): ExitCode
+    {
+        return $this->greet();
+    }
+
+    #[Command(name: 'greet', description: 'Greet by name')]
     public function greet(
         #[Argument(description: 'Target name')]
         string $name = 'world',

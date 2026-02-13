@@ -7,6 +7,7 @@ namespace Minicli\Console;
 use Closure;
 use Minicli\App;
 use Minicli\Attributes\Command;
+use Minicli\Attributes\DefaultCommand;
 use Minicli\Attributes\Middleware;
 use Minicli\Components\Alert;
 use Minicli\Components\Component;
@@ -272,6 +273,7 @@ final class CommandRegistry implements ServiceInterface
     ): array {
         $subcommands = [];
         $hasDefault = false;
+        $defaultMethod = $this->resolveDefaultMethod($reflection);
 
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodAttributes = $method->getAttributes(Command::class);
@@ -298,25 +300,62 @@ final class CommandRegistry implements ServiceInterface
                 $subcommandName,
                 $middlewares,
             );
+        }
 
-            if ($methodCommand->default) {
-                $this->registerSubcommand(
-                    $reflection,
-                    $method,
-                    $commandName,
-                    $classCommand->description,
-                    $argumentsHandler,
-                    $argumentsInfo,
-                    middlewares: $middlewares,
-                );
-                $hasDefault = true;
-            }
+        if ($defaultMethod instanceof ReflectionMethod) {
+            $defaultArgumentsHandler = new ArgumentsHandler($defaultMethod->getParameters());
+
+            $this->registerSubcommand(
+                $reflection,
+                $defaultMethod,
+                $commandName,
+                $classCommand->description,
+                $defaultArgumentsHandler,
+                $defaultArgumentsHandler->extractArgumentInfo(),
+                middlewares: [...$classMiddlewares, ...$this->extractMiddlewares($defaultMethod->getAttributes(Middleware::class))],
+            );
+
+            $hasDefault = true;
         }
 
         return [
             'subcommands' => $subcommands,
             'hasDefault' => $hasDefault,
         ];
+    }
+
+    /**
+     * @param  ReflectionClass<ConsoleCommand>  $reflection
+     */
+    private function resolveDefaultMethod(ReflectionClass $reflection): ?ReflectionMethod
+    {
+        if ($reflection->hasMethod('default')) {
+            $method = $reflection->getMethod('default');
+            if ($method->isPublic()) {
+                return $method;
+            }
+        }
+
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->getAttributes(DefaultCommand::class) !== []) {
+                return $method;
+            }
+        }
+
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $commandAttributes = $method->getAttributes(Command::class);
+            if ($commandAttributes === []) {
+                continue;
+            }
+
+            /** @var Command $commandAttribute */
+            $commandAttribute = $commandAttributes[0]->newInstance();
+            if ($commandAttribute->default) {
+                return $method;
+            }
+        }
+
+        return null;
     }
 
     /**

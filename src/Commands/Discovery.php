@@ -6,6 +6,7 @@ namespace Minicli\Commands;
 
 use Minicli\Attributes\Command;
 use Minicli\Components\Alert;
+use Minicli\Components\Select;
 use Minicli\Components\Text;
 use Minicli\Console\CommandRegistry;
 use Minicli\Console\ConsoleCommand;
@@ -19,6 +20,22 @@ use ReflectionException;
 #[Command(description: 'Manage discovery cache')]
 final class Discovery extends ConsoleCommand
 {
+    public function default(): ExitCode
+    {
+        $selection = Select::make('Select a discovery command')
+            ->options([
+                'cache' => 'cache - Build or refresh discovery cache',
+                'clear' => 'clear - Clear discovery cache',
+            ])
+            ->vertical()
+            ->ask();
+
+        return match ($selection) {
+            'clear' => $this->clear(),
+            default => $this->cache(),
+        };
+    }
+
     #[Command(description: 'Build or refresh discovery cache')]
     public function cache(): ExitCode
     {

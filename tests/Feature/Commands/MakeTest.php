@@ -115,6 +115,31 @@ PHP,
         ->and($output)->toContain('EXISTS=yes');
 });
 
+it('runs interactive default make command when subcommand is omitted', function (): void {
+    $output = runInlinePhpWithInput(
+        <<<'PHP'
+$appRoot = sys_get_temp_dir() . '/minicli-make-default-' . uniqid('', true);
+mkdir($appRoot . '/app/Commands', 0775, true);
+mkdir($appRoot . '/app/Services', 0775, true);
+mkdir($appRoot . '/app/Middlewares', 0775, true);
+mkdir($appRoot . '/config', 0775, true);
+mkdir($appRoot . '/logs', 0775, true);
+
+$app = new Minicli\App($appRoot);
+$result = $app->runCommand(['minicli', 'make']);
+
+echo "\nRESULT={$result}";
+echo "\nEXISTS=" . (file_exists($appRoot . '/app/Commands/FromDefault.php') ? 'yes' : 'no');
+PHP,
+        "1\nFrom Default\n",
+    );
+
+    expect($output)->toContain('Select a make command')
+        ->and($output)->toContain('What should the command class be named?')
+        ->and($output)->toContain('RESULT=0')
+        ->and($output)->toContain('EXISTS=yes');
+});
+
 function makeTempAppRoot(): string
 {
     $appRoot = sys_get_temp_dir() . '/minicli-make-' . bin2hex(random_bytes(8));

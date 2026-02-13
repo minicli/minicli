@@ -18,7 +18,7 @@ final class Input
 
     public function read(): string
     {
-        if (function_exists('readline')) {
+        if (function_exists('readline') && $this->isInteractiveInput()) {
             return $this->storeInput((string) readline($this->prompt));
         }
 
