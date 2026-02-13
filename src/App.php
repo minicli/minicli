@@ -334,7 +334,7 @@ final readonly class App
         $table->addRow(Row::make(['Metric', 'Value'])->bold());
         $table->addRow(Row::make(['Command', $commandName === '' ? 'help' : $commandName]));
         $table->addRow(Row::make(['Exit code', $resultCode === null ? 'exception' : (string) $resultCode]));
-        $table->addRow(Row::make(['Time', number_format($elapsedMilliseconds, 2) . ' ms']));
+        $table->addRow(Row::make(['Time', formatElapsedTime($elapsedMilliseconds)]));
         $table->addRow(Row::make(['Memory delta', formatBytes($memoryDiff)]));
         $table->addRow(Row::make(['Peak memory', formatBytes($peakMemory)]));
         $table->render();

@@ -127,14 +127,21 @@ class Table extends Component
 
             foreach ($rowContent->cells as $cell) {
                 $columnSizes[$columnCount] ??= $minColSize;
-                if ($this->stringWidth($cell->content()) >= $columnSizes[$columnCount]) {
-                    $columnSizes[$columnCount] = $this->stringWidth($cell->content()) + 2;
+                if ($this->visualWidth($cell->content()) > $columnSizes[$columnCount]) {
+                    $columnSizes[$columnCount] = $this->visualWidth($cell->content());
                 }
                 $columnCount++;
             }
         }
 
-        return $columnSizes;
+        if (! $this->withBorders) {
+            return $columnSizes;
+        }
+
+        return array_map(
+            static fn (int $columnSize): int => $columnSize + 2,
+            $columnSizes,
+        );
     }
 
     /**

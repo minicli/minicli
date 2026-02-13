@@ -16,14 +16,17 @@ it('shows profiling stats when profile flag is enabled', function (): void {
     ]);
     $output = (string) ob_get_clean();
 
+    $plainOutput = stripAnsi($output);
+
     expect($result)->toBe(0)
-        ->and($output)->toContain('HELLO ERIKA')
-        ->and($output)->toContain('Command Profile')
-        ->and($output)->toContain('test greet')
-        ->and($output)->toContain('Exit code')
-        ->and($output)->toContain('Time')
-        ->and($output)->toContain('Memory delta')
-        ->and($output)->toContain('Peak memory');
+        ->and($plainOutput)->toContain('HELLO ERIKA')
+        ->and($plainOutput)->toContain('Command Profile')
+        ->and($plainOutput)->toContain('test greet')
+        ->and($plainOutput)->toContain('Exit code')
+        ->and($plainOutput)->toContain('Time')
+        ->and($plainOutput)->toContain(' ms')
+        ->and($plainOutput)->toContain('Memory delta')
+        ->and($plainOutput)->toContain('Peak memory');
 });
 
 it('shows profiling stats even when command throws', function (): void {
@@ -39,8 +42,28 @@ it('shows profiling stats even when command throws', function (): void {
 
     $output = (string) ob_get_clean();
 
-    expect($output)->toContain('Command Profile')
-        ->and($output)->toContain('test explode')
-        ->and($output)->toContain('Exit code')
-        ->and($output)->toContain('exception');
+    $plainOutput = stripAnsi($output);
+
+    expect($plainOutput)->toContain('Command Profile')
+        ->and($plainOutput)->toContain('test explode')
+        ->and($plainOutput)->toContain('Exit code')
+        ->and($plainOutput)->toContain('exception');
 });
+
+it('shows profile time in seconds when above one second', function (): void {
+    $app = getConfiguredApp();
+
+    ob_start();
+    $result = $app->runCommand(['minicli', 'test', 'slow-profile', '--profile']);
+    $output = (string) ob_get_clean();
+    $plainOutput = stripAnsi($output);
+
+    expect($result)->toBe(0)
+        ->and($plainOutput)->toContain('test slow-profile')
+        ->and($plainOutput)->toMatch('/Time\s*\|\s*\d+\.\d{2}\s+s/');
+});
+
+function stripAnsi(string $text): string
+{
+    return (string) preg_replace('/\e\[[\d;]*m/', '', $text);
+}

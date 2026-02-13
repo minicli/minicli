@@ -75,7 +75,21 @@ it('applies row alignment to all cells', function (): void {
 
     $output = $table->output();
 
-    expect($output)->toContain('|  left')
-        ->toContain(' middle ')
-        ->toContain(' right  |');
+    expect($output)->toContain('| left')
+        ->toContain('middle')
+        ->toContain('right |');
+});
+
+it('keeps bordered lines with matching widths for short values', function (): void {
+    Component::setFilter(new SimpleOutputFilter());
+
+    $table = Table::make([
+        Row::make(['A', 'B']),
+        Row::make(['1', '2']),
+    ])->withBorders();
+
+    $lines = array_values(array_filter(explode("\n", trim($table->output()))));
+    $lineLengths = array_map(strlen(...), $lines);
+
+    expect(array_unique($lineLengths))->toHaveCount(1);
 });

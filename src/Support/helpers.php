@@ -70,6 +70,13 @@ function formatBytes(int $bytes): string
     return number_format($size, 2) . ' ' . $units[$unitIndex];
 }
 
+function formatElapsedTime(float $elapsedMilliseconds): string
+{
+    return $elapsedMilliseconds >= 1000
+        ? number_format($elapsedMilliseconds / 1000, 2) . ' s'
+        : number_format($elapsedMilliseconds, 2) . ' ms';
+}
+
 function paddedString(string $tableCell, int $colSize = 5): string
 {
     return mb_str_pad($tableCell, $colSize);

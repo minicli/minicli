@@ -53,4 +53,12 @@ final class TestCommand extends ConsoleCommand
     {
         return 'invalid';
     }
+
+    #[Command(description: 'Sleep for profile output tests')]
+    public function slowProfile(): ExitCode
+    {
+        usleep(1_200_000);
+
+        return ExitCode::Success;
+    }
 }
